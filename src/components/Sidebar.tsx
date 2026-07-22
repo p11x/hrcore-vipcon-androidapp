@@ -30,6 +30,8 @@ import {
   X,
   IdCard,
   Contact,
+  BarChart3,
+  ShieldAlert,
 } from 'lucide-react'
 
 const adminNavItems = [
@@ -46,6 +48,8 @@ const adminNavItems = [
   { icon: Building2, label: 'Clients List', path: '/admin/clients', showDot: false },
   { icon: Calendar, label: 'Calendar Events', path: '/admin/holidays', showDot: true },
   { icon: MessageSquare, label: 'Chat List', path: '/admin/chat', showDot: false },
+  { icon: BarChart3, label: 'Reports', path: '/admin/reports', showDot: false },
+  { icon: ShieldAlert, label: 'Audit Log', path: '/admin/audit', showDot: false },
 ]
 
 const employeeNavItems = [
@@ -134,21 +138,20 @@ export function Sidebar({ onSignOut, isAdmin = false }: { onSignOut?: () => void
       </aside>
 
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-surface border-b border-border-soft z-40 flex items-center justify-between px-4">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-display font-bold text-lg">
-            V
-          </div>
-          <div className="flex flex-col">
-            <span className="font-display font-semibold text-text-hi truncate max-w-[200px]">HR CORE</span>
-            <span className="text-[10px] text-text-mid font-medium truncate max-w-[200px]">By Vepcon Soft Systems</span>
-          </div>
-        </div>
         <button
           onClick={() => setMobileMenuOpen(true)}
-          className="p-2 -mr-2 text-text-mid hover:bg-bg-app rounded-lg focus-ring"
+          className="p-2 -ml-2 text-text-mid hover:bg-bg-app rounded-lg focus-ring"
+          aria-label="Open menu"
         >
           <Menu className="w-6 h-6" />
         </button>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-display font-bold text-lg">
+            V
+          </div>
+          <span className="font-display font-semibold text-text-hi">HR CORE</span>
+        </div>
+        <div className="w-10" /> {/* Spacer to balance the layout */}
       </div>
 
       <AnimatePresence>
