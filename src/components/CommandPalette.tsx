@@ -112,10 +112,10 @@ export function CommandPalette() {
             initial={prefersReduced ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
             animate={prefersReduced ? { opacity: 1 } : { opacity: 1, scale: 1 }}
             exit={prefersReduced ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
-            className="bg-ink-900 border border-hairline rounded-lg w-full max-w-md mx-4 md:mx-4"
+            className="bg-surface border border-border-soft rounded-lg w-full max-w-md mx-4 md:mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 border-b border-hairline">
+            <div className="p-4 border-b border-border-soft">
               <div className="flex items-center gap-2">
                 <Search className="w-4 h-4 text-text-mid" aria-hidden="true" />
                 <input
@@ -123,7 +123,7 @@ export function CommandPalette() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="flex-1 bg-transparent text-text-hi focus:outline-none focus:ring-2 focus:ring-signal rounded"
+                  className="flex-1 bg-transparent text-text-hi focus:outline-none focus:ring-2 focus:ring-primary rounded"
                   placeholder="Jump to..."
                   aria-label="Search commands"
                 />
@@ -137,7 +137,7 @@ export function CommandPalette() {
                   <div
                     key={action.id}
                     className={`px-4 py-2 cursor-pointer font-body focus-ring ${
-                      i === selectedIndex ? 'bg-ink-800' : 'hover:bg-ink-800'
+                      i === selectedIndex ? 'bg-bg-app' : 'hover:bg-bg-app'
                     }`}
                     onClick={() => handleSelect(action.path)}
                     role="option"

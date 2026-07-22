@@ -279,7 +279,7 @@ export function AdminDashboard() {
   const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ value: number }> }) => {
     if (active && payload && payload[0]) {
       return (
-        <div className="bg-bg-surface border border-border-soft rounded px-2 py-1 shadow-lg">
+        <div className="bg-surface border border-border-soft rounded px-2 py-1 shadow-lg">
           <span className="font-mono text-sm text-text-hi">{payload[0].value}</span>
         </div>
       )
@@ -307,12 +307,12 @@ export function AdminDashboard() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setShowSearchResults(true)}
                 placeholder="Search employees..."
-                className="pl-9 pr-4 py-2 rounded-full border border-border-soft bg-bg-surface text-sm focus-ring w-48 md:w-64"
+                className="pl-9 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring w-48 md:w-64"
               />
               {showSearchResults && searchQuery.length > 0 && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowSearchResults(false)} />
-                  <div className="absolute top-full left-0 mt-2 w-full bg-bg-surface border border-border-soft rounded-lg shadow-xl py-2 z-20 max-h-80 overflow-y-auto">
+                  <div className="absolute top-full left-0 mt-2 w-full bg-surface border border-border-soft rounded-lg shadow-xl py-2 z-20 max-h-80 overflow-y-auto">
                     {Object.keys(filteredEmployees).length === 0 ? (
                       <div className="px-4 py-3 text-sm text-text-low text-center">No employees found</div>
                     ) : (
@@ -353,7 +353,7 @@ export function AdminDashboard() {
             <div className="relative">
               <button
                 onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-soft bg-bg-surface text-sm text-text-mid hover:text-text-hi transition-colors focus-ring"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-soft bg-surface text-sm text-text-mid hover:text-text-hi transition-colors focus-ring"
               >
                 <Building className="w-4 h-4 text-primary" />
                 <span className="max-w-[120px] truncate">{selectedCompany || 'Companies'}</span>
@@ -362,7 +362,7 @@ export function AdminDashboard() {
               {companyDropdownOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setCompanyDropdownOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-48 bg-bg-surface border border-border-soft rounded-lg shadow-xl py-1 z-20 font-sans">
+                  <div className="absolute right-0 mt-2 w-48 bg-surface border border-border-soft rounded-lg shadow-xl py-1 z-20 font-sans">
                     <div className="px-3 py-1 text-xs text-text-low font-mono uppercase tracking-wider border-b border-border-soft mb-1 flex justify-between items-center">
                       <span>Added Companies</span>
                       {selectedCompany && (
@@ -409,7 +409,7 @@ export function AdminDashboard() {
               initial={prefersReduced ? { opacity: 1 } : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0 }}
-              className="bg-bg-surface border border-border-soft rounded-xl p-6"
+              className="bg-surface border border-border-soft rounded-xl p-6"
               whileHover={{ y: -2 }}
             >
               <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Employees Info</h3>
@@ -455,7 +455,7 @@ export function AdminDashboard() {
                     initial={prefersReduced ? { opacity: 1 } : { opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    className={`bg-bg-surface border border-border-soft rounded-xl p-4 ${bgOpacity} ${borderClass} border-t-2`}
+                    className={`bg-surface border border-border-soft rounded-xl p-4 ${bgOpacity} ${borderClass} border-t-2`}
                   >
                     <div className="mb-2">
                       <Icon className="w-5 h-5 stroke-[1.75]" style={{ color: tile.color }} />
@@ -471,7 +471,7 @@ export function AdminDashboard() {
               initial={prefersReduced ? { opacity: 1 } : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="bg-bg-surface border border-border-soft rounded-xl p-6"
+              className="bg-surface border border-border-soft rounded-xl p-6"
               whileHover={{ y: -2 }}
             >
               <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Top Companies</h3>
@@ -523,7 +523,7 @@ export function AdminDashboard() {
               initial={prefersReduced ? { opacity: 1 } : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-bg-surface border border-border-soft rounded-xl p-6"
+              className="bg-surface border border-border-soft rounded-xl p-6"
               whileHover={{ y: -2 }}
             >
               <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Upcoming Reviews</h3>
@@ -550,7 +550,7 @@ export function AdminDashboard() {
             initial={prefersReduced ? { opacity: 1 } : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0 }}
-            className="bg-bg-surface border border-border-soft rounded-xl p-4"
+            className="bg-surface border border-border-soft rounded-xl p-4"
             whileHover={{ y: -2 }}
           >
             <div className="flex items-center gap-3 mb-2">
@@ -582,7 +582,7 @@ export function AdminDashboard() {
             initial={prefersReduced ? { opacity: 1 } : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-bg-surface border border-border-soft rounded-xl p-4"
+            className="bg-surface border border-border-soft rounded-xl p-4"
             whileHover={{ y: -2 }}
           >
             <div className="flex items-center gap-3 mb-2">
@@ -609,7 +609,7 @@ export function AdminDashboard() {
             initial={prefersReduced ? { opacity: 1 } : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-bg-surface border border-border-soft rounded-xl p-4"
+            className="bg-surface border border-border-soft rounded-xl p-4"
             whileHover={{ y: -2 }}
           >
             <div className="flex items-center gap-3 mb-2">
@@ -629,7 +629,7 @@ export function AdminDashboard() {
             initial={prefersReduced ? { opacity: 1 } : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-bg-surface border border-border-soft rounded-xl p-4"
+            className="bg-surface border border-border-soft rounded-xl p-4"
             whileHover={{ y: -2 }}
           >
             <div className="flex items-center gap-3 mb-2">

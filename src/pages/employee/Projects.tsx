@@ -63,7 +63,7 @@ export function Projects() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-bg-surface border border-border-soft rounded-xl p-6 cursor-pointer hover:shadow-md transition-shadow"
+              className="bg-surface border border-border-soft rounded-xl p-6 cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => navigate(`/employee/projects/${project.id}`)}
             >
               <div className="w-12 h-12 rounded-xl bg-accent-mint flex items-center justify-center text-white text-xl mb-4">

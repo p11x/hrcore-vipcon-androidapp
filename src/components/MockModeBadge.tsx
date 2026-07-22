@@ -12,7 +12,7 @@ export function MockModeBadge() {
   if (!visible) return null
 
   return (
-    <div className="fixed bottom-2 left-2 z-50 bg-ink-900 border border-hairline rounded px-2 py-1 font-mono text-xs text-warn">
+    <div className="fixed bottom-2 left-2 z-50 bg-surface border border-border-soft rounded px-2 py-1 font-mono text-xs text-accent-amber">
       MOCK MODE
     </div>
   )

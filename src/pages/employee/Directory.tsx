@@ -63,7 +63,7 @@ export function Directory() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search directory..."
-            className="w-full pl-9 pr-4 py-2 rounded-full border border-border-soft bg-bg-surface text-sm focus-ring"
+            className="w-full pl-9 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring"
           />
         </div>
       </div>

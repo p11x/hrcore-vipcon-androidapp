@@ -204,7 +204,7 @@ export function EmployeesView() {
     <PageShell title="Employees View">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <motion.div
-          className="bg-bg-surface border border-border-soft rounded-xl p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Today Time Utilisation</h3>
@@ -233,7 +233,7 @@ export function EmployeesView() {
         </motion.div>
 
         <motion.div
-          className="bg-bg-surface border border-border-soft rounded-xl p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Employees Yearly Status</h3>
@@ -284,7 +284,7 @@ export function EmployeesView() {
         ))}
       </div>
 
-      <div className="bg-bg-surface border border-border-soft rounded-xl p-6 mb-6">
+      <div className="bg-surface border border-border-soft rounded-xl p-6 mb-6">
         <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Recent Activity</h3>
         <div className="space-y-3">
           {recentActivity.map((item) => (
@@ -307,7 +307,7 @@ export function EmployeesView() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search employees..."
-              className="w-full pl-9 pr-4 py-2 bg-bg-surface border border-border-soft rounded-lg text-sm focus-ring text-text-hi"
+              className="w-full pl-9 pr-4 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring text-text-hi"
             />
           </div>
         </div>
@@ -315,7 +315,7 @@ export function EmployeesView() {
           {filteredEmployees.map((emp) => (
             <motion.div
               key={emp.id}
-              className="bg-bg-surface border border-border-soft rounded-xl p-4 cursor-pointer hover:shadow-md transition-shadow"
+              className="bg-surface border border-border-soft rounded-xl p-4 cursor-pointer hover:shadow-md transition-shadow"
               whileHover={{ y: -2 }}
               onClick={() => handleCardClick(emp.id)}
             >

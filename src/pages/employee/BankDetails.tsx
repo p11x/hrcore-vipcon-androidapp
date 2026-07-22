@@ -39,7 +39,7 @@ export function BankDetails() {
       const db = await getDatabase()
       await db.set(`bankDetails/${user.uid}`, data)
       hrToast.success('Bank Details Saved', 'Bank details updated successfully')
-    } catch (error) {
+    } catch {
       hrToast.error('Save Failed', 'Unable to update bank details')
     }
   }

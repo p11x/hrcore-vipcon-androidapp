@@ -133,7 +133,7 @@ export function Reports() {
     <PageShell title="Reports & Analytics">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <motion.div
-          className="bg-ink-900 border border-hairline rounded-lg p-6"
+          className="bg-surface border border-border-soft rounded-lg p-6"
           whileHover={{ y: -2 }}
         >
           <div className="text-text-mid font-body text-sm mb-2">Avg Attendance</div>
@@ -142,7 +142,7 @@ export function Reports() {
         </motion.div>
 
         <motion.div
-          className="bg-ink-900 border border-hairline rounded-lg p-6"
+          className="bg-surface border border-border-soft rounded-lg p-6"
           whileHover={{ y: -2 }}
         >
           <div className="text-text-mid font-body text-sm mb-2">Leave Usage</div>
@@ -151,7 +151,7 @@ export function Reports() {
         </motion.div>
 
         <motion.div
-          className="bg-ink-900 border border-hairline rounded-lg p-6"
+          className="bg-surface border border-border-soft rounded-lg p-6"
           whileHover={{ y: -2 }}
         >
           <div className="text-text-mid font-body text-sm mb-2">Headcount</div>
@@ -162,7 +162,7 @@ export function Reports() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <motion.div
-          className="bg-ink-900 border border-hairline rounded-lg p-6 sm:col-span-2"
+          className="bg-surface border border-border-soft rounded-lg p-6 sm:col-span-2"
           whileHover={{ y: -2 }}
         >
           <h3 className="text-lg font-display font-semibold text-text-hi mb-4">
@@ -192,7 +192,7 @@ export function Reports() {
         </motion.div>
 
         <motion.div
-          className="bg-ink-900 border border-hairline rounded-lg p-6"
+          className="bg-surface border border-border-soft rounded-lg p-6"
           whileHover={{ y: -2 }}
         >
           <h3 className="text-lg font-display font-semibold text-text-hi mb-4">
@@ -217,7 +217,7 @@ export function Reports() {
       </div>
 
       <motion.div
-        className="bg-ink-900 border border-hairline rounded-lg p-6 mt-4"
+        className="bg-surface border border-border-soft rounded-lg p-6 mt-4"
         whileHover={{ y: -2 }}
       >
         <h3 className="text-lg font-display font-semibold text-text-hi mb-4">

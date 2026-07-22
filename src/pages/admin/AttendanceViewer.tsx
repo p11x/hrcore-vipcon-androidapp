@@ -355,7 +355,7 @@ export function AttendanceViewer() {
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-8">
         <div className="flex flex-wrap items-center gap-3">
           {/* Month Selector Buttons */}
-          <div className="flex items-center bg-bg-surface border border-border-soft rounded-lg p-1">
+          <div className="flex items-center bg-surface border border-border-soft rounded-lg p-1">
             <button
               onClick={handlePrevMonth}
               className="p-1.5 rounded-md hover:bg-bg-app text-text-mid hover:text-text-hi transition-colors focus-ring"
@@ -376,7 +376,7 @@ export function AttendanceViewer() {
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(Number(e.target.value))}
-            className="px-3 py-2 bg-bg-surface border border-border-soft rounded-lg text-sm font-medium text-text-hi focus-ring"
+            className="px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm font-medium text-text-hi focus-ring"
           >
             {months.map((m, idx) => (
               <option key={m} value={idx}>{m}</option>
@@ -386,7 +386,7 @@ export function AttendanceViewer() {
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="px-3 py-2 bg-bg-surface border border-border-soft rounded-lg text-sm font-medium text-text-hi focus-ring"
+            className="px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm font-medium text-text-hi focus-ring"
           >
             {years.map(y => (
               <option key={y} value={y}>{y}</option>
@@ -411,7 +411,7 @@ export function AttendanceViewer() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search employee, company..."
-              className="w-full pl-9 pr-4 py-2 bg-bg-surface border border-border-soft rounded-lg text-sm focus-ring text-text-hi"
+              className="w-full pl-9 pr-4 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring text-text-hi"
             />
           </div>
         </div>
@@ -419,7 +419,7 @@ export function AttendanceViewer() {
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-bg-surface border border-border-soft rounded-xl p-5 flex items-center gap-4">
+        <div className="bg-surface border border-border-soft rounded-xl p-5 flex items-center gap-4">
           <div className="p-3 bg-primary/10 text-primary rounded-lg">
             <User className="w-5 h-5" />
           </div>
@@ -429,7 +429,7 @@ export function AttendanceViewer() {
           </div>
         </div>
 
-        <div className="bg-bg-surface border border-border-soft rounded-xl p-5 flex items-center gap-4">
+        <div className="bg-surface border border-border-soft rounded-xl p-5 flex items-center gap-4">
           <div className="p-3 bg-accent-mint/10 text-accent-mint rounded-lg">
             <CheckCircle2 className="w-5 h-5" />
           </div>
@@ -439,7 +439,7 @@ export function AttendanceViewer() {
           </div>
         </div>
 
-        <div className="bg-bg-surface border border-border-soft rounded-xl p-5 flex items-center gap-4">
+        <div className="bg-surface border border-border-soft rounded-xl p-5 flex items-center gap-4">
           <div className="p-3 bg-accent-amber/10 text-accent-amber rounded-lg">
             <Clock3 className="w-5 h-5" />
           </div>
@@ -449,7 +449,7 @@ export function AttendanceViewer() {
           </div>
         </div>
 
-        <div className="bg-bg-surface border border-border-soft rounded-xl p-5 flex items-center gap-4">
+        <div className="bg-surface border border-border-soft rounded-xl p-5 flex items-center gap-4">
           <div className="p-3 bg-purple-500/10 text-purple-400 rounded-lg">
             <Activity className="w-5 h-5" />
           </div>
@@ -476,7 +476,7 @@ export function AttendanceViewer() {
               transition={{ delay: i * 0.05 }}
               whileHover={{ y: -4, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }}
               onClick={() => setSelectedEmployee(emp)}
-              className="bg-bg-surface border border-border-soft rounded-xl p-6 cursor-pointer relative overflow-hidden group transition-all duration-300"
+              className="bg-surface border border-border-soft rounded-xl p-6 cursor-pointer relative overflow-hidden group transition-all duration-300"
             >
               {/* Top Accent Bar based on rate */}
               <div className={`absolute top-0 left-0 right-0 h-1 transition-all ${
@@ -567,7 +567,7 @@ export function AttendanceViewer() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-bg-surface border border-border-soft rounded-2xl w-full max-w-5xl shadow-2xl overflow-hidden"
+              className="bg-surface border border-border-soft rounded-2xl w-full max-w-5xl shadow-2xl overflow-hidden"
             >
               {/* Modal Header */}
               <div className="p-6 border-b border-border-soft flex justify-between items-start bg-bg-app">
@@ -580,7 +580,7 @@ export function AttendanceViewer() {
                     <p className="text-sm text-text-mid mt-0.5">
                       {selectedEmployee.position} • <span className="font-medium">{selectedEmployee.companyName}</span>
                     </p>
-                    <div className="flex items-center gap-2 mt-1.5 text-xs text-text-low font-mono bg-bg-surface px-2.5 py-1 rounded-md border border-border-soft w-fit">
+                    <div className="flex items-center gap-2 mt-1.5 text-xs text-text-low font-mono bg-surface px-2.5 py-1 rounded-md border border-border-soft w-fit">
                       <Calendar className="w-3.5 h-3.5 text-primary" />
                       Editing Attendance for {months[selectedMonth]} {selectedYear}
                     </div>
@@ -592,7 +592,7 @@ export function AttendanceViewer() {
                     setSelectedEmployee(null)
                     setSelectedDay(null)
                   }}
-                  className="p-1.5 rounded-lg bg-bg-surface hover:bg-bg-app text-text-low hover:text-text-hi transition-colors focus-ring"
+                  className="p-1.5 rounded-lg bg-surface hover:bg-bg-app text-text-low hover:text-text-hi transition-colors focus-ring"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -686,7 +686,7 @@ export function AttendanceViewer() {
                         </h3>
                       </div>
 
-                      <div className="bg-bg-surface border border-border-soft rounded-xl p-4 mb-5">
+                      <div className="bg-surface border border-border-soft rounded-xl p-4 mb-5">
                         <div className="text-xs text-text-low font-mono">SELECTED DATE</div>
                         <div className="text-sm font-semibold text-text-hi mt-1">
                           {new Date(selectedDay).toLocaleDateString('en-US', {
@@ -721,7 +721,7 @@ export function AttendanceViewer() {
                                       opt.value === 'late' ? 'bg-purple-500 text-white border-purple-500 shadow-sm' :
                                       opt.value === 'half-day' ? 'bg-accent-amber text-white border-accent-amber shadow-sm' :
                                       'bg-accent-coral text-white border-accent-coral shadow-sm'
-                                    : `bg-bg-surface border-border-soft ${opt.color}`
+                                    : `bg-surface border-border-soft ${opt.color}`
                                 }`}
                               >
                                 {opt.label}
@@ -743,7 +743,7 @@ export function AttendanceViewer() {
                               value={editClockIn}
                               onChange={(e) => setEditClockIn(e.target.value)}
                               placeholder="09:00 AM"
-                              className="w-full px-3 py-2 bg-bg-surface border border-border-soft rounded-lg text-xs font-mono text-text-hi focus-ring"
+                              className="w-full px-3 py-2 bg-surface border border-border-soft rounded-lg text-xs font-mono text-text-hi focus-ring"
                             />
                           </div>
                           <div>
@@ -755,7 +755,7 @@ export function AttendanceViewer() {
                               value={editClockOut}
                               onChange={(e) => setEditClockOut(e.target.value)}
                               placeholder="05:30 PM"
-                              className="w-full px-3 py-2 bg-bg-surface border border-border-soft rounded-lg text-xs font-mono text-text-hi focus-ring"
+                              className="w-full px-3 py-2 bg-surface border border-border-soft rounded-lg text-xs font-mono text-text-hi focus-ring"
                             />
                           </div>
                         </div>
@@ -767,14 +767,14 @@ export function AttendanceViewer() {
                         className={`w-full py-2 border rounded-lg text-xs font-semibold transition-all ${
                           editStatus === 'clear'
                             ? 'bg-text-hi text-bg-surface border-text-hi shadow-inner'
-                            : 'bg-bg-surface border-border-soft text-text-mid hover:text-text-hi hover:border-text-low'
+                            : 'bg-surface border-border-soft text-text-mid hover:text-text-hi hover:border-text-low'
                         }`}
                       >
                         Clear Attendance
                       </button>
                     </div>
                   ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-bg-surface/50 border border-dashed border-border-soft rounded-2xl h-full min-h-[250px]">
+                    <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-surface/50 border border-dashed border-border-soft rounded-2xl h-full min-h-[250px]">
                       <CalendarDays className="w-8 h-8 text-text-low mb-3" />
                       <h4 className="text-sm font-semibold text-text-hi">No Day Selected</h4>
                       <p className="text-xs text-text-mid mt-1 max-w-[200px]">

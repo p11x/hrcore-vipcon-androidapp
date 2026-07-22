@@ -238,7 +238,7 @@ export function ProjectDetail() {
 
       <div className="space-y-4">
         <motion.div
-          className="bg-bg-surface border-l-4 border-accent-mint rounded-xl p-6"
+          className="bg-surface border-l-4 border-accent-mint rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <div className="flex items-center justify-between mb-4">
@@ -286,7 +286,7 @@ export function ProjectDetail() {
         </motion.div>
 
         <motion.div
-          className="bg-bg-surface border-l-4 border-primary rounded-xl p-6"
+          className="bg-surface border-l-4 border-primary rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <div className="flex items-center justify-between mb-4">
@@ -354,7 +354,7 @@ export function ProjectDetail() {
 
       {activeCommentTask && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-bg-surface border border-border-soft rounded-xl w-full max-w-lg mx-4 flex flex-col h-96">
+          <div className="bg-surface border border-border-soft rounded-xl w-full max-w-lg mx-4 flex flex-col h-96">
             <div className="p-4 border-b border-border-soft">
               <div className="font-display font-semibold text-text-hi">Task Clarifications</div>
             </div>
@@ -406,7 +406,7 @@ export function ProjectDetail() {
 
       {showAssignModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-bg-surface border border-border-soft rounded-xl p-6 w-80">
+          <div className="bg-surface border border-border-soft rounded-xl p-6 w-80">
             <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Select Team Member</h3>
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {Object.entries(employees).map(([id, emp]) => (
@@ -434,7 +434,7 @@ export function ProjectDetail() {
 
       {showTaskModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-bg-surface border border-border-soft rounded-xl p-6 w-96">
+          <div className="bg-surface border border-border-soft rounded-xl p-6 w-96">
             <h3 className="text-lg font-display font-semibold text-text-hi mb-4">
               {editingTask ? 'Edit Task' : 'Add Task'}
             </h3>
@@ -453,7 +453,7 @@ export function ProjectDetail() {
 
       {showEditProject && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-bg-surface border border-border-soft rounded-xl p-6 w-96">
+          <div className="bg-surface border border-border-soft rounded-xl p-6 w-96">
             <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Edit Project</h3>
             <EditProjectModal
               project={project}

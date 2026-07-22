@@ -217,7 +217,7 @@ export function Attendance() {
     <PageShell title="Attendance">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <motion.div
-          className="bg-bg-surface border border-border-soft rounded-xl p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <div className="text-center mb-4">
@@ -290,7 +290,7 @@ export function Attendance() {
         </motion.div>
 
         <motion.div
-          className="bg-bg-surface border border-border-soft rounded-xl p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <div className="flex items-center justify-between mb-4">

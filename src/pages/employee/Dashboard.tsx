@@ -602,7 +602,7 @@ export function EmployeeDashboard() {
                 <span className="text-text-hi font-body">Clocked in</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-signal rounded-full" />
+                <div className="w-2 h-2 bg-primary rounded-full" />
                 <span className="text-text-mid font-mono">Yesterday</span>
                 <span className="text-text-hi font-body">Leave applied</span>
               </div>

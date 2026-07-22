@@ -108,7 +108,7 @@ export function Holidays() {
         </button>
       </div>
 
-      <div className="bg-bg-surface border border-border-soft rounded-xl p-6 mb-6">
+      <div className="bg-surface border border-border-soft rounded-xl p-6 mb-6">
         <div className="grid grid-cols-7 gap-2">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
             <div key={d} className="text-center text-text-low font-mono text-xs py-2">
@@ -125,7 +125,7 @@ export function Holidays() {
               <motion.div
                 key={dateStr}
                 className={`aspect-square flex flex-col items-center justify-center rounded-lg border font-mono text-sm relative p-1 ${
-                  isToday ? 'bg-primary-dim' : 'bg-bg-surface border-border-soft'
+                  isToday ? 'bg-primary-dim' : 'bg-surface border-border-soft'
                 }`}
                 whileHover={{ scale: holiday ? 1.05 : 1.02 }}
               >
@@ -139,26 +139,26 @@ export function Holidays() {
         </div>
       </div>
 
-      <div className="bg-bg-surface border border-border-soft rounded-xl p-6">
+      <div className="bg-surface border border-border-soft rounded-xl p-6">
         <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Add Holiday</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <input
             type="date"
             value={holidayDate}
             onChange={(e) => setHolidayDate(e.target.value)}
-            className="px-3 py-2 bg-bg-surface border border-border-soft rounded-lg text-sm focus-ring"
+            className="px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring"
           />
           <input
             type="text"
             value={holidayName}
             onChange={(e) => setHolidayName(e.target.value)}
-            className="px-3 py-2 bg-bg-surface border border-border-soft rounded-lg text-sm focus-ring"
+            className="px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring"
             placeholder="Holiday name"
           />
           <select
             value={holidayType}
             onChange={(e) => setHolidayType(e.target.value as any)}
-            className="px-3 py-2 bg-bg-surface border border-border-soft rounded-lg text-sm focus-ring"
+            className="px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring"
           >
             <option value="national">National</option>
             <option value="optional">Optional</option>

@@ -383,7 +383,7 @@ export function EmployeeProfile() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-bg-surface border border-border-soft rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-surface border border-border-soft rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
           >
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-display font-semibold text-text-hi">Edit Profile</h3>
@@ -505,7 +505,7 @@ export function EmployeeProfile() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-bg-surface border border-border-soft rounded-xl p-6 max-w-sm"
+            className="bg-surface border border-border-soft rounded-xl p-6 max-w-sm"
           >
             <h3 className="text-lg font-semibold text-text-hi mb-4">Delete Employee?</h3>
             <p className="text-text-mid mb-6">
@@ -559,7 +559,7 @@ export function EmployeeProfile() {
 
       <div className="space-y-4">
         <motion.div
-          className="bg-bg-surface border border-border-soft rounded-xl p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Identity</h3>
@@ -578,7 +578,7 @@ export function EmployeeProfile() {
         </motion.div>
 
         <motion.div
-          className="bg-bg-surface border border-border-soft rounded-xl p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <div className="flex justify-between items-center mb-4">
@@ -616,7 +616,7 @@ export function EmployeeProfile() {
         </motion.div>
 
         <motion.div
-          className="bg-bg-surface border border-border-soft rounded-xl p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Education</h3>
@@ -645,7 +645,7 @@ export function EmployeeProfile() {
         </motion.div>
 
         <motion.div
-          className="bg-bg-surface border border-border-soft rounded-xl p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Bank Details</h3>
@@ -674,7 +674,7 @@ export function EmployeeProfile() {
         </motion.div>
 
         <motion.div
-          className="bg-bg-surface border border-border-soft rounded-xl p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Provident Fund</h3>
@@ -687,7 +687,7 @@ export function EmployeeProfile() {
         </motion.div>
 
         <motion.div
-          className="bg-bg-surface border border-border-soft rounded-xl p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Documents</h3>
@@ -730,7 +730,7 @@ export function EmployeeProfile() {
         </motion.div>
 
         <motion.div
-          className="bg-bg-surface border border-border-soft rounded-xl p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Educational Documents</h3>
@@ -773,7 +773,7 @@ export function EmployeeProfile() {
         </motion.div>
 
         <motion.div
-          className="bg-bg-surface border border-border-soft rounded-xl p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
           <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Send to Employee</h3>

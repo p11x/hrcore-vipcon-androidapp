@@ -87,7 +87,7 @@ export function Projects() {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-lg font-medium text-sm ${
-                activeTab === tab ? 'bg-primary text-white' : 'bg-bg-surface border border-border-soft text-text-mid'
+                activeTab === tab ? 'bg-primary text-white' : 'bg-surface border border-border-soft text-text-mid'
               }`}
             >
               {tab}
@@ -111,7 +111,7 @@ export function Projects() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-bg-surface border border-border-soft rounded-xl p-6 cursor-pointer hover:shadow-md transition-shadow"
+            className="bg-surface border border-border-soft rounded-xl p-6 cursor-pointer hover:shadow-md transition-shadow"
             onClick={() => navigate(`/admin/projects/${project.id}`)}
           >
             <div className="w-12 h-12 rounded-xl bg-accent-mint flex items-center justify-center text-white text-xl mb-4">
@@ -153,7 +153,7 @@ export function Projects() {
 
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-bg-surface border border-border-soft rounded-xl p-6 w-96">
+          <div className="bg-surface border border-border-soft rounded-xl p-6 w-96">
             <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Create Project</h3>
             <div className="space-y-4">
               <div>

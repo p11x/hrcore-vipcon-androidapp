@@ -60,9 +60,10 @@ export function Tickets() {
           comments: t.comments || []
         } as Ticket))
           setTickets(ticketList)
-          if (!selectedTicket && ticketList.length > 0) {
-            setSelectedTicket(ticketList[0])
-          }
+          setSelectedTicket(prev => {
+            if (!prev && ticketList.length > 0) return ticketList[0]
+            return prev
+          })
         } else {
           setTickets([])
           setSelectedTicket(null)
@@ -109,7 +110,7 @@ export function Tickets() {
     <PageShell title="Support Tickets">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          <div className="bg-bg-surface border border-border-soft rounded-xl p-4">
+          <div className="bg-surface border border-border-soft rounded-xl p-4">
             <h3 className="font-display font-semibold text-text-hi mb-3">All Tickets</h3>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {tickets.map((ticket) => (
@@ -171,7 +172,7 @@ export function Tickets() {
               <h3 className="text-sm font-medium text-text-low mb-3">Bug Image Attached</h3>
               <div className="flex flex-col gap-2">
                 {(selectedTicket.images || []).map((img) => (
-                  <div key={img.id} className="flex items-center gap-3 p-3 bg-bg-surface border border-border-soft rounded-lg">
+                  <div key={img.id} className="flex items-center gap-3 p-3 bg-surface border border-border-soft rounded-lg">
                     <div className="w-10 h-10 bg-accent-coral rounded-lg flex items-center justify-center text-white">
                       🖼
                     </div>
@@ -199,7 +200,7 @@ export function Tickets() {
               <h3 className="text-sm font-medium text-text-low mb-3">Bug File Attached</h3>
               <div className="flex flex-col gap-2">
                 {(selectedTicket.files || []).map((file) => (
-                  <div key={file.id} className="flex items-center gap-3 p-3 bg-bg-surface border border-border-soft rounded-lg">
+                  <div key={file.id} className="flex items-center gap-3 p-3 bg-surface border border-border-soft rounded-lg">
                     <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
                       📄
                     </div>
@@ -224,7 +225,7 @@ export function Tickets() {
             </div>
           </div>
 
-          <div className="bg-bg-surface border border-border-soft rounded-xl flex flex-col">
+          <div className="bg-surface border border-border-soft rounded-xl flex flex-col">
             <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-64">
               {(selectedTicket.comments || []).map((comment) => (
                 <div key={comment.id} className="flex gap-3">

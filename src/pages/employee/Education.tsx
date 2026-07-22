@@ -76,7 +76,7 @@ export function Education() {
       const db = await getDatabase()
       await db.set(`education/${user.uid}`, data)
       hrToast.success('Education Saved', 'Education details updated successfully')
-    } catch (error) {
+    } catch {
       hrToast.error('Save Failed', 'Unable to update education details')
     }
   }

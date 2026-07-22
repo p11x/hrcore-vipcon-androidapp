@@ -107,7 +107,7 @@ export function ProjectTimesheet() {
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-2">
           <span className="text-sm font-body text-text-mid">Show</span>
-          <select className="px-2 py-1 bg-bg-surface border border-border-soft rounded text-sm focus-ring">
+          <select className="px-2 py-1 bg-surface border border-border-soft rounded text-sm focus-ring">
             <option>10 entries</option>
           </select>
         </div>
@@ -121,7 +121,7 @@ export function ProjectTimesheet() {
         </button>
       </div>
 
-      <div className="bg-bg-surface border border-border-soft rounded-xl overflow-hidden">
+      <div className="bg-surface border border-border-soft rounded-xl overflow-hidden">
         <table className="w-full font-body text-sm">
           <thead className="bg-bg-app">
             <tr>
@@ -187,7 +187,7 @@ export function ProjectTimesheet() {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-bg-surface border border-border-soft rounded-xl p-6 w-full max-w-lg">
+          <div className="bg-surface border border-border-soft rounded-xl p-6 w-full max-w-lg">
             <h3 className="text-lg font-display font-semibold text-text-hi mb-4">
               {editingEntry ? 'Edit Timesheet' : 'Add Timesheet Entry'}
             </h3>

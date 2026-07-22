@@ -253,7 +253,7 @@ export function Leave() {
               <div className="text-text-mid text-sm">Casual</div>
             </div>
             <div>
-              <div className="text-2xl font-mono text-signal">8</div>
+              <div className="text-2xl font-mono text-primary">8</div>
               <div className="text-text-mid text-sm">Sick</div>
             </div>
             <div>

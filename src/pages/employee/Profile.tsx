@@ -58,7 +58,7 @@ export function Profile() {
               address: '',
             })
           }
-        } catch (error: any) {
+        } catch {
           reset({ email: user.email || '' })
         } finally {
           setLoading(false)

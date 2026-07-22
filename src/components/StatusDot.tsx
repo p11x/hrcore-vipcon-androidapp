@@ -15,9 +15,9 @@ export function StatusDot({
   const dotRef = useRef<HTMLDivElement>(null)
 
   const colorMap = {
-    signal: 'bg-signal',
-    pulse: 'bg-pulse',
-    warn: 'bg-warn',
+    signal: 'bg-primary',
+    pulse: 'bg-accent-mint',
+    warn: 'bg-accent-amber',
     neutral: 'bg-text-low',
   }
 

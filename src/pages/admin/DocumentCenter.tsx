@@ -139,10 +139,10 @@ export function DocumentCenter() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search employees..."
-            className="pl-10 pr-4 py-2 rounded-full border border-border-soft bg-bg-surface text-sm focus-ring w-64"
+            className="pl-10 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring w-64"
           />
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-bg-surface border border-border-soft rounded-full">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-border-soft rounded-full">
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-medium">
             <User className="w-4 h-4" />
           </div>
@@ -150,7 +150,7 @@ export function DocumentCenter() {
         </div>
       </div>
 
-      <div className="bg-bg-surface border border-border-soft rounded-xl overflow-hidden">
+      <div className="bg-surface border border-border-soft rounded-xl overflow-hidden">
         <table className="w-full font-body text-sm">
           <thead className="bg-bg-app">
             <tr>

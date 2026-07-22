@@ -53,13 +53,13 @@ export function Setup() {
   if (alreadySetup) return null
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-ink-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-bg-app p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm"
       >
-        <div className="bg-ink-900 border border-hairline rounded-xl p-8">
+        <div className="bg-surface border border-border-soft rounded-xl p-8">
           <div className="flex items-center gap-3 mb-6">
             <StatusDot status="signal" size="lg" />
             <h1 className="text-2xl font-display font-semibold text-text-hi">
@@ -69,7 +69,7 @@ export function Setup() {
 
           {done ? (
             <div>
-              <p className="text-pulse mb-2">Admin account created successfully!</p>
+              <p className="text-accent-mint mb-2">Admin account created successfully!</p>
               <p className="text-text-low text-sm">
                 This route is now disabled. Access /login to continue.
               </p>
@@ -84,7 +84,7 @@ export function Setup() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 bg-ink-800 border border-hairline rounded text-text-hi focus:outline-none focus:border-signal transition-colors focus-ring"
+                  className="w-full px-3 py-2 bg-bg-app border border-border-soft rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring"
                   placeholder="admin@company.com"
                   required
                 />
@@ -98,7 +98,7 @@ export function Setup() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 bg-ink-800 border border-hairline rounded text-text-hi focus:outline-none focus:border-signal transition-colors focus-ring"
+                  className="w-full px-3 py-2 bg-bg-app border border-border-soft rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring"
                   placeholder="••••••••"
                   required
                 />
@@ -107,7 +107,7 @@ export function Setup() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2 px-4 bg-signal text-ink-950 font-medium rounded hover:bg-signal-dim transition-colors disabled:opacity-50 focus-ring"
+                className="w-full py-2 px-4 bg-primary text-white font-medium rounded hover:bg-primary-dim transition-colors disabled:opacity-50 focus-ring"
               >
                 {loading ? 'Creating...' : 'Create Admin'}
               </button>

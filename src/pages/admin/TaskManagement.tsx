@@ -234,7 +234,7 @@ export function TaskManagement() {
         {[{ label: 'To Do', tasks: todoTasks }, { label: 'In Progress', tasks: inProgressTasks }, { label: 'Completed', tasks: completedTasks }].map((column) => (
           <div 
             key={column.label} 
-            className="bg-bg-surface border border-border-soft rounded-xl p-4"
+            className="bg-surface border border-border-soft rounded-xl p-4"
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               e.preventDefault()
@@ -304,7 +304,7 @@ export function TaskManagement() {
 
       {activeCommentTask && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-bg-surface border border-border-soft rounded-xl w-full max-w-lg mx-4 flex flex-col h-96">
+          <div className="bg-surface border border-border-soft rounded-xl w-full max-w-lg mx-4 flex flex-col h-96">
             <div className="p-4 border-b border-border-soft">
               <div className="font-display font-semibold text-text-hi">Task Clarifications</div>
             </div>
@@ -356,7 +356,7 @@ export function TaskManagement() {
 
       {showTaskModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-bg-surface border border-border-soft rounded-xl p-6 w-96">
+          <div className="bg-surface border border-border-soft rounded-xl p-6 w-96">
             <h3 className="text-lg font-display font-semibold text-text-hi mb-4">
               {editingTask ? 'Edit Task' : 'Add Task'}
             </h3>

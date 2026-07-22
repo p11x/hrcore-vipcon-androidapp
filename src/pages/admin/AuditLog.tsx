@@ -24,11 +24,11 @@ export function AuditLog() {
 
   return (
     <PageShell title="Audit Log">
-      <div className="bg-ink-900 border border-hairline rounded-lg divide-y divide-hairline">
+      <div className="bg-surface border border-border-soft rounded-lg divide-y divide-border-soft">
         {[...entries].reverse().map((entry) => (
           <motion.div
             key={entry.id}
-            className="flex items-center gap-3 p-4 hover:bg-ink-800 transition-colors"
+            className="flex items-center gap-3 p-4 hover:bg-bg-app transition-colors"
             whileHover={{ x: 4 }}
           >
             <StatusDot status="pulse" size="sm" />

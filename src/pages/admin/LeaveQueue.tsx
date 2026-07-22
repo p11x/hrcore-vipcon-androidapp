@@ -57,7 +57,7 @@ export function LeaveQueue() {
           <select
             value={showCount}
             onChange={(e) => setShowCount(Number(e.target.value))}
-            className="px-2 py-1 bg-bg-surface border border-border-soft rounded text-sm focus-ring"
+            className="px-2 py-1 bg-surface border border-border-soft rounded text-sm focus-ring"
           >
             <option value={10}>10 entries</option>
             <option value={25}>25 entries</option>
@@ -69,7 +69,7 @@ export function LeaveQueue() {
           <input
             type="search"
             placeholder="Search..."
-            className="pl-9 pr-4 py-2 rounded-full border border-border-soft bg-bg-surface text-sm focus-ring w-48"
+            className="pl-9 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring w-48"
           />
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-low" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -77,7 +77,7 @@ export function LeaveQueue() {
         </div>
       </div>
 
-      <div className="bg-bg-surface border border-border-soft rounded-xl overflow-hidden">
+      <div className="bg-surface border border-border-soft rounded-xl overflow-hidden">
         <table className="w-full font-body text-sm">
           <thead className="bg-bg-app">
             <tr>

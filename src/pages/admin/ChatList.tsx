@@ -154,7 +154,7 @@ export function ChatList() {
   return (
     <PageShell title="Chat List">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-12rem)]">
-        <div className="bg-bg-surface border border-border-soft rounded-xl flex flex-col">
+        <div className="bg-surface border border-border-soft rounded-xl flex flex-col">
           <div className="p-4 border-b border-border-soft flex justify-between items-center">
             <div className="flex gap-2">
               {['Chat', 'Groups', 'Contact'].map((tab) => (
@@ -201,7 +201,7 @@ export function ChatList() {
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-bg-surface border border-border-soft rounded-xl flex flex-col">
+        <div className="lg:col-span-2 bg-surface border border-border-soft rounded-xl flex flex-col">
           {selectedThread ? (
             <>
               <div className="p-4 border-b border-border-soft">
@@ -257,7 +257,7 @@ export function ChatList() {
 
       {showNewChatModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-bg-surface border border-border-soft rounded-xl p-6 w-96 max-h-96 flex flex-col">
+          <div className="bg-surface border border-border-soft rounded-xl p-6 w-96 max-h-96 flex flex-col">
             <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Start New Conversation</h3>
             <div className="relative mb-3">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-mid" />

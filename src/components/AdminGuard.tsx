@@ -12,8 +12,8 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-ink-950 ml-18">
-        <div className="w-16 h-16 border-2 border-hairline border-t-signal rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-bg-app ml-18">
+        <div className="w-16 h-16 border-2 border-border-soft border-t-primary rounded-full animate-spin" />
       </div>
     )
   }

@@ -101,7 +101,7 @@ export function Employees() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search employees..."
-              className="pl-9 pr-4 py-2 rounded-full border border-border-soft bg-bg-surface text-sm focus-ring w-48 md:w-64"
+              className="pl-9 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring w-48 md:w-64"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -109,7 +109,7 @@ export function Employees() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 bg-bg-surface border border-border-soft rounded-lg text-sm focus-ring text-text-hi"
+              className="px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring text-text-hi"
             >
               <option value="All">All</option>
               <option value="Active">Active</option>
@@ -131,7 +131,7 @@ export function Employees() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-bg-surface border border-border-soft rounded-xl p-6 relative group"
+              className="bg-surface border border-border-soft rounded-xl p-6 relative group"
             >
               <div className="absolute top-4 right-4 flex gap-1">
                 <button 

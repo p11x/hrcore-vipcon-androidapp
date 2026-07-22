@@ -40,7 +40,7 @@ const onSubmit = async (_data: AnnouncementFormData) => {}
     <PageShell title="Announcements">
       <div className="max-w-2xl">
         <motion.div
-          className="bg-ink-900 border border-hairline rounded-lg p-6 mb-6"
+          className="bg-surface border border-border-soft rounded-lg p-6 mb-6"
           whileHover={{ y: -2 }}
         >
           <h3 className="text-lg font-display font-semibold text-text-hi mb-4">
@@ -53,11 +53,11 @@ const onSubmit = async (_data: AnnouncementFormData) => {}
               </label>
               <input
                 {...register('title')}
-                className="w-full px-3 py-2 bg-ink-800 border border-hairline rounded text-text-hi focus:outline-none focus:border-signal transition-colors focus-ring"
+                className="w-full px-3 py-2 bg-bg-app border border-border-soft rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring"
                 placeholder="Announcement title"
               />
               {errors.title && (
-                <p className="text-signal text-sm mt-1">{errors.title.message}</p>
+                <p className="text-primary text-sm mt-1">{errors.title.message}</p>
               )}
             </div>
 
@@ -68,18 +68,18 @@ const onSubmit = async (_data: AnnouncementFormData) => {}
               <textarea
                 {...register('content')}
                 rows={3}
-                className="w-full px-3 py-2 bg-ink-800 border border-hairline rounded text-text-hi focus:outline-none focus:border-signal transition-colors focus-ring"
+                className="w-full px-3 py-2 bg-bg-app border border-border-soft rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring"
                 placeholder="Announcement content"
               />
               {errors.content && (
-                <p className="text-signal text-sm mt-1">{errors.content.message}</p>
+                <p className="text-primary text-sm mt-1">{errors.content.message}</p>
               )}
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2 bg-signal text-ink-950 font-medium rounded hover:bg-signal-dim transition-colors disabled:opacity-50 flex items-center gap-2 focus-ring"
+              className="px-6 py-2 bg-primary text-white font-medium rounded hover:bg-primary-dim transition-colors disabled:opacity-50 flex items-center gap-2 focus-ring"
             >
               <Plus className="w-4 h-4" />
               {isSubmitting ? 'Posting...' : 'Post Announcement'}
@@ -96,7 +96,7 @@ const onSubmit = async (_data: AnnouncementFormData) => {}
             announcements.map((a) => (
               <motion.div
                 key={a.id}
-                className="bg-ink-900 border border-hairline rounded-lg p-4"
+                className="bg-surface border border-border-soft rounded-lg p-4"
                 whileHover={{ y: -2 }}
               >
                 <div className="flex items-start gap-3">
@@ -107,8 +107,8 @@ const onSubmit = async (_data: AnnouncementFormData) => {}
                     <div className="text-text-low font-mono text-xs mt-2">{a.createdAt}</div>
                   </div>
                   <span className={`px-2 py-1 rounded text-xs font-mono ${
-                    a.priority === 'high' ? 'text-signal' :
-                    a.priority === 'medium' ? 'text-warn' : 'text-pulse'
+                    a.priority === 'high' ? 'text-primary' :
+                    a.priority === 'medium' ? 'text-accent-amber' : 'text-accent-mint'
                   }`}>
                     {a.priority}
                   </span>

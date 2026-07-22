@@ -101,7 +101,7 @@ export function Clients() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 bg-bg-surface border border-border-soft rounded-lg text-sm focus-ring"
+            className="px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring"
           >
             <option value="All">All</option>
             <option value="Active">Active</option>
@@ -117,7 +117,7 @@ export function Clients() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-bg-surface border border-border-soft rounded-xl p-6 relative"
+            className="bg-surface border border-border-soft rounded-xl p-6 relative"
           >
             <div className="absolute top-4 right-4 flex gap-1">
               <button onClick={() => handleEdit(client)} className="p-1.5 rounded hover:bg-bg-app focus-ring" title="Edit">
@@ -160,7 +160,7 @@ export function Clients() {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-bg-surface border border-border-soft rounded-xl p-6 w-full max-w-md">
+          <div className="bg-surface border border-border-soft rounded-xl p-6 w-full max-w-md">
             <h3 className="text-lg font-display font-semibold text-text-hi mb-4">
               {editingClient ? 'Edit Client' : 'Add Client'}
             </h3>
