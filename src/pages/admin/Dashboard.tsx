@@ -27,7 +27,7 @@ const prefersReduced = typeof window !== 'undefined' && window.matchMedia('(pref
 
 export function AdminDashboard() {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const [documents, setDocuments] = useState<Record<string, Record<string, DocumentStatus>>>({})
   const [unreadNotifications, setUnreadNotifications] = useState(0)
 
@@ -76,6 +76,8 @@ export function AdminDashboard() {
     let unsubNotifications: (() => void) | null = null
 
     getDatabase().then((db: any) => {
+      if (!tenantId) return
+
       if (user?.uid) {
         unsubNotifications = db.onValue(`notifications/${user.uid}`, (snapshot: any) => {
           const data = snapshot.val() as Record<string, any> | undefined
@@ -87,11 +89,11 @@ export function AdminDashboard() {
           }
         })
       }
-      unsubDocs = db.onValue('Documents', (snapshot: any) => {
+      unsubDocs = db.onValue(`tenants/${tenantId}/Documents`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Record<string, DocumentStatus>> | undefined
         if (data) setDocuments(data)
       })
-      unsubProj = db.onValue('projects', (snapshot: any) => {
+      unsubProj = db.onValue(`tenants/${tenantId}/projects`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Project> | undefined
         if (data) {
           setProjects(Object.entries(data).map(([id, p]) => ({ ...p, id, members: p.members || [] })).sort((a, b) => a.daysLeft - b.daysLeft).slice(0, 3))
@@ -99,12 +101,12 @@ export function AdminDashboard() {
           setProjects([])
         }
       })
-      unsubTickets = db.onValue('tickets', (snapshot: any) => {
+      unsubTickets = db.onValue(`tenants/${tenantId}/tickets`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Ticket> | undefined
         if (data) setTickets(Object.values(data))
         else setTickets([])
       })
-      unsubEmps = db.onValue('employees', (snapshot: any) => {
+      unsubEmps = db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, unknown> | undefined
         if (data) {
           setEmployees(data)
@@ -112,12 +114,12 @@ export function AdminDashboard() {
           setEmployees({})
         }
       })
-      unsubAttendance = db.onValue('attendance', (snapshot: any) => {
+      unsubAttendance = db.onValue(`tenants/${tenantId}/attendance`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) setAttendance(data)
         else setAttendance({})
       })
-      unsubLeaves = db.onValue('leaves', (snapshot: any) => {
+      unsubLeaves = db.onValue(`tenants/${tenantId}/leaves`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) setLeaves(data)
         else setLeaves({})
@@ -132,7 +134,7 @@ export function AdminDashboard() {
       if (unsubLeaves) unsubLeaves()
       if (unsubNotifications) unsubNotifications()
     }
-  }, [user?.uid])
+  }, [user?.uid, tenantId])
 
   const employeeTrendData = useMemo(() => {
     const count = Object.keys(dashboardEmployees).length || 7

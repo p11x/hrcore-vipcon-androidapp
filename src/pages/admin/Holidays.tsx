@@ -5,6 +5,7 @@ import { startOfMonth, endOfMonth, eachDayOfInterval, format } from 'date-fns'
 import { useState, useEffect } from 'react'
 import { hrToast } from '../../components/HRCToast'
 import { getDatabase } from '../../firebase/config'
+import { useAuth } from '../../context/AuthContext'
 
 interface HolidayEvent {
   id: string
@@ -14,6 +15,7 @@ interface HolidayEvent {
 }
 
 export function Holidays() {
+  const { tenantId } = useAuth()
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [holidays, setHolidays] = useState<HolidayEvent[]>([])
   const [holidayName, setHolidayName] = useState('')
@@ -21,9 +23,10 @@ export function Holidays() {
   const [holidayType, setHolidayType] = useState<'national' | 'optional' | 'observance'>('national')
 
   useEffect(() => {
+    if (!tenantId) return
     let unsub: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsub = db.onValue('holidays', (snapshot: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/holidays`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Omit<HolidayEvent, 'id'>> | undefined
         if (data) {
           setHolidays(Object.entries(data).map(([id, h]) => ({ ...h, id } as HolidayEvent)))
@@ -33,7 +36,7 @@ export function Holidays() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [])
+  }, [tenantId])
 
   const days = eachDayOfInterval({
     start: startOfMonth(currentMonth),
@@ -56,7 +59,7 @@ export function Holidays() {
   }
 
   const handleAddHoliday = async () => {
-    if (!holidayDate || !holidayName.trim()) return
+    if (!holidayDate || !holidayName.trim() || !tenantId) return
     const db = await getDatabase()
     const newHoliday: HolidayEvent = {
       id: `hol-${Date.now()}`,
@@ -64,7 +67,7 @@ export function Holidays() {
       name: holidayName,
       type: holidayType,
     }
-    await (db as any).set(`holidays/${newHoliday.id}`, newHoliday)
+    await (db as any).set(`tenants/${tenantId}/holidays/${newHoliday.id}`, newHoliday)
     hrToast.success('Holiday Added', 'Holiday event created successfully')
     setHolidayName('')
     setHolidayDate('')

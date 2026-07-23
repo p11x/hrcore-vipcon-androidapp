@@ -84,7 +84,15 @@ export const announcementSchema = z.object({
   priority: z.enum(['low', 'medium', 'high']).optional(),
 })
 
+export const registrationSchema = z.object({
+  fullName: z.string().min(1, 'Full name is required'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  organizationName: z.string().min(1, 'Organization name is required'),
+})
+
 export type LoginFormData = z.infer<typeof loginSchema>
+export type RegistrationFormData = z.infer<typeof registrationSchema>
 export type PersonalDetailsFormData = z.infer<typeof personalDetailsSchema>
 export type EducationFormData = z.infer<typeof educationSchema>
 export type BankDetailsFormData = z.infer<typeof bankDetailsSchema>

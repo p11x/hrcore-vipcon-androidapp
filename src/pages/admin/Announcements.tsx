@@ -5,6 +5,10 @@ import { announcementSchema } from '../../lib/validators'
 import type { AnnouncementFormData } from '../../lib/validators'
 import { motion } from 'framer-motion'
 import { Plus, Megaphone } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
+import { useState, useEffect } from 'react'
+import { getDatabase } from '../../firebase/config'
+import { hrToast } from '../../components/HRCToast'
 
 const useMock = import.meta.env.VITE_USE_MOCK === 'true'
 
@@ -17,24 +21,49 @@ interface Announcement {
 }
 
 export function Announcements() {
+  const { tenantId } = useAuth()
+  const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<AnnouncementFormData>({
     resolver: zodResolver(announcementSchema),
   })
 
-  const announcements: Announcement[] = useMock
-    ? [
-        { id: 'ann-001', title: 'Office Closure', content: 'Dec 25th is a holiday', priority: 'high', createdAt: '2024-01-10' },
-        { id: 'ann-002', title: 'Team Lunch', content: 'Friday team lunch at 1pm', priority: 'medium', createdAt: '2024-01-05' },
-      ]
-    : [
-        { id: '1', title: 'Office Closure', content: 'Dec 25th is a holiday', priority: 'high', createdAt: '2024-01-10' },
-      ]
+  useEffect(() => {
+    if (!tenantId) return
+    let unsub: (() => void) | null = null
+    getDatabase().then((db: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/announcements`, (snapshot: any) => {
+        const data = snapshot.val()
+        if (data) {
+          setAnnouncements(Object.entries(data).map(([id, ann]: [string, any]) => ({ ...ann, id } as Announcement)))
+        } else {
+          setAnnouncements([])
+        }
+      })
+    })
+    return () => { if (unsub) unsub() }
+  }, [tenantId])
 
-const onSubmit = async (_data: AnnouncementFormData) => {}
+  const onSubmit = async (data: AnnouncementFormData) => {
+    if (!tenantId) return
+    try {
+      const db = await getDatabase()
+      const annId = `ann-${Date.now()}`
+      const newAnn = {
+        ...data,
+        createdAt: new Date().toISOString().split('T')[0]
+      }
+      await (db as any).set(`tenants/${tenantId}/announcements/${annId}`, newAnn)
+      hrToast.success('Announcement Posted', 'Successfully added to your organization')
+      reset()
+    } catch (e: any) {
+      hrToast.error('Post Failed', e.message)
+    }
+  }
 
   return (
     <PageShell title="Announcements">

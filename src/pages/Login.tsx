@@ -1,37 +1,35 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { loginSchema } from '../lib/validators'
-import type { LoginFormData } from '../lib/validators'
+import { loginSchema, registrationSchema } from '../lib/validators'
+import type { LoginFormData, RegistrationFormData } from '../lib/validators'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
+type Mode = 'login' | 'register'
 
 export function Login() {
-  const { signIn, user, isAdmin, loading } = useAuth()
+  const { signIn, registerAdmin, user, isAdmin, loading } = useAuth()
   const navigate = useNavigate()
+  const [mode, setMode] = useState<Mode>('login')
 
   const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
+    register: registerLogin,
+    handleSubmit: handleSubmitLogin,
+    formState: { errors: loginErrors, isSubmitting: isLoggingIn },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
 
-  useEffect(() => {
-    const checkSetup = async () => {
-      const { getDatabase } = await import('../firebase/config')
-      const database = await getDatabase()
-      const snap = await (database as any).get('Config/setupComplete')
-      if (!snap.exists()) {
-        navigate('/setup', { replace: true })
-      }
-    }
-    checkSetup()
-  }, [navigate])
+  const {
+    register: registerReg,
+    handleSubmit: handleSubmitReg,
+    formState: { errors: regErrors, isSubmitting: isRegistering },
+  } = useForm<RegistrationFormData>({
+    resolver: zodResolver(registrationSchema),
+  })
 
   useEffect(() => {
     if (user && !loading) {
@@ -43,95 +41,202 @@ export function Login() {
     }
   }, [user, isAdmin, navigate, loading])
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onLoginSubmit = async (data: LoginFormData) => {
     try {
       await signIn(data.email, data.password)
-      toast.success('Welcome back', {
-        style: {
-          background: '#FFFFFF',
-          border: '1px solid #EAEBF3',
-          color: '#1E1B2E',
-        },
-      })
+      toast.success('Welcome back')
     } catch (error: any) {
       console.error('Login error:', error)
-      const msg = error?.message || error?.code || 'Invalid credentials'
-      toast.error(msg, {
-        style: {
-          background: '#FFFFFF',
-          border: '1px solid #EAEBF3',
-          color: '#1E1B2E',
-        },
-      })
+      toast.error(error?.message || 'Invalid credentials')
+    }
+  }
+
+  const onRegisterSubmit = async (data: RegistrationFormData) => {
+    try {
+      await registerAdmin(data.email, data.password, data.fullName, data.organizationName)
+      toast.success('Registration successful! Welcome.')
+    } catch (error: any) {
+      console.error('Registration error:', error)
+      toast.error(error?.message || 'Failed to register organization')
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#F5F6FB' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-bg-app">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="w-full max-w-sm"
+        className="w-full max-w-md"
       >
-        <div className="bg-white border rounded-[16px] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6" style={{ borderColor: '#EAEBF3' }}>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-display font-bold text-lg">
+        <div className="bg-surface border border-border-soft rounded-2xl shadow-sm p-8">
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white font-display font-bold text-2xl mb-4 shadow-lg shadow-primary/20">
               V
             </div>
-            <div className="flex flex-col">
-              <h1 className="text-2xl font-display font-semibold text-text-hi">
-                HR CORE
-              </h1>
-              <span className="text-xs text-text-mid font-medium">By Vepcon Soft Systems</span>
-            </div>
+            <h1 className="text-3xl font-display font-bold text-text-hi">
+              HR CORE
+            </h1>
+            <p className="text-sm text-text-mid mt-1 font-medium">Multi-Tenant Workforce Management</p>
           </div>
 
-
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-text-mid mb-2">
-                Email
-              </label>
-              <input
-                {...register('email')}
-                type="email"
-                className="w-full px-3 py-2 bg-white border rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring"
-                style={{ borderColor: '#EAEBF3' }}
-                placeholder="you@company.com"
-                disabled={isSubmitting}
-              />
-              {errors.email && (
-                <p className="text-accent-coral text-sm mt-1">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text-mid mb-2">
-                Password
-              </label>
-              <input
-                {...register('password')}
-                type="password"
-                className="w-full px-3 py-2 bg-white border rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring"
-                style={{ borderColor: '#EAEBF3' }}
-                placeholder="••••••••"
-                disabled={isSubmitting}
-              />
-              {errors.password && (
-                <p className="text-accent-coral text-sm mt-1">{errors.password.message}</p>
-              )}
-            </div>
-
+          <div className="flex p-1 bg-bg-app rounded-lg mb-8">
             <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-2 px-4 bg-primary text-white font-medium rounded hover:bg-primary/90 transition-colors disabled:opacity-50 focus-ring"
+              onClick={() => setMode('login')}
+              className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${
+                mode === 'login'
+                  ? 'bg-white text-primary shadow-sm'
+                  : 'text-text-mid hover:text-text-hi'
+              }`}
             >
-              {isSubmitting ? 'Signing in...' : 'Sign In'}
+              Login
             </button>
-          </form>
+            <button
+              onClick={() => setMode('register')}
+              className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${
+                mode === 'register'
+                  ? 'bg-white text-primary shadow-sm'
+                  : 'text-text-mid hover:text-text-hi'
+              }`}
+            >
+              Register
+            </button>
+          </div>
+
+          <AnimatePresence mode="wait">
+            {mode === 'login' ? (
+              <motion.form
+                key="login"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                onSubmit={handleSubmitLogin(onLoginSubmit)}
+                className="space-y-5"
+              >
+                <div>
+                  <label className="block text-xs font-bold text-text-low uppercase tracking-wider mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    {...registerLogin('email')}
+                    type="email"
+                    className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                    placeholder="you@company.com"
+                    disabled={isLoggingIn}
+                  />
+                  {loginErrors.email && (
+                    <p className="text-accent-coral text-xs mt-1.5 ml-1">{loginErrors.email.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-text-low uppercase tracking-wider mb-2">
+                    Password
+                  </label>
+                  <input
+                    {...registerLogin('password')}
+                    type="password"
+                    className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                    placeholder="••••••••"
+                    disabled={isLoggingIn}
+                  />
+                  {loginErrors.password && (
+                    <p className="text-accent-coral text-xs mt-1.5 ml-1">{loginErrors.password.message}</p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoggingIn}
+                  className="w-full py-3 px-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 shadow-lg shadow-primary/25 active:scale-[0.98]"
+                >
+                  {isLoggingIn ? 'Verifying...' : 'Sign In'}
+                </button>
+              </motion.form>
+            ) : (
+              <motion.form
+                key="register"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                onSubmit={handleSubmitReg(onRegisterSubmit)}
+                className="space-y-4"
+              >
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-text-low uppercase tracking-wider mb-2">
+                      Full Name
+                    </label>
+                    <input
+                      {...registerReg('fullName')}
+                      className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all"
+                      placeholder="John Doe"
+                      disabled={isRegistering}
+                    />
+                    {regErrors.fullName && (
+                      <p className="text-accent-coral text-xs mt-1">{regErrors.fullName.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-low uppercase tracking-wider mb-2">
+                      Organization Name
+                    </label>
+                    <input
+                      {...registerReg('organizationName')}
+                      className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all"
+                      placeholder="Acme Corp"
+                      disabled={isRegistering}
+                    />
+                    {regErrors.organizationName && (
+                      <p className="text-accent-coral text-xs mt-1">{regErrors.organizationName.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-text-low uppercase tracking-wider mb-2">
+                    Work Email
+                  </label>
+                  <input
+                    {...registerReg('email')}
+                    type="email"
+                    className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all"
+                    placeholder="admin@company.com"
+                    disabled={isRegistering}
+                  />
+                  {regErrors.email && (
+                    <p className="text-accent-coral text-xs mt-1">{regErrors.email.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-text-low uppercase tracking-wider mb-2">
+                    Password
+                  </label>
+                  <input
+                    {...registerReg('password')}
+                    type="password"
+                    className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all"
+                    placeholder="Min 6 characters"
+                    disabled={isRegistering}
+                  />
+                  {regErrors.password && (
+                    <p className="text-accent-coral text-xs mt-1">{regErrors.password.message}</p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isRegistering}
+                  className="w-full py-3 px-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 shadow-lg shadow-primary/25 active:scale-[0.98] mt-2"
+                >
+                  {isRegistering ? 'Creating Workspace...' : 'Create Admin Account'}
+                </button>
+                <p className="text-[11px] text-text-low text-center mt-4">
+                  By registering, you agree to our Terms of Service and Privacy Policy.
+                </p>
+              </motion.form>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
     </div>

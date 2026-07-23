@@ -3,6 +3,7 @@ import { MonoStat } from '../../components/MonoStat'
 import { motion } from 'framer-motion'
 import { useState, useEffect, useMemo } from 'react'
 import { getDatabase } from '../../firebase/config'
+import { useAuth } from '../../context/AuthContext'
 import {
   AreaChart,
   Area,
@@ -35,27 +36,29 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export function Reports() {
+  const { tenantId } = useAuth()
   const [employees, setEmployees] = useState<Record<string, any>>({})
   const [attendance, setAttendance] = useState<Record<string, any>>({})
   const [leaves, setLeaves] = useState<Record<string, any>>({})
 
   useEffect(() => {
+    if (!tenantId) return
     let unsubEmps: (() => void) | null = null
     let unsubAttendance: (() => void) | null = null
     let unsubLeaves: (() => void) | null = null
 
     getDatabase().then((db: any) => {
-      unsubEmps = db.onValue('employees', (snapshot: any) => {
+      unsubEmps = db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) setEmployees(data)
         else setEmployees({})
       })
-      unsubAttendance = db.onValue('attendance', (snapshot: any) => {
+      unsubAttendance = db.onValue(`tenants/${tenantId}/attendance`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) setAttendance(data)
         else setAttendance({})
       })
-      unsubLeaves = db.onValue('leaves', (snapshot: any) => {
+      unsubLeaves = db.onValue(`tenants/${tenantId}/leaves`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) setLeaves(data)
         else setLeaves({})
@@ -67,7 +70,7 @@ export function Reports() {
       if (unsubAttendance) unsubAttendance()
       if (unsubLeaves) unsubLeaves()
     }
-  }, [])
+  }, [tenantId])
 
   const empCount = useMemo(() => Object.keys(employees).length, [employees])
 

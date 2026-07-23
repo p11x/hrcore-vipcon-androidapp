@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useState } from 'react'
 import { hrToast } from '../../components/HRCToast'
+import { useAuth } from '../../context/AuthContext'
 
 const addEmployeeSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -34,6 +35,7 @@ type AddEmployeeFormData = z.infer<typeof addEmployeeSchema>
 
 export function AddEmployee() {
   const [loading, setLoading] = useState(false)
+  const { tenantId } = useAuth()
   const {
     register,
     handleSubmit,
@@ -59,6 +61,10 @@ export function AddEmployee() {
   const isPasswordDirty = passwordValue.length > 0;
 
   const onSubmit = async (data: AddEmployeeFormData) => {
+    if (!tenantId) {
+      hrToast.error('Error', 'Missing Organization context. Please logout and login again.')
+      return
+    }
     setLoading(true)
     try {
       const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
@@ -94,15 +100,18 @@ export function AddEmployee() {
         fullName: data.name,
         companyName: finalCompanyName,
         position: data.position,
-        role: data.role
+        role: data.role,
+        tenantId: tenantId
       })
       
       // The admin writes to the company employee directory
-      await (primaryDb as any).set(`employees/${uid}`, {
+      await (primaryDb as any).set(`tenants/${tenantId}/employees/${uid}`, {
         name: data.name,
+        email: data.email,
         companyName: finalCompanyName,
         position: data.position,
         role: data.role,
+        tenantId: tenantId
       })
       
       hrToast.success('Employee Created', `${data.name} has been added successfully`)

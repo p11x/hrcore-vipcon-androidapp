@@ -1,6 +1,9 @@
 import { PageShell } from '../../components/PageShell'
 import { StatusDot } from '../../components/StatusDot'
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { getDatabase } from '../../firebase/config'
+import { useAuth } from '../../context/AuthContext'
 
 interface AuditEntry {
   id: string
@@ -10,7 +13,24 @@ interface AuditEntry {
 }
 
 export function AuditLog() {
-  const entries: AuditEntry[] = []
+  const { tenantId } = useAuth()
+  const [entries, setEntries] = useState<AuditEntry[]>([])
+
+  useEffect(() => {
+    if (!tenantId) return
+    let unsub: (() => void) | null = null
+    getDatabase().then((db: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/auditLog`, (snapshot: any) => {
+        const data = snapshot.val()
+        if (data) {
+          setEntries(Object.entries(data).map(([id, entry]: [string, any]) => ({ ...entry, id } as AuditEntry)))
+        } else {
+          setEntries([])
+        }
+      })
+    })
+    return () => { if (unsub) unsub() }
+  }, [tenantId])
 
   if (entries.length === 0) {
     return (

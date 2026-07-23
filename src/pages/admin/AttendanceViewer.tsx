@@ -3,6 +3,7 @@ import { PageShell } from '../../components/PageShell'
 import { getDatabase } from '../../firebase/config'
 import { hrToast } from '../../components/HRCToast'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAuth } from '../../context/AuthContext'
 import {
   Calendar,
   User,
@@ -75,6 +76,7 @@ const generateMockAttendanceForMonth = (employeeId: string, year: number, month:
 }
 
 export function AttendanceViewer() {
+  const { tenantId } = useAuth()
   const [employees, setEmployees] = useState<Employee[]>([])
   const [attendanceDb, setAttendanceDb] = useState<AllAttendanceRecords>({})
   const [searchQuery, setSearchQuery] = useState('')
@@ -92,12 +94,13 @@ export function AttendanceViewer() {
 
   // Real-time listener for database
   useEffect(() => {
+    if (!tenantId) return
     let unsubEmp: (() => void) | null = null
     let unsubAtt: (() => void) | null = null
 
     getDatabase().then((db: any) => {
       // 1. Listen to employees
-      unsubEmp = db.onValue('employees', (snapshot: any) => {
+      unsubEmp = db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) {
           const loaded: Employee[] = Object.entries(data).map(([id, emp]: [string, any]) => ({
@@ -114,7 +117,7 @@ export function AttendanceViewer() {
       })
 
       // 2. Listen to attendance
-      unsubAtt = db.onValue('attendance', (snapshot: any) => {
+      unsubAtt = db.onValue(`tenants/${tenantId}/attendance`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) {
           setAttendanceDb(data as AllAttendanceRecords)
@@ -128,7 +131,7 @@ export function AttendanceViewer() {
       if (unsubEmp) unsubEmp()
       if (unsubAtt) unsubAtt()
     }
-  }, [])
+  }, [tenantId])
 
   // Helper to obtain attendance for an employee and specific day, merging mock data
   const getDayRecord = useCallback((employeeId: string, dateStr: string): AttendanceDayRecord | undefined => {
@@ -217,7 +220,7 @@ export function AttendanceViewer() {
         const empAttendance = attendanceDb[emp.id] || {}
         const todayRecord = empAttendance[today]
         if (todayRecord && (todayRecord.status === 'present' || todayRecord.status === 'late' || todayRecord.status === 'half-day') && !todayRecord.clockOut) {
-          updates[`attendance/${emp.id}/${today}/clockOut`] = '18:00'
+          updates[`tenants/${tenantId}/attendance/${emp.id}/${today}/clockOut`] = '18:00'
           count++
         }
       })
@@ -270,11 +273,11 @@ export function AttendanceViewer() {
 
   // Save the attendance modification back to real database
   const handleSaveAttendance = async () => {
-    if (!selectedEmployee || !selectedDay) return
+    if (!selectedEmployee || !selectedDay || !tenantId) return
 
     try {
       const db = await getDatabase()
-      const path = `attendance/${selectedEmployee.id}/${selectedDay}`
+      const path = `tenants/${tenantId}/attendance/${selectedEmployee.id}/${selectedDay}`
       
       if (editStatus === 'clear') {
         await db.remove(path)

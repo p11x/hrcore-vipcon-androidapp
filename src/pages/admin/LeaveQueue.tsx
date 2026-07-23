@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { hrToast } from '../../components/HRCToast'
 import { getDatabase } from '../../firebase/config'
+import { useAuth } from '../../context/AuthContext'
 
 interface LeaveRequest {
   id: string
@@ -17,13 +18,15 @@ interface LeaveRequest {
 }
 
 export function LeaveQueue() {
+  const { tenantId } = useAuth()
   const [showCount, setShowCount] = useState(10)
   const [leaves, setLeaves] = useState<LeaveRequest[]>([])
 
   useEffect(() => {
+    if (!tenantId) return
     let unsub: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsub = db.onValue('leaves', (snapshot: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/leaves`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Omit<LeaveRequest, 'id'>> | undefined
         if (data) {
           const pending = Object.entries(data)
@@ -39,10 +42,11 @@ export function LeaveQueue() {
   }, [])
 
   const handleAction = async (id: string, action: 'approve' | 'reject') => {
+    if (!tenantId) return
     try {
       const db = await getDatabase()
       const status = action === 'approve' ? 'approved' : 'rejected'
-      await (db as any).set(`leaves/${id}/status`, status)
+      await (db as any).set(`tenants/${tenantId}/leaves/${id}/status`, status)
       hrToast.success(action === 'approve' ? 'Approved' : 'Rejected', `Leave request ${action}ed successfully`)
     } catch (e) {
       hrToast.error('Action Failed', (e as Error).message)

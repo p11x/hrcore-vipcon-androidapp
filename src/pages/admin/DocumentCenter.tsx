@@ -2,6 +2,7 @@ import { PageShell } from '../../components/PageShell'
 import { Eye, Download, Search, User } from 'lucide-react'
 import { useState, useEffect, useMemo } from 'react'
 import { getDatabase } from '../../firebase/config'
+import { useAuth } from '../../context/AuthContext'
 
 interface DocumentStatus {
   uploaded: boolean
@@ -38,20 +39,22 @@ const docTypes = [
 ]
 
 export function DocumentCenter() {
+  const { tenantId } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [docsData, setDocsData] = useState<Record<string, any> | null>(null)
   const [empData, setEmpData] = useState<Record<string, any> | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!tenantId) return
     let unsubDocs: (() => void) | null = null
     let unsubEmp: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsubDocs = db.onValue('Documents', (snapshot: any) => {
+      unsubDocs = db.onValue(`tenants/${tenantId}/Documents`, (snapshot: any) => {
         setDocsData(snapshot.val() || {})
       })
 
-      unsubEmp = db.onValue('employees', (empSnap: any) => {
+      unsubEmp = db.onValue(`tenants/${tenantId}/employees`, (empSnap: any) => {
         setEmpData(empSnap.val() || {})
       })
     })
@@ -60,7 +63,7 @@ export function DocumentCenter() {
       if (unsubDocs) unsubDocs()
       if (unsubEmp) unsubEmp()
     }
-  }, [])
+  }, [tenantId])
 
   useEffect(() => {
     if (docsData !== null && empData !== null) {

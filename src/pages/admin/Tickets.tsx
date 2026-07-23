@@ -3,6 +3,7 @@ import { Send } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { hrToast } from '../../components/HRCToast'
 import { getDatabase } from '../../firebase/config'
+import { useAuth } from '../../context/AuthContext'
 
 interface Attachment {
   id: string
@@ -42,14 +43,16 @@ const handleDownload = (url?: string, filename?: string) => {
 }
 
 export function Tickets() {
+  const { tenantId } = useAuth()
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
   const [newComment, setNewComment] = useState('')
 
   useEffect(() => {
+    if (!tenantId) return
     let unsub: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsub = db.onValue('tickets', (snapshot: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/tickets`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Omit<Ticket, 'id'>> | undefined
         if (data) {
           const ticketList = Object.entries(data).map(([id, t]) => ({
@@ -74,13 +77,14 @@ export function Tickets() {
   }, [])
 
   const handleStatusChange = async (ticketId: string, status: 'open' | 'in-progress' | 'resolved') => {
+    if (!tenantId) return
     const db = await getDatabase()
-    await (db as any).set(`tickets/${ticketId}/status`, status)
+    await (db as any).set(`tenants/${tenantId}/tickets/${ticketId}/status`, status)
     hrToast.success('Status Updated', `Ticket status changed to ${status}`)
   }
 
   const handleSendComment = async (ticketId: string) => {
-    if (!newComment.trim()) return
+    if (!newComment.trim() || !tenantId) return
     const db = await getDatabase()
     const comment: Comment = {
       id: `cmt-${Date.now()}`,
@@ -92,7 +96,7 @@ export function Tickets() {
     const ticket = tickets.find(t => t.id === ticketId)
     if (ticket) {
       const updatedComments = [...ticket.comments, comment]
-      await (db as any).set(`tickets/${ticketId}/comments`, updatedComments)
+      await (db as any).set(`tenants/${tenantId}/tickets/${ticketId}/comments`, updatedComments)
       setNewComment('')
       hrToast.success('Reply Sent', 'Your reply has been sent')
     }

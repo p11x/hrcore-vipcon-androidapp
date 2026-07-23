@@ -4,6 +4,7 @@ import { Plus, Edit, Trash2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { hrToast } from '../../components/HRCToast'
 import { getDatabase } from '../../firebase/config'
+import { useAuth } from '../../context/AuthContext'
 
 interface TimesheetEntry {
   id: string
@@ -20,6 +21,7 @@ interface TimesheetEntry {
 }
 
 export function ProjectTimesheet() {
+  const { tenantId } = useAuth()
   const [timesheets, setTimesheets] = useState<TimesheetEntry[]>([])
   const [showModal, setShowModal] = useState(false)
   const [editingEntry, setEditingEntry] = useState<TimesheetEntry | null>(null)
@@ -36,9 +38,10 @@ export function ProjectTimesheet() {
   })
 
   useEffect(() => {
+    if (!tenantId) return
     let unsub: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsub = db.onValue('timesheets', (snapshot: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/timesheets`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Omit<TimesheetEntry, 'id'>> | undefined
         if (data) {
           setTimesheets(Object.entries(data).map(([id, ts]) => ({ ...ts, id } as TimesheetEntry)))
@@ -48,7 +51,7 @@ export function ProjectTimesheet() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [])
+  }, [tenantId])
 
   const calculateTotal = (data: typeof formData) => {
     const totalMinutes = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].reduce((sum, day) => {
@@ -61,6 +64,7 @@ export function ProjectTimesheet() {
   }
 
   const handleSaveEntry = async () => {
+    if (!tenantId) return
     const db = await getDatabase()
     const entry = {
       ...formData,
@@ -68,11 +72,11 @@ export function ProjectTimesheet() {
     }
 
     if (editingEntry) {
-      await (db as any).set(`timesheets/${editingEntry.id}`, entry)
+      await (db as any).set(`tenants/${tenantId}/timesheets/${editingEntry.id}`, entry)
       hrToast.success('Timesheet Updated', 'Timesheet entry updated')
     } else {
       const newEntry = { ...entry, id: `ts-${Date.now()}` }
-      await (db as any).set(`timesheets/${newEntry.id}`, newEntry)
+      await (db as any).set(`tenants/${tenantId}/timesheets/${newEntry.id}`, newEntry)
       hrToast.success('Timesheet Added', 'New timesheet entry created')
     }
     setShowModal(false)
@@ -97,8 +101,9 @@ export function ProjectTimesheet() {
   }
 
   const handleDelete = async (id: string) => {
+    if (!tenantId) return
     const db = await getDatabase()
-    await (db as any).remove(`timesheets/${id}`)
+    await (db as any).remove(`tenants/${tenantId}/timesheets/${id}`)
     hrToast.success('Timesheet Deleted', 'Entry removed successfully')
   }
 

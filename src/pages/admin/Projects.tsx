@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getDatabase } from '../../firebase/config'
 import { hrToast } from '../../components/HRCToast'
+import { useAuth } from '../../context/AuthContext'
 
 interface Project {
   id: string
@@ -21,6 +22,7 @@ interface Project {
 const statusTabs = ['All', 'Started', 'Approval', 'Completed']
 
 export function Projects() {
+  const { tenantId } = useAuth()
   const [activeTab, setActiveTab] = useState('All')
   const [projects, setProjects] = useState<Project[]>([])
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -33,9 +35,10 @@ export function Projects() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    if (!tenantId) return
     let unsub: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsub = db.onValue('projects', (snapshot: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/projects`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Project> | undefined
         if (data) {
           setProjects(Object.entries(data).map(([id, p]) => ({ ...p, id, members: p.members || [] })))
@@ -45,11 +48,12 @@ export function Projects() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [])
+  }, [tenantId])
 
   const filteredProjects = projects.filter((p) => activeTab === 'All' || p.status === activeTab)
 
   const handleCreateProject = async () => {
+    if (!tenantId) return
     setCreateLoading(true)
     try {
       const db = await getDatabase()
@@ -65,7 +69,7 @@ export function Projects() {
         attachments: 0,
         comments: 0,
       }
-      await (db as any).set(`projects/${projectId}`, projectData)
+      await (db as any).set(`tenants/${tenantId}/projects/${projectId}`, projectData)
       hrToast.success('Project Created', `${newProject.name} has been added`)
       setShowCreateModal(false)
       setNewProject({ name: '', category: 'Web Dev', description: '' })

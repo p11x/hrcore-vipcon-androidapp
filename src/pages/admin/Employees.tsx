@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { hrToast } from '../../components/HRCToast'
 import { useNavigate } from 'react-router-dom'
 import { getDatabase } from '../../firebase/config'
+import { useAuth } from '../../context/AuthContext'
 
 interface Employee {
   id: string
@@ -18,6 +19,7 @@ interface Employee {
 }
 
 export function Employees() {
+  const { tenantId } = useAuth()
   const [statusFilter, setStatusFilter] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [employees, setEmployees] = useState<Employee[]>([])
@@ -25,10 +27,11 @@ export function Employees() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    if (!tenantId) return
     let unsubscribe: (() => void) | null = null
     setLoading(true)
     getDatabase().then((db: any) => {
-      unsubscribe = db.onValue('employees', (snapshot: any) => {
+      unsubscribe = db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) {
           const loaded: Employee[] = Object.entries(data).map(([id, emp]: [string, any]) => {
@@ -64,7 +67,7 @@ export function Employees() {
     
     try {
       const db = await getDatabase()
-      await (db as any).remove(`employees/${id}`)
+      await (db as any).remove(`tenants/${tenantId}/employees/${id}`)
       await (db as any).remove(`users/${id}`)
       hrToast.success('Deleted', `${name} has been removed.`)
     } catch (error) {

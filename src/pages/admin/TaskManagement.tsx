@@ -4,6 +4,7 @@ import { Check, Edit, Plus, Paperclip, MessageSquare, Send } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { hrToast } from '../../components/HRCToast'
 import { getDatabase } from '../../firebase/config'
+import { useAuth } from '../../context/AuthContext'
 
 interface Task {
   id: string
@@ -36,6 +37,7 @@ interface Project {
 }
 
 export function TaskManagement() {
+  const { tenantId } = useAuth()
   const [tasks, setTasks] = useState<Task[]>([])
   const [employees, setEmployees] = useState<Record<string, Employee>>({})
   const [removedMembers, setRemovedMembers] = useState<Set<string>>(new Set())
@@ -47,9 +49,10 @@ export function TaskManagement() {
   const [newComment, setNewComment] = useState('')
 
   useEffect(() => {
+    if (!tenantId) return
     const unsubs: Array<() => void> = []
     getDatabase().then((db: any) => {
-      unsubs.push(db.onValue('tasks', (snapshot: any) => {
+      unsubs.push(db.onValue(`tenants/${tenantId}/tasks`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Task> | undefined
         if (data) {
           setTasks(Object.entries(data).map(([id, t]) => ({ ...t, id })))
@@ -58,23 +61,24 @@ export function TaskManagement() {
         }
       }))
 
-      unsubs.push(db.onValue('employees', (snapshot: any) => {
+      unsubs.push(db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Employee> | undefined
         if (data) setEmployees(data)
       }))
 
-      unsubs.push(db.onValue('projects', (snapshot: any) => {
+      unsubs.push(db.onValue(`tenants/${tenantId}/projects`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Project> | undefined
         if (data) setProjects(data)
       }))
     })
     return () => { unsubs.forEach(u => u()) }
-  }, [])
+  }, [tenantId])
 
   useEffect(() => {
+    if (!tenantId) return
     let unsub: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsub = db.onValue('taskComments', (snapshot: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/taskComments`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Record<string, TaskComment>> | undefined
         if (data) {
           const formatted: Record<string, TaskComment[]> = {}
@@ -88,12 +92,13 @@ export function TaskManagement() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [])
+  }, [tenantId])
 
   const handleTaskSubmit = async (taskData: { title: string; assignee: string; status: 'To Do' | 'In Progress' | 'Completed' }) => {
+    if (!tenantId) return
     const db = await getDatabase()
     if (editingTask) {
-      await (db as any).set(`tasks/${editingTask.id}`, { ...editingTask, ...taskData })
+      await (db as any).set(`tenants/${tenantId}/tasks/${editingTask.id}`, { ...editingTask, ...taskData })
       hrToast.success('Task Updated', 'Task updated successfully')
     } else {
       const newTask: Task = {
@@ -106,7 +111,7 @@ export function TaskManagement() {
         attachments: 0,
         comments: 0,
       }
-      await (db as any).set(`tasks/${newTask.id}`, newTask)
+      await (db as any).set(`tenants/${tenantId}/tasks/${newTask.id}`, newTask)
       hrToast.success('Task Created', 'New task added')
     }
     setShowTaskModal(false)
@@ -114,11 +119,12 @@ export function TaskManagement() {
   }
 
   const handleStatusChange = async (taskId: string, status: 'To Do' | 'In Progress' | 'Completed') => {
+    if (!tenantId) return
     try {
       const db = await getDatabase()
       const task = tasks.find(t => t.id === taskId)
       if (task) {
-        await (db as any).update(`tasks/${taskId}`, { status })
+        await (db as any).update(`tenants/${tenantId}/tasks/${taskId}`, { status })
         hrToast.success('Status Updated', `Task moved to ${status}`)
       }
     } catch (error: any) {
@@ -147,7 +153,7 @@ export function TaskManagement() {
   const completedTasks = tasks.filter(t => t.status === 'Completed')
 
   const handleSendComment = async (taskId: string) => {
-    if (!newComment.trim()) return
+    if (!newComment.trim() || !tenantId) return
     const db = await getDatabase()
     const comment: TaskComment = {
       id: `cmt-${Date.now()}`,
@@ -156,7 +162,7 @@ export function TaskManagement() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
     const existing = taskComments[taskId] || []
-    await (db as any).set(`taskComments/${taskId}`, [...existing, comment])
+    await (db as any).set(`tenants/${tenantId}/taskComments/${taskId}`, [...existing, comment])
     setNewComment('')
     hrToast.success('Comment Sent', 'Your clarification has been sent')
   }
