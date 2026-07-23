@@ -352,8 +352,8 @@ export function AttendanceViewer() {
   return (
     <PageShell title="Employee Attendance">
       {/* Overview stats & selectors */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-8">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
           {/* Month Selector Buttons */}
           <div className="flex items-center bg-surface border border-border-soft rounded-lg p-1">
             <button
@@ -362,7 +362,7 @@ export function AttendanceViewer() {
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="px-4 text-sm font-medium text-text-hi min-w-[110px] text-center font-display">
+            <span className="px-2 md:px-4 text-xs md:text-sm font-medium text-text-hi min-w-[90px] md:min-w-[110px] text-center font-display">
               {months[selectedMonth]} {selectedYear}
             </span>
             <button
@@ -373,44 +373,46 @@ export function AttendanceViewer() {
             </button>
           </div>
 
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(Number(e.target.value))}
-            className="px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm font-medium text-text-hi focus-ring"
-          >
-            {months.map((m, idx) => (
-              <option key={m} value={idx}>{m}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              className="px-2 md:px-3 py-2 bg-surface border border-border-soft rounded-lg text-xs md:text-sm font-medium text-text-hi focus-ring"
+            >
+              {months.map((m, idx) => (
+                <option key={m} value={idx}>{m.slice(0, 3)}</option>
+              ))}
+            </select>
 
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm font-medium text-text-hi focus-ring"
-          >
-            {years.map(y => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              className="px-2 md:px-3 py-2 bg-surface border border-border-soft rounded-lg text-xs md:text-sm font-medium text-text-hi focus-ring"
+            >
+              {years.map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Actions & Search Input */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
           <button
             onClick={handleAttendanceRegularisation}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors focus-ring w-full sm:w-auto justify-center"
           >
             <Clock className="w-4 h-4" />
-            Regularise Attendance
+            Regularise
           </button>
           
-          <div className="relative w-full sm:w-80">
+          <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 text-text-low absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search employee, company..."
+              placeholder="Search..."
               className="w-full pl-9 pr-4 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring text-text-hi"
             />
           </div>

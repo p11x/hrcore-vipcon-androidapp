@@ -298,7 +298,7 @@ export function EmployeesView() {
       </div>
 
       <div>
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
           <h3 className="text-lg font-display font-semibold text-text-hi">Employees</h3>
           <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 text-text-low absolute left-3 top-1/2 -translate-y-1/2" />
@@ -306,12 +306,12 @@ export function EmployeesView() {
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search employees..."
+              placeholder="Search..."
               className="w-full pl-9 pr-4 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring text-text-hi"
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-96 overflow-y-auto pr-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-96 overflow-y-auto pr-2">
           {filteredEmployees.map((emp) => (
             <motion.div
               key={emp.id}

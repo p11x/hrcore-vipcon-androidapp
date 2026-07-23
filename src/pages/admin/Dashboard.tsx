@@ -293,21 +293,21 @@ export function AdminDashboard() {
       animate={{ opacity: 1 }}
       className="min-h-screen bg-bg-app"
     >
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-display font-semibold text-text-hi">
-            {selectedCompany ? `${selectedCompany} Dashboard` : 'Admin Dashboard'}
+      <div className="p-4 md:p-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <h1 className="text-2xl md:text-3xl font-display font-semibold text-text-hi">
+            {selectedCompany ? selectedCompany : 'Admin Dashboard'}
           </h1>
-          <div className="flex items-center gap-4">
-            <div className="relative">
+          <div className="flex flex-wrap items-center gap-2 md:gap-4">
+            <div className="relative flex-1 md:flex-none">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-low" />
               <input
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setShowSearchResults(true)}
-                placeholder="Search employees..."
-                className="pl-9 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring w-48 md:w-64"
+                placeholder="Search..."
+                className="w-full md:w-48 lg:w-64 pl-9 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring"
               />
               {showSearchResults && searchQuery.length > 0 && (
                 <>
@@ -398,7 +398,7 @@ export function AdminDashboard() {
               <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-medium">
                 <User className="w-5 h-5" />
               </div>
-              <span className="text-sm font-body">Admin</span>
+              <span className="hidden lg:inline text-sm font-body">Admin</span>
             </div>
           </div>
         </div>

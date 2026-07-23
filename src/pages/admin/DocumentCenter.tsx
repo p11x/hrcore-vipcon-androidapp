@@ -131,18 +131,18 @@ export function DocumentCenter() {
 
   return (
     <PageShell title="Document Center">
-      <div className="flex justify-between items-center mb-6">
-        <div className="relative">
+      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+        <div className="relative flex-1 md:flex-none">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-low" />
           <input
             type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search employees..."
-            className="pl-10 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring w-64"
+            placeholder="Search..."
+            className="w-full md:w-64 pl-10 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring"
           />
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-border-soft rounded-full">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-border-soft rounded-full self-start md:self-auto">
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-medium">
             <User className="w-4 h-4" />
           </div>
@@ -151,36 +151,37 @@ export function DocumentCenter() {
       </div>
 
       <div className="bg-surface border border-border-soft rounded-xl overflow-hidden">
-        <table className="w-full font-body text-sm">
-          <thead className="bg-bg-app">
-            <tr>
-              <th className="text-left p-4 font-medium text-text-low w-64">EMPLOYEE</th>
-              {docTypes.map((doc) => (
-                <th key={doc.key} className="text-center p-4 font-medium text-text-low min-w-24">
-                  {doc.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
+        <div className="overflow-x-auto">
+          <table className="w-full font-body text-sm min-w-[1000px]">
+            <thead className="bg-bg-app">
               <tr>
-                <td colSpan={docTypes.length + 1} className="p-8 text-center text-text-mid">Loading...</td>
+                <th className="text-left p-4 font-medium text-text-low w-64 sticky left-0 bg-bg-app z-10">EMPLOYEE</th>
+                {docTypes.map((doc) => (
+                  <th key={doc.key} className="text-center p-4 font-medium text-text-low min-w-24">
+                    {doc.label}
+                  </th>
+                ))}
               </tr>
-            ) : (
-              filteredEmployees.map((emp) => (
-                <tr key={emp.id} className="border-t border-border-soft hover:bg-bg-app transition-colors">
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-accent-mint flex items-center justify-center text-white text-xs font-mono">
-                        {emp.avatar}
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={docTypes.length + 1} className="p-8 text-center text-text-mid">Loading...</td>
+                </tr>
+              ) : (
+                filteredEmployees.map((emp) => (
+                  <tr key={emp.id} className="border-t border-border-soft hover:bg-bg-app transition-colors">
+                    <td className="p-4 sticky left-0 bg-surface z-10 border-r border-border-soft shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-accent-mint flex items-center justify-center text-white text-xs font-mono">
+                          {emp.avatar}
+                        </div>
+                        <div className="truncate max-w-[160px]">
+                          <div className="font-body font-medium text-text-hi truncate">{emp.name}</div>
+                          <div className="font-mono text-text-mid text-xs truncate">{emp.employeeId}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="font-body font-medium text-text-hi">{emp.name}</div>
-                        <div className="font-mono text-text-mid text-sm">{emp.employeeId}</div>
-                      </div>
-                    </div>
-                  </td>
+                    </td>
                   {docTypes.map((doc) => {
                     const docStatus = emp.docs[doc.key as keyof typeof emp.docs]
                     const isUploaded = docStatus.uploaded
@@ -217,6 +218,7 @@ export function DocumentCenter() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </PageShell>
   )

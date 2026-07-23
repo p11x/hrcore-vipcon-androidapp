@@ -149,9 +149,9 @@ export function Sidebar({ onSignOut, isAdmin = false }: { onSignOut?: () => void
           <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-display font-bold text-lg">
             V
           </div>
-          <span className="font-display font-semibold text-text-hi">HR CORE</span>
+          <span className="font-display font-semibold text-text-hi tracking-tight">HR CORE</span>
         </div>
-        <div className="w-10" /> {/* Spacer to balance the layout */}
+        <div className="w-10" />
       </div>
 
       <AnimatePresence>
