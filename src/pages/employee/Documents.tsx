@@ -39,7 +39,7 @@ const sendDocTypes: Array<{ type: 'aadhaar' | 'pan' | 'resume' | 'photo' | 'sign
 ]
 
 export function Documents() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const userId = user?.uid || 'emp-001'
   const [documents, setDocuments] = useState<Record<string, DocumentStatus>>({})
   const [offerLetter, setOfferLetter] = useState<OfferLetter | null>(null)
@@ -56,14 +56,14 @@ export function Documents() {
     let unsubEmployee: (() => void) | null = null
     
     getDatabase().then((db: any) => {
-      unsubEmployee = db.onValue(`employees/${userId}`, (snapshot: any) => {
+      unsubEmployee = db.onValue(`tenants/${tenantId}/employees/${userId}`, (snapshot: any) => {
         const data = snapshot.val()
         if (data?.uanNumber) {
           setUanNumber(data.uanNumber)
         }
       })
 
-      unsubDocs = db.onValue('Documents', (snapshot: any) => {
+      unsubDocs = db.onValue(`tenants/${tenantId}/Documents`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Record<string, DocumentStatus>> | undefined
         if (data && data[userId]) {
           setDocuments({
@@ -85,7 +85,7 @@ export function Documents() {
         setLoading(false)
       })
 
-      unsubOffers = db.onValue('OfferLetters', (snapshot: any) => {
+      unsubOffers = db.onValue(`tenants/${tenantId}/OfferLetters`, (snapshot: any) => {
         const offers = snapshot.val() as Record<string, OfferLetter> | undefined
         if (offers) {
           const myOffer = Object.values(offers).find((o: any) => o.employeeId === userId && o.sent)
@@ -93,7 +93,7 @@ export function Documents() {
         }
       })
 
-      unsubPayslips = db.onValue('Payslips', (snapshot: any) => {
+      unsubPayslips = db.onValue(`tenants/${tenantId}/Payslips`, (snapshot: any) => {
         const psl = snapshot.val() as Record<string, Payslip> | undefined
         if (psl) {
           const myPayslips = Object.values(psl).filter((p: any) => p.employeeId === userId && p.sent)
@@ -117,10 +117,10 @@ export function Documents() {
     }
     try {
       const db = await getDatabase()
-      await db.update(`employees/${userId}`, {
+      await db.update(`tenants/${tenantId}/employees/${userId}`, {
         uanNumber: uanNumber.trim(),
       })
-      await db.update(`users/${userId}`, {
+      await db.update(`tenants/${tenantId}/users/${userId}`, {
         uanNumber: uanNumber.trim(),
       })
       setIsEditingUan(false)
@@ -139,7 +139,7 @@ export function Documents() {
       const storage = await getStorage()
       const { ref: storageRef, uploadBytes, getDownloadURL } = await import('firebase/storage')
       
-      const fileRef = storageRef(storage, `documents/${userId}/${docType}/${file.name}`)
+      const fileRef = storageRef(storage, `tenants/${tenantId}/documents/${userId}/${docType}/${file.name}`)
       await uploadBytes(fileRef, file)
       const downloadUrl = await getDownloadURL(fileRef)
 
@@ -149,7 +149,7 @@ export function Documents() {
         filename: file.name,
       }
 
-      await db.set(`Documents/${userId}/${docType}`, newDocData)
+      await db.set(`tenants/${tenantId}/Documents/${userId}/${docType}`, newDocData)
       hrToast.success('Document Uploaded', `${file.name} has been uploaded successfully`)
     } catch (error: any) {
       hrToast.error('Upload Failed', error?.message || 'Unable to upload document')

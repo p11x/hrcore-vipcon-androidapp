@@ -22,7 +22,7 @@ interface LeaveRequest {
 }
 
 export function Leave() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const userId = user?.uid || 'emp-001'
   const [activeTab, setActiveTab] = useState<'apply' | 'my-requests'>('apply')
   const [myRequests, setMyRequests] = useState<LeaveRequest[]>([])
@@ -41,7 +41,7 @@ export function Leave() {
   useEffect(() => {
     let unsub: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsub = db.onValue('leaves', (snapshot: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/leaves`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Omit<LeaveRequest, 'id'>> | undefined
         if (data) {
           const requests = Object.entries(data)

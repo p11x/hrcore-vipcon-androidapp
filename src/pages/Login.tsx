@@ -127,7 +127,6 @@ export function Login() {
                     <p className="text-accent-coral text-xs mt-1.5 ml-1">{loginErrors.email.message}</p>
                   )}
                 </div>
-
                 <div>
                   <label className="block text-xs font-bold text-text-low uppercase tracking-wider mb-2">
                     Password
@@ -143,7 +142,6 @@ export function Login() {
                     <p className="text-accent-coral text-xs mt-1.5 ml-1">{loginErrors.password.message}</p>
                   )}
                 </div>
-
                 <button
                   type="submit"
                   disabled={isLoggingIn}
@@ -151,6 +149,9 @@ export function Login() {
                 >
                   {isLoggingIn ? 'Verifying...' : 'Sign In'}
                 </button>
+                <div className="mt-4 p-3 bg-primary/10 rounded-lg text-xs text-primary text-center">
+                  <strong>Demo Admin:</strong> admin@hrcore.dev / admin123
+                </div>
               </motion.form>
             ) : (
               <motion.form
@@ -191,7 +192,6 @@ export function Login() {
                     )}
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-xs font-bold text-text-low uppercase tracking-wider mb-2">
                     Work Email
@@ -207,7 +207,6 @@ export function Login() {
                     <p className="text-accent-coral text-xs mt-1">{regErrors.email.message}</p>
                   )}
                 </div>
-
                 <div>
                   <label className="block text-xs font-bold text-text-low uppercase tracking-wider mb-2">
                     Password
@@ -223,7 +222,6 @@ export function Login() {
                     <p className="text-accent-coral text-xs mt-1">{regErrors.password.message}</p>
                   )}
                 </div>
-
                 <button
                   type="submit"
                   disabled={isRegistering}

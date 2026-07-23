@@ -10,7 +10,7 @@ import { getDatabase } from '../../firebase/config'
 import { hrToast } from '../../components/HRCToast'
 
 export function BankDetails() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const {
     register,
     handleSubmit,
@@ -23,7 +23,7 @@ export function BankDetails() {
   useEffect(() => {
     if (user?.uid) {
       getDatabase().then((db: any) => {
-        db.get(`bankDetails/${user.uid}`).then((snapshot: any) => {
+        db.get(`tenants/${tenantId}/bankDetails/${user.uid}`).then((snapshot: any) => {
           const data = snapshot.val() as BankDetailsFormData | null
           if (data) {
             reset(data)
@@ -37,7 +37,7 @@ export function BankDetails() {
     if (!user?.uid) return
     try {
       const db = await getDatabase()
-      await db.set(`bankDetails/${user.uid}`, data)
+      await db.set(`tenants/${tenantId}/bankDetails/${user.uid}`, data)
       hrToast.success('Bank Details Saved', 'Bank details updated successfully')
     } catch {
       hrToast.error('Save Failed', 'Unable to update bank details')

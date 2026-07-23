@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { hrToast } from '../../components/HRCToast'
 
 export function VirtualID() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const [employeeData, setEmployeeData] = useState<any>(null)
   const [userData, setUserData] = useState<any>(null)
   const [isUploading, setIsUploading] = useState(false)
@@ -19,14 +19,14 @@ export function VirtualID() {
       let unsubUser: (() => void) | null = null
       
       getDatabase().then((db: any) => {
-        unsubEmp = db.onValue(`employees/${user.uid}`, (snapshot: any) => {
+        unsubEmp = db.onValue(`tenants/${tenantId}/employees/${user.uid}`, (snapshot: any) => {
           const data = snapshot.val()
           if (data) {
             setEmployeeData(data)
           }
         })
         
-        unsubUser = db.onValue(`users/${user.uid}`, (snapshot: any) => {
+        unsubUser = db.onValue(`tenants/${tenantId}/users/${user.uid}`, (snapshot: any) => {
           const data = snapshot.val()
           if (data) {
             setUserData(data)
@@ -61,10 +61,10 @@ export function VirtualID() {
         const base64String = reader.result as string
         const db = await getDatabase()
         
-        await db.update(`employees/${user?.uid}`, {
+        await db.update(`tenants/${tenantId}/employees/${user?.uid}`, {
           avatar: base64String
         })
-        await db.update(`users/${user?.uid}`, {
+        await db.update(`tenants/${tenantId}/users/${user?.uid}`, {
           avatar: base64String
         })
         

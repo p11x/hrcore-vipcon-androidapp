@@ -15,7 +15,7 @@ const recentActivity = [
 ]
 
 export function Attendance() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const userId = user?.uid || 'emp-001'
   const [punchState, setPunchState] = useState<'in' | 'out'>('out')
   const [activity, setActivity] = useState(recentActivity)
@@ -26,7 +26,7 @@ export function Attendance() {
     let unsubAll: (() => void) | null = null
     if (user?.uid) {
       getDatabase().then((db: any) => {
-        unsubAll = db.onValue(`attendance/${user.uid}`, (snapshot: any) => {
+        unsubAll = db.onValue(`tenants/${tenantId}/attendance/${user.uid}`, (snapshot: any) => {
           const data = snapshot.val()
           if (data) setAttendance(data)
           else setAttendance({})
@@ -41,7 +41,7 @@ export function Attendance() {
     if (user?.uid) {
       const today = new Date().toISOString().split('T')[0]
       getDatabase().then((db: any) => {
-        unsub = db.onValue(`attendance/${user.uid}/${today}`, (snapshot: any) => {
+        unsub = db.onValue(`tenants/${tenantId}/attendance/${user.uid}/${today}`, (snapshot: any) => {
           const data = snapshot.val()
           if (data && data.checkInTime && !data.checkOutTime) {
             setPunchState('in')

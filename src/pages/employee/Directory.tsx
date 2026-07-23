@@ -12,7 +12,10 @@ interface Employee {
   role: string
 }
 
+import { useAuth } from "../../context/AuthContext"
+
 export function Directory() {
+  const { tenantId } = useAuth()
   const { onlineUsers } = usePresence()
   const [employees, setEmployees] = useState<Employee[]>([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -20,7 +23,7 @@ export function Directory() {
   useEffect(() => {
     let unsubscribe: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsubscribe = db.onValue('employees', (snapshot: any) => {
+      unsubscribe = db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) {
           const loaded: Employee[] = Object.entries(data).map(([id, emp]: [string, any]) => {

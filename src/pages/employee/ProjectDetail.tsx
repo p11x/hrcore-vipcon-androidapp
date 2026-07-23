@@ -47,7 +47,7 @@ interface Employee {
 export function ProjectDetail() {
   const { projectId } = useParams<{ projectId: string }>()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const userId = user?.uid || 'emp-001'
   const [project, setProject] = useState<Project | null>(null)
   const [tasks, setTasks] = useState<Task[]>([])
@@ -77,7 +77,7 @@ export function ProjectDetail() {
     }
 
     getDatabase().then((db: any) => {
-      unsubTasks = db.onValue('tasks', (snapshot: any) => {
+      unsubTasks = db.onValue(`tenants/${tenantId}/tasks`, (snapshot: any) => {
         const allTasks = snapshot.val() as Record<string, Task> | undefined
         if (allTasks) {
           const projectTasks = Object.entries(allTasks)
@@ -89,7 +89,7 @@ export function ProjectDetail() {
         }
       })
 
-      unsubComments = db.onValue('taskComments', (snapshot: any) => {
+      unsubComments = db.onValue(`tenants/${tenantId}/taskComments`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Record<string, TaskComment>> | undefined
         if (data) {
           const formatted: Record<string, TaskComment[]> = {}

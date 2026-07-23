@@ -30,7 +30,7 @@ interface Project {
 }
 
 export function Tasks() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const userId = user?.uid || 'emp-001'
   const [tasks, setTasks] = useState<Task[]>([])
   const [projects, setProjects] = useState<Record<string, Project>>({})
@@ -44,7 +44,7 @@ export function Tasks() {
     let unsubProjects: (() => void) | null = null
     let unsubComments: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsubTasks = db.onValue('tasks', (snapshot: any) => {
+      unsubTasks = db.onValue(`tenants/${tenantId}/tasks`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Task> | undefined
         if (data) {
           setTasks(Object.entries(data).map(([id, t]) => ({ ...t, id })))
@@ -54,12 +54,12 @@ export function Tasks() {
         setLoading(false)
       })
 
-      unsubProjects = db.onValue('projects', (snapshot: any) => {
+      unsubProjects = db.onValue(`tenants/${tenantId}/projects`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Project> | undefined
         if (data) setProjects(data)
       })
 
-      unsubComments = db.onValue('taskComments', (snapshot: any) => {
+      unsubComments = db.onValue(`tenants/${tenantId}/taskComments`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Record<string, TaskComment>> | undefined
         if (data) {
           const formatted: Record<string, TaskComment[]> = {}
@@ -90,7 +90,7 @@ export function Tasks() {
       const db = await getDatabase()
       const task = tasks.find(t => t.id === taskId)
       if (task) {
-        await db.update(`tasks/${taskId}`, { status })
+        await db.update(`tenants/${tenantId}/tasks/${taskId}`, { status })
         hrToast.success('Status Updated', `Task moved to ${status}`)
       }
     } catch (error: any) {
@@ -112,7 +112,7 @@ export function Tasks() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
     const existing = taskComments[taskId] || []
-    await db.set(`taskComments/${taskId}`, [...existing, comment])
+    await db.set(`tenants/${tenantId}/taskComments/${taskId}`, [...existing, comment])
     setNewComment('')
     hrToast.success('Comment Sent', 'Your clarification has been sent')
   }

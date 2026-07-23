@@ -23,7 +23,7 @@ const eduDocTypes = [
 ]
 
 export function Education() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const {
     register,
     handleSubmit,
@@ -41,14 +41,14 @@ export function Education() {
     let unsubDocs: (() => void) | null = null
     if (user?.uid) {
       getDatabase().then((db: any) => {
-        db.get(`education/${user.uid}`).then((snapshot: any) => {
+        db.get(`tenants/${tenantId}/education/${user.uid}`).then((snapshot: any) => {
           const data = snapshot.val() as EducationFormData | null
           if (data) {
             reset(data)
           }
         })
         
-        unsubDocs = db.onValue(`Documents/${user.uid}`, (snapshot: any) => {
+        unsubDocs = db.onValue(`tenants/${tenantId}/Documents/${user.uid}`, (snapshot: any) => {
           const data = snapshot.val() as Record<string, DocumentStatus> | null
           if (data) {
             setDocuments({
@@ -74,7 +74,7 @@ export function Education() {
     if (!user?.uid) return
     try {
       const db = await getDatabase()
-      await db.set(`education/${user.uid}`, data)
+      await db.set(`tenants/${tenantId}/education/${user.uid}`, data)
       hrToast.success('Education Saved', 'Education details updated successfully')
     } catch {
       hrToast.error('Save Failed', 'Unable to update education details')
@@ -99,7 +99,7 @@ export function Education() {
         filename: file.name,
       }
 
-      await db.set(`Documents/${user.uid}/${docType}`, newDocData)
+      await db.set(`tenants/${tenantId}/Documents/${user.uid}/${docType}`, newDocData)
       hrToast.success('Document Uploaded', `${file.name} has been uploaded successfully`)
     } catch (error: any) {
       console.error('Upload error:', error)

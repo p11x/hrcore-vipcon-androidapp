@@ -19,7 +19,7 @@ interface Project {
 }
 
 export function Projects() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const userId = user?.uid || 'emp-001'
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
@@ -28,7 +28,7 @@ export function Projects() {
   useEffect(() => {
     let unsub: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsub = db.onValue('projects', (snapshot: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/projects`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Project> | undefined
         if (data) {
           const allProjects = Object.entries(data).map(([id, p]) => ({ ...p, id, members: p.members || [] }))

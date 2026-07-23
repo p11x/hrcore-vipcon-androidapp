@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react'
 import { getDatabase } from '../../firebase/config'
 import { hrToast } from '../../components/HRCToast'
 
-const useMock = import.meta.env.VITE_USE_MOCK === 'true'
+
 
 interface Announcement {
   id: string

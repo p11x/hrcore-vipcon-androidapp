@@ -12,14 +12,17 @@ interface HolidayEvent {
   type: 'national' | 'optional' | 'observance'
 }
 
+import { useAuth } from "../../context/AuthContext"
+
 export function HolidayCalendar() {
+  const { tenantId } = useAuth()
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [holidays, setHolidays] = useState<HolidayEvent[]>([])
 
   useEffect(() => {
     let unsub: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsub = db.onValue('holidays', (snapshot: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/holidays`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Omit<HolidayEvent, 'id'>> | undefined
         if (data) {
           setHolidays(Object.entries(data).map(([id, h]) => ({ ...h, id } as HolidayEvent)))

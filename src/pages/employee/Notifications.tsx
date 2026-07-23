@@ -15,7 +15,7 @@ interface Notification {
 }
 
 export function Notifications() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -26,7 +26,7 @@ export function Notifications() {
     const fetchNotifications = async () => {
       try {
         const db = await getDatabase()
-        unsubscribe = db.onValue(`notifications/${user.uid}`, (snapshot: any) => {
+        unsubscribe = db.onValue(`tenants/${tenantId}/notifications/${user.uid}`, (snapshot: any) => {
           const data = snapshot.val() as Record<string, Omit<Notification, 'id'>> | null
           if (data) {
             const parsed = Object.entries(data).map(([id, val]) => ({
@@ -58,7 +58,7 @@ export function Notifications() {
     if (!user) return
     try {
       const db = await getDatabase()
-      await db.update(`notifications/${user.uid}/${id}`, { read: true })
+      await db.update(`tenants/${tenantId}/notifications/${user.uid}/${id}`, { read: true })
     } catch (error) {
       console.error("Error marking notification as read:", error)
     }
@@ -75,7 +75,7 @@ export function Notifications() {
         }
       })
       if (Object.keys(updates).length > 0) {
-        await db.update(`notifications/${user.uid}`, updates)
+        await db.update(`tenants/${tenantId}/notifications/${user.uid}`, updates)
       }
     } catch (error) {
       console.error("Error marking all as read:", error)

@@ -25,7 +25,7 @@ interface Employee {
 }
 
 export function Chat() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const userId = user?.uid || 'emp-001'
   const [activeThread, setActiveThread] = useState<string | null>(null)
   const [newMessage, setNewMessage] = useState('')
@@ -38,7 +38,7 @@ export function Chat() {
     let unsubChat: (() => void) | null = null
     let unsubEmp: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsubChat = db.onValue('messages_Chat', (snapshot: any) => {
+      unsubChat = db.onValue(`tenants/${tenantId}/messages_Chat`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, { id: string; participants: string[]; messages: Message[] }> | undefined
         if (data) {
           const myThreads = Object.entries(data)
@@ -50,7 +50,7 @@ export function Chat() {
         }
       })
 
-      unsubEmp = db.onValue('users', (snapshot: any) => {
+      unsubEmp = db.onValue(`tenants/${tenantId}/users`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, { fullName?: string, name?: string }> | undefined
         if (data) {
           const formatted: Record<string, Employee> = {}
@@ -115,7 +115,7 @@ export function Chat() {
         text: newMessage,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }
-      await db.set(`messages_Chat/${activeThread}/messages`, [...existing, newMsg])
+      await db.set(`tenants/${tenantId}/messages_Chat/${activeThread}/messages`, [...existing, newMsg])
       setNewMessage('')
       hrToast.success('Message Sent', 'Your message has been sent')
     }
@@ -128,7 +128,7 @@ export function Chat() {
     if (!thread) {
       const checkExisting = async () => {
         const db = await getDatabase()
-        const existingThreads = await db.get('messages_Chat')
+        const existingThreads = await db.get(`tenants/${tenantId}/messages_Chat`)
         const existingData = existingThreads.val() as Record<string, Thread> | undefined
         if (existingData) {
           const found = Object.entries(existingData).find(([_, t]) => {
@@ -145,7 +145,7 @@ export function Chat() {
           participants: [userId, otherUserId],
           messages: [],
         }
-        await db.set(`messages_Chat/${threadId}`, newThread)
+        await db.set(`tenants/${tenantId}/messages_Chat/${threadId}`, newThread)
         setActiveThread(threadId)
       }
       checkExisting()

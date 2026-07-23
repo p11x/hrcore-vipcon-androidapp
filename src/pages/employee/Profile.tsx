@@ -11,7 +11,7 @@ import { getDatabase } from '../../firebase/config'
 import { hrToast } from '../../components/HRCToast'
 
 export function Profile() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [position, setPosition] = useState<string>('')
@@ -32,7 +32,7 @@ export function Profile() {
     if (user?.uid) {
       getDatabase().then(async (db: any) => {
         try {
-          const snapshot = await db.get(`users/${user.uid}`)
+          const snapshot = await db.get(`tenants/${tenantId}/users/${user.uid}`)
           const data = snapshot.val() as Partial<PersonalDetailsFormData> & { avatar?: string, position?: string } | null
           if (data) {
             setPosition(data.position || 'Employee')

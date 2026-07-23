@@ -6,7 +6,7 @@ import { User } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export function DigitalID() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const [employeeData, setEmployeeData] = useState<any>(null)
   const [userData, setUserData] = useState<any>(null)
 
@@ -16,14 +16,14 @@ export function DigitalID() {
       let unsubUser: (() => void) | null = null
 
       getDatabase().then((db: any) => {
-        unsubEmp = db.onValue(`employees/${user.uid}`, (snapshot: any) => {
+        unsubEmp = db.onValue(`tenants/${tenantId}/employees/${user.uid}`, (snapshot: any) => {
           const data = snapshot.val()
           if (data) {
             setEmployeeData(data)
           }
         })
 
-        unsubUser = db.onValue(`users/${user.uid}`, (snapshot: any) => {
+        unsubUser = db.onValue(`tenants/${tenantId}/users/${user.uid}`, (snapshot: any) => {
           const data = snapshot.val()
           if (data) {
             setUserData(data)

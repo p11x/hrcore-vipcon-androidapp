@@ -41,7 +41,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (!isAdminUser || !userTenantId) {
               const db = await getDatabase()
               // First verify the user exists in our DB, if not they were deleted
-              const snap = await db.get(`users/${firebaseUser.uid}`)
+              let snap = await db.get(`users/${firebaseUser.uid}`)
+              if (!snap.exists()) {
+                await new Promise(resolve => setTimeout(resolve, 2000))
+                snap = await db.get(`users/${firebaseUser.uid}`)
+              }
               if (!snap.exists()) {
                 if ((auth as any).signOut) {
                   await (auth as any).signOut()
@@ -102,9 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch (error: any) {
-      if (error.message === 'Your account has been disabled or deleted.') {
-        throw error
-      }
+      throw error;
     }
   }
 

@@ -20,7 +20,7 @@ interface SupportTicket {
 }
 
 export function SupportTickets() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const {
     register,
     handleSubmit,
@@ -35,7 +35,7 @@ export function SupportTickets() {
   useEffect(() => {
     let unsub: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsub = db.onValue('tickets', (snapshot: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/tickets`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Omit<SupportTicket, 'id'>> | undefined
         if (data) {
           setTickets(Object.entries(data).map(([id, t]) => ({ ...t, id, status: t.status || 'open' } as SupportTicket)))

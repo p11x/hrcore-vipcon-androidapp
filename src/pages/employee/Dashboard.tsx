@@ -33,7 +33,7 @@ interface TicketItem {
 }
 
 export function EmployeeDashboard() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const navigate = useNavigate()
   const [documents, setDocuments] = useState<Record<string, DocumentStatus>>({})
   const [leaveBalance, setLeaveBalance] = useState<LeaveBalance | null>(null)
@@ -64,12 +64,12 @@ export function EmployeeDashboard() {
     let unsubNotifications: (() => void) | null = null
 
     getDatabase().then((db: any) => {
-      unsubDocs = db.onValue(`Documents/${userId}`, (snapshot: any) => {
+      unsubDocs = db.onValue(`tenants/${tenantId}/Documents/${userId}`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, DocumentStatus> | undefined
         setDocuments(data || {})
       })
       
-      unsubNotifications = db.onValue(`notifications/${userId}`, (snapshot: any) => {
+      unsubNotifications = db.onValue(`tenants/${tenantId}/notifications/${userId}`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, any> | undefined
         if (data) {
           const unreadCount = Object.values(data).filter(n => !n.read).length
@@ -79,35 +79,35 @@ export function EmployeeDashboard() {
         }
       })
       
-      unsubLeave = db.onValue(`leaveBalance/${userId}`, (snapshot: any) => {
+      unsubLeave = db.onValue(`tenants/${tenantId}/leaveBalance/${userId}`, (snapshot: any) => {
         const data = snapshot.val() as LeaveBalance | undefined
         if (data) setLeaveBalance(data)
       })
-      unsubTickets = db.onValue('tickets', (snapshot: any) => {
+      unsubTickets = db.onValue(`tenants/${tenantId}/tickets`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, TicketItem> | undefined
         if (data) setTickets(Object.values(data).filter((t) => t.status === 'open'))
       })
-      unsubUser = db.onValue(`users/${userId}`, (snapshot: any) => {
+      unsubUser = db.onValue(`tenants/${tenantId}/users/${userId}`, (snapshot: any) => {
         const data = snapshot.val()
         setPersonalDetails(data)
       })
-      unsubEducation = db.onValue(`education/${userId}`, (snapshot: any) => {
+      unsubEducation = db.onValue(`tenants/${tenantId}/education/${userId}`, (snapshot: any) => {
         const data = snapshot.val()
         setEducationDetails(data)
       })
-      unsubBank = db.onValue(`bankDetails/${userId}`, (snapshot: any) => {
+      unsubBank = db.onValue(`tenants/${tenantId}/bankDetails/${userId}`, (snapshot: any) => {
         const data = snapshot.val()
         setBankDetails(data)
       })
-      unsubEmployee = db.onValue(`employees/${userId}`, (snapshot: any) => {
+      unsubEmployee = db.onValue(`tenants/${tenantId}/employees/${userId}`, (snapshot: any) => {
         const data = snapshot.val()
         setEmployeeDbData(data)
       })
-      unsubAttendance = db.onValue(`attendance/${userId}`, (snapshot: any) => {
+      unsubAttendance = db.onValue(`tenants/${tenantId}/attendance/${userId}`, (snapshot: any) => {
         const data = snapshot.val()
         setAttendance(data)
       })
-      unsubLeaves = db.onValue(`leaves`, (snapshot: any) => {
+      unsubLeaves = db.onValue(`tenants/${tenantId}/leaves`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) {
           const lvs = Object.values(data).filter((l: any) => l.employeeId === userId && l.status === 'approved')
@@ -231,7 +231,7 @@ export function EmployeeDashboard() {
       const db = await getDatabase()
       
       // Use employees count to generate a sequential ID
-      const empSnap = await db.get('employees')
+      const empSnap = await db.get(`tenants/${tenantId}/employees`)
       let count = 1
       if (empSnap.exists()) {
         count = Object.keys(empSnap.val()).length + 1
@@ -240,13 +240,13 @@ export function EmployeeDashboard() {
       const code = 'EMP-' + count.toString().padStart(4, '0')
       const joinDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
       
-      await db.update(`employees/${userId}`, {
+      await db.update(`tenants/${tenantId}/employees/${userId}`, {
         employeeCode: code,
         employeeId: code,
         joinDate: joinDate,
       })
 
-      await db.update(`users/${userId}`, {
+      await db.update(`tenants/${tenantId}/users/${userId}`, {
         employeeCode: code,
         employeeId: code,
         joinDate: joinDate,

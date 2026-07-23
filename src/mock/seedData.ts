@@ -1,8 +1,30 @@
 export const seedData = {
+  organizations: {
+    'mock-tenant-1': {
+      name: 'Acme Corp',
+      createdAt: '2026-01-01T00:00:00Z',
+      adminId: 'admin-001'
+    }
+  },
+  tenants: {
+    'mock-tenant-1': {
   users: {
+
+    'admin-001': {
+      id: 'admin-001',
+      email: 'admin@hrcore.dev',
+      tenantId: 'mock-tenant-1',
+      fullName: 'Admin User',
+      phone: '+1 555 9999',
+      companyName: 'Acme Corp',
+      position: 'Administrator',
+      role: 'admin',
+    },
+
     'emp-001': {
       id: 'emp-001',
-      email: 'alice@vepcone.dev',
+      email: 'alice@hrcore.dev',
+      tenantId: 'mock-tenant-1',
       fullName: 'Alice Chen',
       phone: '+1 555 0001',
       companyName: 'Acme Corp',
@@ -10,7 +32,8 @@ export const seedData = {
     },
     'emp-002': {
       id: 'emp-002',
-      email: 'bob@vepcone.dev',
+      email: 'bob@hrcore.dev',
+      tenantId: 'mock-tenant-1',
       fullName: 'Bob Rivera',
       phone: '+1 555 0002',
       companyName: 'Globex',
@@ -18,7 +41,8 @@ export const seedData = {
     },
     'emp-003': {
       id: 'emp-003',
-      email: 'carol@vepcone.dev',
+      email: 'carol@hrcore.dev',
+      tenantId: 'mock-tenant-1',
       fullName: 'Carol Kim',
       phone: '+1 555 0003',
       companyName: 'Acme Corp',
@@ -26,7 +50,8 @@ export const seedData = {
     },
     'emp-004': {
       id: 'emp-004',
-      email: 'david@vepcone.dev',
+      email: 'david@hrcore.dev',
+      tenantId: 'mock-tenant-1',
       fullName: 'David Park',
       phone: '+1 555 0004',
       companyName: 'Initech',
@@ -34,7 +59,8 @@ export const seedData = {
     },
     'emp-005': {
       id: 'emp-005',
-      email: 'eve@vepcone.dev',
+      email: 'eve@hrcore.dev',
+      tenantId: 'mock-tenant-1',
       fullName: 'Eve Martinez',
       phone: '+1 555 0005',
       companyName: 'Acme Corp',
@@ -42,7 +68,8 @@ export const seedData = {
     },
     'emp-006': {
       id: 'emp-006',
-      email: 'frank@vepcone.dev',
+      email: 'frank@hrcore.dev',
+      tenantId: 'mock-tenant-1',
       fullName: 'Frank Wilson',
       phone: '+1 555 0006',
       companyName: 'Umbrella Corp',
@@ -51,6 +78,7 @@ export const seedData = {
     'emp-007': {
       id: 'emp-007',
       email: 'sunny@gmail.com',
+      tenantId: 'mock-tenant-1',
       fullName: 'Sunny',
       phone: '+1 555 0007',
       companyName: 'Acme Corp',
@@ -474,6 +502,7 @@ export const seedData = {
       name: 'TechCorp Ltd',
       title: 'CEO',
       email: 'contact@techcorp.com',
+      tenantId: 'mock-tenant-1',
       phone: '+1 555 1001',
       avatar: 'TC',
       status: 'Active',
@@ -484,6 +513,7 @@ export const seedData = {
       name: 'DesignPlus Inc',
       title: 'Manager',
       email: 'info@designplus.com',
+      tenantId: 'mock-tenant-1',
       phone: '+1 555 1002',
       avatar: 'DP',
       status: 'Active',
@@ -494,6 +524,7 @@ export const seedData = {
       name: 'CloudSystems',
       title: 'Director',
       email: 'admin@cloudsystems.com',
+      tenantId: 'mock-tenant-1',
       phone: '+1 555 1003',
       avatar: 'CS',
       status: 'On Hold',
@@ -504,6 +535,7 @@ export const seedData = {
       name: 'DataFlow Co',
       title: 'CEO',
       email: 'hello@dataflow.co',
+      tenantId: 'mock-tenant-1',
       phone: '+1 555 1004',
       avatar: 'DF',
       status: 'Active',
@@ -514,6 +546,7 @@ export const seedData = {
       name: 'PixelCraft Studio',
       title: 'Founder',
       email: 'team@pixelcraft.io',
+      tenantId: 'mock-tenant-1',
       phone: '+1 555 1005',
       avatar: 'PC',
       status: 'Active',
@@ -525,6 +558,7 @@ export const seedData = {
       id: 'contact-001',
       name: 'John Smith',
       email: 'john@example.com',
+      tenantId: 'mock-tenant-1',
       phone: '+1 555 2001',
       avatar: 'JS',
       birthdate: '1990-05-15',
@@ -535,6 +569,7 @@ export const seedData = {
       id: 'contact-002',
       name: 'Sarah Johnson',
       email: 'sarah@example.com',
+      tenantId: 'mock-tenant-1',
       phone: '+1 555 2002',
       avatar: 'SJ',
       birthdate: '1988-09-22',
@@ -706,6 +741,8 @@ export const seedData = {
     'task-004': {
       'cmt-005': { id: 'cmt-005', sender: 'admin', text: 'Good progress!', timestamp: '11:00 AM' },
     },
+  },
+  },
   },
   Config: {
     setupComplete: true,
