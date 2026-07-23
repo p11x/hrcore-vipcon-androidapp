@@ -92,7 +92,7 @@ const validCredentials: Record<string, string> = {
 }
 
 const restoreSession = () => {
-  const stored = sessionStorage.getItem('mock-auth-user')
+  const stored = localStorage.getItem('mock-auth-user')
   if (stored) {
     const { email } = JSON.parse(stored)
     const found = email === 'admin@vepcone.dev' ? adminUser : Object.values(employeeUsers).find(u => u.email === email)
@@ -111,7 +111,7 @@ export const mockAuth = {
     }
     const found = email === 'admin@vepcone.dev' ? adminUser : Object.values(employeeUsers).find(u => u.email === email)
     currentUser = found ?? null
-    sessionStorage.setItem('mock-auth-user', JSON.stringify({ email }))
+    localStorage.setItem('mock-auth-user', JSON.stringify({ email }))
     listeners.forEach((l) => l(currentUser))
     return currentUser as User
   },
@@ -132,14 +132,14 @@ export const mockAuth = {
     employeeUsers[uid] = newUser
     validCredentials[email] = password
     currentUser = newUser
-    sessionStorage.setItem('mock-auth-user', JSON.stringify({ email }))
+    localStorage.setItem('mock-auth-user', JSON.stringify({ email }))
     listeners.forEach((l) => l(currentUser))
     return newUser
   },
 
   signOut: async () => {
     currentUser = null
-    sessionStorage.removeItem('mock-auth-user')
+    localStorage.removeItem('mock-auth-user')
     listeners.forEach((l) => l(null))
   },
 
