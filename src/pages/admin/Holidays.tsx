@@ -71,12 +71,12 @@ export function Holidays() {
   }
 
   return (
-    <PageShell title="Holiday Calendar">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-4">
+    <PageShell title="Holidays">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-primary" />
-            <h3 className="text-xl font-display font-semibold text-text-hi">
+            <h3 className="text-xl font-display font-semibold text-text-hi whitespace-nowrap">
               {format(currentMonth, 'MMMM yyyy')}
             </h3>
           </div>
@@ -85,7 +85,7 @@ export function Holidays() {
               onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
               className="p-2 rounded-lg border border-border-soft hover:bg-bg-app transition-colors focus-ring"
             >
-              <ChevronLeft className="w-4 h-4 text-text-mid" />
+              <ChevronLeft className="w-4 h-4" />
             </button>
             <button 
               onClick={() => setCurrentMonth(new Date())}
@@ -97,12 +97,12 @@ export function Holidays() {
               onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
               className="p-2 rounded-lg border border-border-soft hover:bg-bg-app transition-colors focus-ring"
             >
-              <ChevronRight className="w-4 h-4 text-text-mid" />
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        <button className="px-4 py-2 bg-primary text-white rounded-lg font-medium flex items-center gap-2 focus-ring text-sm">
+        <button className="px-4 py-2 bg-primary text-white rounded-lg font-medium flex items-center gap-2 focus-ring text-sm self-end lg:self-auto">
           <Plus className="w-4 h-4" />
           Add Event
         </button>

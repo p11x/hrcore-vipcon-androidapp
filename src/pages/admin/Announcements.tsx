@@ -38,14 +38,19 @@ const onSubmit = async (_data: AnnouncementFormData) => {}
 
   return (
     <PageShell title="Announcements">
-      <div className="max-w-2xl">
+      <div className="w-full max-w-4xl">
         <motion.div
-          className="bg-surface border border-border-soft rounded-lg p-6 mb-6"
+          className="bg-surface border border-border-soft rounded-xl p-6 mb-8 shadow-sm"
           whileHover={{ y: -2 }}
         >
-          <h3 className="text-lg font-display font-semibold text-text-hi mb-4">
-            Create Announcement
-          </h3>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Megaphone className="w-5 h-5 text-primary" />
+            </div>
+            <h3 className="text-xl font-display font-semibold text-text-hi">
+              New Announcement
+            </h3>
+          </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-text-mid mb-2">

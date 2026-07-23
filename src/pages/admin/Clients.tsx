@@ -87,23 +87,23 @@ export function Clients() {
 
   return (
     <PageShell title="Clients List">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <button
           onClick={() => setShowModal(true)}
-          className="px-4 py-2 bg-primary text-white rounded-lg font-medium flex items-center gap-2 focus-ring text-sm"
+          className="px-4 py-2 bg-primary text-white rounded-lg font-medium flex items-center gap-2 focus-ring text-sm self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           Add Client
         </button>
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-body text-text-mid">Status</span>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <span className="text-sm font-body text-text-mid whitespace-nowrap">Status Filter</span>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring"
+            className="w-full sm:w-auto px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring"
           >
-            <option value="All">All</option>
+            <option value="All">All Clients</option>
             <option value="Active">Active</option>
             <option value="On Hold">On Hold</option>
           </select>

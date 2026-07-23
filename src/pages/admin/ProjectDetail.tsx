@@ -238,25 +238,25 @@ export function ProjectDetail() {
 
       <div className="space-y-4">
         <motion.div
-          className="bg-surface border-l-4 border-accent-mint rounded-xl p-6"
+          className="bg-surface border-l-4 border-accent-mint rounded-xl p-6 shadow-sm"
           whileHover={{ y: -2 }}
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <h3 className="text-lg font-display font-semibold text-text-hi">Team</h3>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setShowEditProject(true)}
-                className="px-3 py-1.5 border border-border-soft rounded text-sm font-medium hover:bg-bg-app transition-colors focus-ring flex items-center gap-1"
+                className="px-3 py-1.5 border border-border-soft rounded-lg text-sm font-medium hover:bg-bg-app transition-colors focus-ring flex items-center gap-1.5"
               >
                 <Edit className="w-4 h-4" />
-                Edit Project
+                <span>Edit Project</span>
               </button>
               <button
                 onClick={() => setShowAssignModal(true)}
-                className="px-3 py-1.5 bg-primary text-white rounded text-sm font-medium hover:bg-primary/90 transition-colors focus-ring flex items-center gap-1"
+                className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors focus-ring flex items-center gap-1.5"
               >
                 <UserPlus className="w-4 h-4" />
-                Assign Member
+                <span>Assign</span>
               </button>
             </div>
           </div>

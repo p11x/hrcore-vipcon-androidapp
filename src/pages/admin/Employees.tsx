@@ -85,33 +85,33 @@ export function Employees() {
 
   return (
     <PageShell title="Employee Management">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
         <button 
           onClick={() => navigate('/admin/add-employee')}
-          className="px-4 py-2 bg-primary text-white rounded-lg font-medium flex items-center gap-2 focus-ring text-sm"
+          className="px-4 py-2 bg-primary text-white rounded-lg font-medium flex items-center gap-2 focus-ring text-sm self-start"
         >
           <Plus className="w-4 h-4" />
           Add Employee
         </button>
-        <div className="flex items-center gap-4">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-low" />
             <input
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search employees..."
-              className="pl-9 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring w-48 md:w-64"
+              placeholder="Search..."
+              className="w-full pl-9 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-body text-text-mid">Status</span>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <span className="text-sm font-body text-text-mid whitespace-nowrap">Status</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring text-text-hi"
+              className="w-full sm:w-auto px-3 py-2 bg-surface border border-border-soft rounded-lg text-sm focus-ring text-text-hi"
             >
-              <option value="All">All</option>
+              <option value="All">All Status</option>
               <option value="Active">Active</option>
               <option value="On Leave">On Leave</option>
             </select>
