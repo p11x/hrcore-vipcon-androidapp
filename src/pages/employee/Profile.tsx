@@ -121,7 +121,7 @@ export function Profile() {
     </PageShell>
   ) : (
     <PageShell title="Personal Details">
-      <div className="max-w-2xl space-y-6">
+      <div className="w-full space-y-6">
         <motion.div
           className="bg-surface border border-border-soft rounded-xl p-6 flex flex-col items-center"
           whileHover={{ y: -2 }}

@@ -38,9 +38,9 @@ const onSubmit = async (_data: AnnouncementFormData) => {}
 
   return (
     <PageShell title="Announcements">
-      <div className="w-full max-w-4xl">
+      <div className="w-full">
         <motion.div
-          className="bg-surface border border-border-soft rounded-xl p-6 mb-8 shadow-sm"
+          className="w-full bg-surface border border-border-soft rounded-xl p-6 mb-8 shadow-sm"
           whileHover={{ y: -2 }}
         >
           <div className="flex items-center gap-3 mb-6">

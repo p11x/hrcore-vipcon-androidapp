@@ -94,7 +94,7 @@ export function Leave() {
 
   return (
     <PageShell title="Leave">
-      <div className="max-w-4xl">
+      <div className="w-full">
         <div className="flex gap-2 mb-6 border-b border-border-soft">
           <button
             onClick={() => setActiveTab('apply')}

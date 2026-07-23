@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 @layer base {
+  html, body, #root {
+    width: 100% !important;
+    min-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+  }
   body {
     @apply bg-[#F5F6FB] text-text-hi font-body;
     -webkit-font-smoothing: antialiased;

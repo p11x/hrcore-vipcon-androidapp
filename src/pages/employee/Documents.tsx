@@ -169,7 +169,7 @@ export function Documents() {
 
   return (
     <PageShell title="My Documents">
-      <div className="max-w-2xl space-y-6">
+      <div className="w-full space-y-6">
         <div>
           <h3 className="text-lg font-display font-semibold text-text-hi mb-3">Send to Company</h3>
           <div className="bg-surface border border-border-soft rounded-xl overflow-hidden">

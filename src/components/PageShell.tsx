@@ -13,7 +13,7 @@ export function PageShell({ title, children, className }: PageShellProps) {
       initial="initial"
       animate="animate"
       exit="exit"
-      className={`p-6 ${className || ''}`}
+      className={`w-full min-h-full p-4 md:p-6 ${className || ''}`}
     >
       {title && (
         <h1 className="text-3xl font-display font-semibold text-text-hi mb-6">

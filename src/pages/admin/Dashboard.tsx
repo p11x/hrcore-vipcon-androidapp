@@ -291,16 +291,16 @@ export function AdminDashboard() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-bg-app"
+      className="w-full min-h-screen bg-bg-app"
     >
-      <div className="p-4 md:p-6">
+      <div className="w-full p-4 md:p-6">
         {/* Row 1: Title, Companies, and Admin Profile */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div className="w-full flex flex-wrap items-center justify-between gap-4 mb-6">
           <h1 className="text-2xl md:text-3xl font-display font-semibold text-text-hi">
             {selectedCompany ? selectedCompany : 'Admin Dashboard'}
           </h1>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 ml-auto">
             {/* Companies Dropdown */}
             <div className="relative">
               <button
@@ -357,7 +357,7 @@ export function AdminDashboard() {
         </div>
 
         {/* Row 2: Search and Notification Bell */}
-        <div className="flex items-center gap-3 mb-6 w-full max-w-2xl">
+        <div className="flex items-center gap-3 mb-6 w-full">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-low" />
             <input

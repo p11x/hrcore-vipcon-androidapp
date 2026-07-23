@@ -125,10 +125,10 @@ function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-bg-app">
+    <div className="w-full flex min-h-screen bg-bg-app overflow-x-hidden">
       <Sidebar onSignOut={handleSignOut} isAdmin={true} />
-      <div className="w-full flex-1 md:ml-64 pt-16 md:pt-0">
-        <Suspense fallback={<div className="p-6"><CardSkeleton /></div>}>
+      <div className="flex-1 w-full min-w-0 md:ml-64 pt-16 md:pt-0">
+        <Suspense fallback={<div className="w-full p-6"><CardSkeleton /></div>}>
           <Routes>
 <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="employees-view" element={<EmployeesView />} />
