@@ -151,7 +151,7 @@ export function DocumentCenter() {
       </div>
 
       <div className="bg-surface border border-border-soft rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-visible">
           <table className="w-full font-body text-sm min-w-[1000px]">
             <thead className="bg-bg-app">
               <tr>

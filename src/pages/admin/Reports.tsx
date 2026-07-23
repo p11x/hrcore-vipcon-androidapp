@@ -4,8 +4,8 @@ import { motion } from 'framer-motion'
 import { useState, useEffect, useMemo } from 'react'
 import { getDatabase } from '../../firebase/config'
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   BarChart,
   Bar,
   PieChart,
@@ -15,9 +15,24 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  CartesianGrid,
 } from 'recharts'
 
-const pieColors = ['#3ECF8E', '#FF6B35', '#F5C518', '#6B7078', '#ADB1B8']
+const pieColors = ['#4F46E5', '#10B981', '#F59E0B', '#F472B6', '#6366F1']
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-surface border border-border-soft p-3 rounded-lg shadow-xl">
+        <p className="text-xs font-mono font-bold text-text-low mb-1 uppercase tracking-wider">{label}</p>
+        <p className="text-sm font-body font-bold text-primary">
+          {payload[0].name}: <span className="text-text-hi">{payload[0].value}</span>
+        </p>
+      </div>
+    )
+  }
+  return null
+}
 
 export function Reports() {
   const [employees, setEmployees] = useState<Record<string, any>>({})
@@ -129,11 +144,12 @@ export function Reports() {
     }
     return Object.entries(counts).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value)
   }, [employees])
+
   return (
     <PageShell title="Reports & Analytics">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <motion.div
-          className="bg-surface border border-border-soft rounded-lg p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6 shadow-sm"
           whileHover={{ y: -2 }}
         >
           <div className="text-text-mid font-body text-sm mb-2">Avg Attendance</div>
@@ -142,7 +158,7 @@ export function Reports() {
         </motion.div>
 
         <motion.div
-          className="bg-surface border border-border-soft rounded-lg p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6 shadow-sm"
           whileHover={{ y: -2 }}
         >
           <div className="text-text-mid font-body text-sm mb-2">Leave Usage</div>
@@ -151,7 +167,7 @@ export function Reports() {
         </motion.div>
 
         <motion.div
-          className="bg-surface border border-border-soft rounded-lg p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6 shadow-sm"
           whileHover={{ y: -2 }}
         >
           <div className="text-text-mid font-body text-sm mb-2">Headcount</div>
@@ -160,94 +176,134 @@ export function Reports() {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <motion.div
-          className="bg-surface border border-border-soft rounded-lg p-6 sm:col-span-2"
+          className="bg-surface border border-border-soft rounded-xl p-6 lg:col-span-2 shadow-sm"
           whileHover={{ y: -2 }}
         >
-          <h3 className="text-lg font-display font-semibold text-text-hi mb-4">
+          <h3 className="text-lg font-display font-semibold text-text-hi mb-6">
             Attendance Trend
           </h3>
-          <div className="h-64">
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={attendanceData}>
-                <XAxis dataKey="day" stroke="#6B7078" fontFamily="'JetBrains Mono', monospace" />
-                <YAxis stroke="#6B7078" fontFamily="'JetBrains Mono', monospace" />
-                <Tooltip
-                  contentStyle={{
-                    background: '#14171D',
-                    border: '1px solid #262B33',
-                  }}
+              <AreaChart data={attendanceData}>
+                <defs>
+                  <linearGradient id="colorPresent" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#4F46E5" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#EAEBF3" vertical={false} />
+                <XAxis
+                  dataKey="day"
+                  stroke="#A0A3B1"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  dy={10}
                 />
-                <Line
+                <YAxis
+                  stroke="#A0A3B1"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  dx={-10}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Area
                   type="monotone"
                   dataKey="present"
-                  stroke="#3ECF8E"
-                  strokeWidth={2}
-                  dot={{ fill: '#3ECF8E' }}
+                  name="Present"
+                  stroke="#4F46E5"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorPresent)"
+                  animationDuration={1500}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </motion.div>
 
         <motion.div
-          className="bg-surface border border-border-soft rounded-lg p-6"
+          className="bg-surface border border-border-soft rounded-xl p-6 shadow-sm"
           whileHover={{ y: -2 }}
         >
-          <h3 className="text-lg font-display font-semibold text-text-hi mb-4">
-            Leave Usage
+          <h3 className="text-lg font-display font-semibold text-text-hi mb-6">
+            Leave Distribution
           </h3>
-          <div className="h-64">
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={leaveData}>
-                <XAxis dataKey="type" stroke="#6B7078" fontFamily="'JetBrains Mono', monospace" />
-                <YAxis stroke="#6B7078" fontFamily="'JetBrains Mono', monospace" />
-                <Tooltip
-                  contentStyle={{
-                    background: '#14171D',
-                    border: '1px solid #262B33',
-                  }}
+                <CartesianGrid strokeDasharray="3 3" stroke="#EAEBF3" vertical={false} />
+                <XAxis
+                  dataKey="type"
+                  stroke="#A0A3B1"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  dy={10}
                 />
-                <Bar dataKey="used" fill="#FF6B35" />
+                <YAxis
+                  stroke="#A0A3B1"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  dx={-10}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar
+                  dataKey="used"
+                  name="Days"
+                  fill="#10B981"
+                  radius={[4, 4, 0, 0]}
+                  barSize={40}
+                  animationDuration={1500}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </motion.div>
-      </div>
 
-      <motion.div
-        className="bg-surface border border-border-soft rounded-lg p-6 mt-4"
-        whileHover={{ y: -2 }}
-      >
-        <h3 className="text-lg font-display font-semibold text-text-hi mb-4">
-          Headcount by Company
-        </h3>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={companyData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-              >
-                {companyData.map((_, i) => (
-                  <Cell key={`cell-${i}`} fill={pieColors[i]} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  background: '#14171D',
-                  border: '1px solid #262B33',
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </motion.div>
+        <motion.div
+          className="bg-surface border border-border-soft rounded-xl p-6 shadow-sm"
+          whileHover={{ y: -2 }}
+        >
+          <h3 className="text-lg font-display font-semibold text-text-hi mb-6">
+            Headcount by Company
+          </h3>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={companyData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                  animationDuration={1500}
+                >
+                  {companyData.map((_, i) => (
+                    <Cell key={`cell-${i}`} fill={pieColors[i % pieColors.length]} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex flex-wrap justify-center gap-4 mt-4">
+            {companyData.slice(0, 4).map((entry, i) => (
+              <div key={entry.name} className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: pieColors[i % pieColors.length] }} />
+                <span className="text-xs font-medium text-text-mid truncate max-w-[80px]">{entry.name}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
     </PageShell>
   )
 }

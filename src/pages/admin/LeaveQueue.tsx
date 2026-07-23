@@ -78,12 +78,12 @@ export function LeaveQueue() {
       </div>
 
       <div className="bg-surface border border-border-soft rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-visible">
           <table className="w-full font-body text-sm min-w-[800px]">
             <thead className="bg-bg-app">
               <tr>
                 <th className="text-left p-4 font-medium text-text-low">EMPLOYEE ID</th>
-                <th className="text-left p-4 font-medium text-text-low">EMPLOYEE NAME</th>
+                <th className="text-left p-4 font-medium text-text-low sticky left-0 bg-bg-app z-10">EMPLOYEE NAME</th>
                 <th className="text-left p-4 font-medium text-text-low">LEAVE TYPE</th>
                 <th className="text-left p-4 font-medium text-text-low">FROM</th>
                 <th className="text-left p-4 font-medium text-text-low">TO</th>
@@ -103,7 +103,7 @@ export function LeaveQueue() {
                       {leave.employeeId}
                     </span>
                   </td>
-                  <td className="p-4">
+                  <td className="p-4 sticky left-0 bg-surface z-10 border-r border-border-soft shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-accent-mint flex items-center justify-center text-white text-xs font-mono">
                         {leave.avatar}

@@ -37,3 +37,29 @@
     @apply px-4 py-2 border border-soft text-text-hi rounded hover:bg-primary-dim transition-colors focus-ring;
   }
 }
+
+@layer utilities {
+  .scrollbar-visible {
+    scrollbar-width: thin;
+    scrollbar-color: #4F46E5 #F5F6FB;
+  }
+
+  .scrollbar-visible::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+
+  .scrollbar-visible::-webkit-scrollbar-track {
+    background: #F5F6FB;
+    border-radius: 10px;
+  }
+
+  .scrollbar-visible::-webkit-scrollbar-thumb {
+    background: rgba(79, 70, 229, 0.4);
+    border-radius: 10px;
+  }
+
+  .scrollbar-visible::-webkit-scrollbar-thumb:hover {
+    background: rgba(79, 70, 229, 0.6);
+  }
+}

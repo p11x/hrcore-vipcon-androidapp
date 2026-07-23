@@ -104,7 +104,7 @@ export function ProjectTimesheet() {
 
   return (
     <PageShell title="Project Timesheet">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
         <div className="flex items-center gap-2">
           <span className="text-sm font-body text-text-mid">Show</span>
           <select className="px-2 py-1 bg-surface border border-border-soft rounded text-sm focus-ring">
@@ -114,7 +114,7 @@ export function ProjectTimesheet() {
 
         <button
           onClick={() => setShowModal(true)}
-          className="px-4 py-2 bg-primary text-white rounded-lg font-medium flex items-center gap-2 hover:bg-primary/90 transition-colors focus-ring"
+          className="px-4 py-2 bg-primary text-white rounded-lg font-medium flex items-center gap-2 hover:bg-primary/90 transition-colors focus-ring w-full sm:w-auto justify-center"
         >
           <Plus className="w-4 h-4" />
           Add Entry
@@ -122,10 +122,11 @@ export function ProjectTimesheet() {
       </div>
 
       <div className="bg-surface border border-border-soft rounded-xl overflow-hidden">
-        <table className="w-full font-body text-sm">
-          <thead className="bg-bg-app">
+        <div className="overflow-x-auto scrollbar-visible">
+          <table className="w-full font-body text-sm min-w-[900px]">
+            <thead className="bg-bg-app">
             <tr>
-              <th className="text-left p-4 font-medium text-text-low">EMPLOYEE</th>
+              <th className="text-left p-4 font-medium text-text-low sticky left-0 bg-bg-app z-10">EMPLOYEE</th>
               <th className="text-left p-4 font-medium text-text-low">PROJECT</th>
               <th className="text-center p-4 font-medium text-text-low">MON</th>
               <th className="text-center p-4 font-medium text-text-low">TUE</th>
@@ -145,7 +146,7 @@ export function ProjectTimesheet() {
                 className="border-t border-border-soft hover:bg-bg-app transition-colors"
                 whileHover={{ x: 2 }}
               >
-                <td className="p-4 font-mono text-accent-coral">{ts.employee}</td>
+                <td className="p-4 font-mono text-accent-coral sticky left-0 bg-surface z-10 border-r border-border-soft shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">{ts.employee}</td>
                 <td className="p-4 text-text-hi">{ts.project}</td>
                 {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day) => (
                   <td key={day} className="p-4 text-center font-mono text-text-mid">
@@ -174,8 +175,9 @@ export function ProjectTimesheet() {
             )}
           </tbody>
         </table>
+        </div>
 
-        <div className="p-4 border-t border-border-soft flex justify-between items-center text-sm text-text-mid font-body">
+        <div className="p-4 border-t border-border-soft flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-text-mid font-body">
           <span>Showing 1 to {timesheets.length} of {timesheets.length} entries</span>
           <div className="flex items-center gap-1">
             <button className="px-3 py-1 rounded border border-border-soft hover:bg-primary-dim">Previous</button>

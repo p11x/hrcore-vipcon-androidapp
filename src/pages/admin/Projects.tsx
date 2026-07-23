@@ -80,14 +80,14 @@ export function Projects() {
 
   return (
     <PageShell title="Projects Management">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto scrollbar-visible">
           {statusTabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-lg font-medium text-sm ${
-                activeTab === tab ? 'bg-primary text-white' : 'bg-surface border border-border-soft text-text-mid'
+              className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors ${
+                activeTab === tab ? 'bg-primary text-white' : 'bg-surface border border-border-soft text-text-mid hover:bg-bg-app'
               }`}
             >
               {tab}
@@ -97,10 +97,10 @@ export function Projects() {
 
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-primary text-white rounded-lg font-medium flex items-center gap-2 focus-ring text-sm"
+          className="px-4 py-2 bg-primary text-white rounded-lg font-medium flex items-center gap-2 focus-ring text-sm self-end sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          Create Project
+          <span className="whitespace-nowrap">Create Project</span>
         </button>
       </div>
 
