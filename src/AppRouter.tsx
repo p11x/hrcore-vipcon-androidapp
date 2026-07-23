@@ -7,7 +7,9 @@ import { Setup } from './pages/Setup'
 import { Sidebar } from './components/Sidebar'
 import { CardSkeleton } from './components/skeletons/CardSkeleton'
 import { useAuth } from './context/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import { App } from '@capacitor/app'
 
 const EmployeeDashboard = lazy(() => import('./pages/employee/Dashboard').then(m => ({ default: m.EmployeeDashboard })))
 const VirtualID = lazy(() => import('./pages/employee/VirtualID').then(m => ({ default: m.VirtualID })))
@@ -48,6 +50,30 @@ const ProjectDetail = lazy(() => import('./pages/admin/ProjectDetail').then(m =>
 const AddEmployee = lazy(() => import('./pages/admin/AddEmployee').then(m => ({ default: m.AddEmployee })))
 
 function AppRouter() {
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  useEffect(() => {
+    const handleBackButton = App.addListener('backButton', ({ canGoBack }) => {
+      if (canGoBack) {
+        // If it's a root-level page like login or dashboards, we might want to exit or do nothing
+        // but for now, navigating back internally is the primary goal
+        const path = location.pathname
+        if (path === '/login' || path === '/admin/dashboard' || path === '/employee/dashboard') {
+          // You could optionally minimize the app here: App.exitApp()
+          return
+        }
+        navigate(-1)
+      } else {
+        App.exitApp()
+      }
+    })
+
+    return () => {
+      handleBackButton.then(h => h.remove())
+    }
+  }, [location, navigate])
+
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
