@@ -294,12 +294,72 @@ export function AdminDashboard() {
       className="min-h-screen bg-bg-app"
     >
       <div className="p-4 md:p-6">
+        {/* Top Row: Companies and Admin Profile */}
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-2">
+            {/* Companies Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-soft bg-surface text-sm text-text-mid hover:text-text-hi transition-colors focus-ring"
+              >
+                <Building className="w-4 h-4 text-primary" />
+                <span className="max-w-[100px] md:max-w-[120px] truncate text-xs md:text-sm">{selectedCompany || 'Companies'}</span>
+                <ChevronDown className="w-4 h-4 text-text-low" />
+              </button>
+              {companyDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setCompanyDropdownOpen(false)} />
+                  <div className="absolute left-0 mt-2 w-48 bg-bg-surface border border-border-soft rounded-lg shadow-xl py-1 z-20 font-sans">
+                    <div className="px-3 py-1 text-xs text-text-low font-mono uppercase tracking-wider border-b border-border-soft mb-1 flex justify-between items-center">
+                      <span>Added Companies</span>
+                      {selectedCompany && (
+                        <button
+                          onClick={() => setSelectedCompany(null)}
+                          className="text-[10px] text-primary hover:underline lowercase"
+                        >
+                          clear
+                        </button>
+                      )}
+                    </div>
+                    {companiesList.map((company) => (
+                      <div
+                        key={company}
+                        className={`px-3 py-2 text-sm cursor-pointer transition-colors ${
+                          company === selectedCompany
+                            ? 'bg-primary-dim text-primary font-medium'
+                            : 'text-text-mid hover:bg-bg-app hover:text-text-hi'
+                        }`}
+                        onClick={() => {
+                          setSelectedCompany(company === selectedCompany ? null : company)
+                          setCompanyDropdownOpen(false)
+                        }}
+                      >
+                        {company}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 pl-2 border-l border-border-soft">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-medium">
+              <User className="w-5 h-5" />
+            </div>
+            <span className="text-sm font-body text-text-hi">Admin</span>
+          </div>
+        </div>
+
+        {/* Second Row: Title, Search, and Notification */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <h1 className="text-2xl md:text-3xl font-display font-semibold text-text-hi">
             {selectedCompany ? selectedCompany : 'Admin Dashboard'}
           </h1>
-          <div className="flex flex-wrap items-center gap-2 md:gap-4">
-            <div className="relative flex-1 md:flex-none">
+
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="relative flex-1 md:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-low" />
               <input
                 type="search"
@@ -307,12 +367,12 @@ export function AdminDashboard() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setShowSearchResults(true)}
                 placeholder="Search..."
-                className="w-full md:w-48 lg:w-64 pl-9 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring"
+                className="w-full pl-9 pr-4 py-2 rounded-full border border-border-soft bg-surface text-sm focus-ring"
               />
               {showSearchResults && searchQuery.length > 0 && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowSearchResults(false)} />
-                  <div className="absolute top-full left-0 mt-2 w-full bg-surface border border-border-soft rounded-lg shadow-xl py-2 z-20 max-h-80 overflow-y-auto">
+                  <div className="absolute top-full left-0 mt-2 w-full bg-bg-surface border border-border-soft rounded-lg shadow-xl py-2 z-20 max-h-80 overflow-y-auto">
                     {Object.keys(filteredEmployees).length === 0 ? (
                       <div className="px-4 py-3 text-sm text-text-low text-center">No employees found</div>
                     ) : (
@@ -340,66 +400,16 @@ export function AdminDashboard() {
                 </>
               )}
             </div>
-            <button 
+
+            <button
               onClick={() => navigate('/admin/notifications')}
-              className="p-2 rounded-full hover:bg-primary-dim transition-colors relative focus-ring"
+              className="p-2 rounded-full hover:bg-primary-dim transition-colors relative focus-ring flex-shrink-0"
             >
               <Bell className="w-5 h-5 text-text-mid" />
               {unreadNotifications > 0 && (
                 <span className="absolute top-1 right-1 w-2 h-2 bg-accent-coral rounded-full" />
               )}
             </button>
-            {/* Companies Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-soft bg-surface text-sm text-text-mid hover:text-text-hi transition-colors focus-ring"
-              >
-                <Building className="w-4 h-4 text-primary" />
-                <span className="max-w-[120px] truncate">{selectedCompany || 'Companies'}</span>
-                <ChevronDown className="w-4 h-4 text-text-low" />
-              </button>
-              {companyDropdownOpen && (
-                <>
-                  <div className="fixed inset-0 z-10" onClick={() => setCompanyDropdownOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-48 bg-surface border border-border-soft rounded-lg shadow-xl py-1 z-20 font-sans">
-                    <div className="px-3 py-1 text-xs text-text-low font-mono uppercase tracking-wider border-b border-border-soft mb-1 flex justify-between items-center">
-                      <span>Added Companies</span>
-                      {selectedCompany && (
-                        <button 
-                          onClick={() => setSelectedCompany(null)}
-                          className="text-[10px] text-primary hover:underline lowercase"
-                        >
-                          clear
-                        </button>
-                      )}
-                    </div>
-                    {companiesList.map((company) => (
-                      <div
-                        key={company}
-                        className={`px-3 py-2 text-sm cursor-pointer transition-colors ${
-                          company === selectedCompany 
-                            ? 'bg-primary-dim text-primary font-medium'
-                            : 'text-text-mid hover:bg-bg-app hover:text-text-hi'
-                        }`}
-                        onClick={() => {
-                          setSelectedCompany(company === selectedCompany ? null : company)
-                          setCompanyDropdownOpen(false)
-                        }}
-                      >
-                        {company}
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="flex items-center gap-2 pl-2 border-l border-border-soft">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-medium">
-                <User className="w-5 h-5" />
-              </div>
-              <span className="hidden lg:inline text-sm font-body">Admin</span>
-            </div>
           </div>
         </div>
 
