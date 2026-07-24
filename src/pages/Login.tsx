@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Check, X } from 'lucide-react'
 
 type Mode = 'login' | 'register'
 
@@ -32,6 +33,16 @@ export function Login() {
     resolver: zodResolver(registrationSchema),
     defaultValues: { companySelection: 'vipcon soft systems' }
   })
+
+  const passwordValue = watchReg('password') || ''
+
+  const passwordRules = [
+    { label: '8+ chars', met: passwordValue.length >= 8 },
+    { label: 'Mixed case', met: /[A-Z]/.test(passwordValue) && /[a-z]/.test(passwordValue) },
+    { label: 'Number', met: /[0-9]/.test(passwordValue) },
+    { label: 'Special char', met: /[^A-Za-z0-9]/.test(passwordValue) }
+  ]
+  const isPasswordDirty = passwordValue.length > 0
 
   useEffect(() => {
     if (user && !loading) {
@@ -176,7 +187,7 @@ export function Login() {
                     <input
                       {...registerReg('fullName')}
                       className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all"
-                      placeholder="John Doe"
+                      placeholder="Enter your full name"
                       disabled={isRegistering}
                     />
                     {regErrors.fullName && (
@@ -235,9 +246,25 @@ export function Login() {
                     {...registerReg('password')}
                     type="password"
                     className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all"
-                    placeholder="Min 6 characters"
+                    placeholder="Min 8 characters, mixed case"
                     disabled={isRegistering}
                   />
+                  {isPasswordDirty && (
+                    <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1">
+                      {passwordRules.map((rule, idx) => (
+                        <div key={idx} className="flex items-center gap-1 text-[10px]">
+                          {rule.met ? (
+                            <Check className="w-3 h-3 text-accent-mint" />
+                          ) : (
+                            <X className="w-3 h-3 text-text-low" />
+                          )}
+                          <span className={rule.met ? 'text-accent-mint font-bold' : 'text-text-low'}>
+                            {rule.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   {regErrors.password && (
                     <p className="text-accent-coral text-xs mt-1">{regErrors.password.message}</p>
                   )}
