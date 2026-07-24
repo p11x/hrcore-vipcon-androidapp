@@ -37,12 +37,16 @@ export function EmployeesView() {
       unsubscribe = db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, { name: string; companyName?: string; department?: string; position: string; role?: string }> | undefined
         if (data) {
-          setEmployees(Object.entries(data).map(([id, emp]) => ({
-            id,
-            name: emp.name,
-            companyName: emp.companyName || emp.department || '',
-            position: emp.position || emp.role || '',
-          })))
+          setEmployees(
+            Object.entries(data)
+              .filter(([_, emp]) => emp.role?.toLowerCase() !== 'admin')
+              .map(([id, emp]) => ({
+                id,
+                name: emp.name,
+                companyName: emp.companyName || emp.department || '',
+                position: emp.position || emp.role || '',
+              }))
+          )
         } else {
           setEmployees([])
         }

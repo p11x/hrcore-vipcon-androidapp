@@ -50,7 +50,12 @@ export function Reports() {
     getDatabase().then((db: any) => {
       unsubEmps = db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val()
-        if (data) setEmployees(data)
+        if (data) {
+          const filtered = Object.fromEntries(
+            Object.entries(data).filter(([_, emp]: [string, any]) => emp.role?.toLowerCase() !== 'admin')
+          )
+          setEmployees(filtered)
+        }
         else setEmployees({})
       })
       unsubAttendance = db.onValue(`tenants/${tenantId}/attendance`, (snapshot: any) => {

@@ -46,7 +46,8 @@ export function AdminDashboard() {
   const dashboardEmployees = useMemo(() => {
     return Object.fromEntries(
       Object.entries(employees).filter(([_, emp]: [string, any]) => {
-        return !selectedCompany || emp.companyName === selectedCompany
+        const isNotAdmin = emp.role?.toLowerCase() !== 'admin'
+        return isNotAdmin && (!selectedCompany || emp.companyName === selectedCompany)
       })
     )
   }, [employees, selectedCompany])
@@ -54,12 +55,13 @@ export function AdminDashboard() {
   const filteredEmployees = useMemo(() => {
     return Object.fromEntries(
       Object.entries(employees).filter(([_, emp]: [string, any]) => {
+        const isNotAdmin = emp.role?.toLowerCase() !== 'admin'
         const matchesCompany = !selectedCompany || emp.companyName === selectedCompany
         const matchesSearch = !searchQuery || 
           emp.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
           emp.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           emp.position?.toLowerCase().includes(searchQuery.toLowerCase())
-        return matchesCompany && matchesSearch
+        return isNotAdmin && matchesCompany && matchesSearch
       })
     )
   }, [employees, selectedCompany, searchQuery])

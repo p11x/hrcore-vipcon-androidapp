@@ -34,19 +34,21 @@ export function Employees() {
       unsubscribe = db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) {
-          const loaded: Employee[] = Object.entries(data).map(([id, emp]: [string, any]) => {
-            const name = emp.name || emp.fullName || 'Unnamed Employee'
-            return {
-              id,
-              name,
-              avatar: name.split(' ').map((n: string) => n ? n[0] : '').join('').slice(0, 2).toUpperCase() || 'E',
-              role: emp.position || emp.role || 'Employee',
-              companyName: emp.companyName || emp.department || 'Acme Corp',
-              email: emp.email || '',
-              phone: emp.phone || '',
-              status: emp.status || 'Active'
-            }
-          })
+          const loaded: Employee[] = Object.entries(data)
+            .filter(([_, emp]: [string, any]) => emp.role?.toLowerCase() !== 'admin')
+            .map(([id, emp]: [string, any]) => {
+              const name = emp.name || emp.fullName || 'Unnamed Employee'
+              return {
+                id,
+                name,
+                avatar: name.split(' ').map((n: string) => n ? n[0] : '').join('').slice(0, 2).toUpperCase() || 'E',
+                role: emp.position || emp.role || 'Employee',
+                companyName: emp.companyName || emp.department || 'Acme Corp',
+                email: emp.email || '',
+                phone: emp.phone || '',
+                status: emp.status || 'Active'
+              }
+            })
           setEmployees(loaded)
         } else {
           setEmployees([])
