@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Check, X } from 'lucide-react'
 
 type Mode = 'login' | 'register'
 
@@ -26,10 +27,22 @@ export function Login() {
   const {
     register: registerReg,
     handleSubmit: handleSubmitReg,
+    watch: watchReg,
     formState: { errors: regErrors, isSubmitting: isRegistering },
   } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
+    defaultValues: { companySelection: 'vipcon soft systems' }
   })
+
+  const passwordValue = watchReg('password') || ''
+
+  const passwordRules = [
+    { label: '8+ chars', met: passwordValue.length >= 8 },
+    { label: 'Mixed case', met: /[A-Z]/.test(passwordValue) && /[a-z]/.test(passwordValue) },
+    { label: 'Number', met: /[0-9]/.test(passwordValue) },
+    { label: 'Special char', met: /[^A-Za-z0-9]/.test(passwordValue) }
+  ]
+  const isPasswordDirty = passwordValue.length > 0
 
   useEffect(() => {
     if (user && !loading) {
@@ -53,7 +66,8 @@ export function Login() {
 
   const onRegisterSubmit = async (data: RegistrationFormData) => {
     try {
-      await registerAdmin(data.email, data.password, data.fullName, data.organizationName)
+      const finalOrgName = data.companySelection === 'Others' ? data.customCompanyName : data.companySelection
+      await registerAdmin(data.email, data.password, data.fullName, finalOrgName!)
       toast.success('Registration successful! Welcome.')
     } catch (error: any) {
       console.error('Registration error:', error)
@@ -149,9 +163,6 @@ export function Login() {
                 >
                   {isLoggingIn ? 'Verifying...' : 'Sign In'}
                 </button>
-                <div className="mt-4 p-3 bg-primary/10 rounded-lg text-xs text-primary text-center">
-                  <strong>Demo Admin:</strong> admin@hrcore.dev / admin123
-                </div>
               </motion.form>
             ) : (
               <motion.form
@@ -170,7 +181,7 @@ export function Login() {
                     <input
                       {...registerReg('fullName')}
                       className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all"
-                      placeholder="John Doe"
+                      placeholder="Enter your full name"
                       disabled={isRegistering}
                     />
                     {regErrors.fullName && (
@@ -179,16 +190,30 @@ export function Login() {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-text-low uppercase tracking-wider mb-2">
-                      Organization Name
+                      Company
                     </label>
-                    <input
-                      {...registerReg('organizationName')}
+                    <select
+                      {...registerReg('companySelection')}
                       className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all"
-                      placeholder="Acme Corp"
                       disabled={isRegistering}
-                    />
-                    {regErrors.organizationName && (
-                      <p className="text-accent-coral text-xs mt-1">{regErrors.organizationName.message}</p>
+                    >
+                      <option value="vipcon soft systems">vipcon soft systems</option>
+                      <option value="Others">Others</option>
+                    </select>
+                    {regErrors.companySelection && (
+                      <p className="text-accent-coral text-xs mt-1">{regErrors.companySelection.message}</p>
+                    )}
+
+                    {watchReg('companySelection') === 'Others' && (
+                      <input
+                        {...registerReg('customCompanyName')}
+                        className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all mt-2"
+                        placeholder="Type your company name"
+                        disabled={isRegistering}
+                      />
+                    )}
+                    {regErrors.customCompanyName && (
+                      <p className="text-accent-coral text-xs mt-1">{regErrors.customCompanyName.message}</p>
                     )}
                   </div>
                 </div>
@@ -215,9 +240,25 @@ export function Login() {
                     {...registerReg('password')}
                     type="password"
                     className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all"
-                    placeholder="Min 6 characters"
+                    placeholder="Min 8 characters, mixed case"
                     disabled={isRegistering}
                   />
+                  {isPasswordDirty && (
+                    <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1">
+                      {passwordRules.map((rule, idx) => (
+                        <div key={idx} className="flex items-center gap-1 text-[10px]">
+                          {rule.met ? (
+                            <Check className="w-3 h-3 text-accent-mint" />
+                          ) : (
+                            <X className="w-3 h-3 text-text-low" />
+                          )}
+                          <span className={rule.met ? 'text-accent-mint font-bold' : 'text-text-low'}>
+                            {rule.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   {regErrors.password && (
                     <p className="text-accent-coral text-xs mt-1">{regErrors.password.message}</p>
                   )}
