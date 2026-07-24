@@ -44,25 +44,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (!isAdminUser || !userTenantId) {
               const db = await getDatabase()
               console.log('Fetching user doc from DB for:', firebaseUser.uid)
-              // First verify the user exists in our DB, if not they were deleted
-              let snap = await db.get(`users/${firebaseUser.uid}`)
-              if (!snap.exists()) {
-                console.log('User doc not found, waiting 2s...')
-                await new Promise(resolve => setTimeout(resolve, 2000))
+
+              let snap = null
+              let retries = 0
+              const maxRetries = 5
+
+              while (retries < maxRetries) {
                 snap = await db.get(`users/${firebaseUser.uid}`)
+                if (snap.exists()) break
+
+                console.log(`User doc not found, retry ${retries + 1}/${maxRetries}...`)
+                await new Promise(resolve => setTimeout(resolve, 1500))
+                retries++
               }
-              if (!snap.exists()) {
-                console.error('User doc still not found, signing out')
-                if ((auth as any).signOut) {
-                  await (auth as any).signOut()
-                } else {
-                  await signOut(auth)
-                }
+
+              if (!snap || !snap.exists()) {
+                console.warn('User doc missing after retries. This might be a new user registration in progress.')
+                // Don't sign out immediately if they just registered (they might have role/tenantId in local memory soon)
+                // However, we need tenantId for the app to function.
+                // We'll wait a bit longer or let them stay in a 'loading' state.
                 return
               }
               const userData = snap.val()
               console.log('User data from DB:', userData)
-              isAdminUser = userData.role === 'admin'
+              isAdminUser = userData.role?.toLowerCase() === 'admin'
               userTenantId = userData.tenantId || null
             }
             
@@ -162,7 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await db.set(`tenants/${newTenantId}/employees/${uid}`, {
       name: fullName,
       email,
-      role: 'Admin',
+      role: 'admin',
       tenantId: newTenantId,
       companyName: orgName,
       status: 'Active'
