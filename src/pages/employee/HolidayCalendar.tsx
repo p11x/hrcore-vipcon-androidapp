@@ -32,10 +32,13 @@ export function HolidayCalendar() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [])
+  }, [tenantId])
+
+  const firstDayOfMonth = startOfMonth(currentMonth)
+  const startingDayIndex = firstDayOfMonth.getDay()
 
   const days = eachDayOfInterval({
-    start: startOfMonth(currentMonth),
+    start: firstDayOfMonth,
     end: endOfMonth(currentMonth),
   })
 
@@ -88,6 +91,10 @@ export function HolidayCalendar() {
             <div key={d} className="text-center text-text-low font-mono text-xs py-2">
               {d}
             </div>
+          ))}
+
+          {Array.from({ length: startingDayIndex }).map((_, i) => (
+            <div key={`empty-${i}`} className="aspect-square" />
           ))}
 
           {days.map((day) => {

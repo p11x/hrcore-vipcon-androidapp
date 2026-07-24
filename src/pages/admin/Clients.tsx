@@ -1,7 +1,8 @@
 import { PageShell } from '../../components/PageShell'
 import { motion } from 'framer-motion'
-import { Plus, Edit, Trash2 } from 'lucide-react'
+import { Plus, Edit, Trash2, Mail, Phone, Building2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { hrToast } from '../../components/HRCToast'
 import { getDatabase } from '../../firebase/config'
 import { useAuth } from '../../context/AuthContext'
@@ -20,10 +21,12 @@ interface Client {
 
 export function Clients() {
   const { tenantId, user } = useAuth()
+  const navigate = useNavigate()
   const [clients, setClients] = useState<Client[]>([])
   const [statusFilter, setStatusFilter] = useState('All')
   const [showModal, setShowModal] = useState(false)
   const [editingClient, setEditingClient] = useState<Client | null>(null)
+  const [viewClient, setViewClient] = useState<Client | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     title: '',
@@ -155,10 +158,16 @@ export function Clients() {
             </span>
 
             <div className="flex gap-2 mt-4">
-              <button className="flex-1 px-3 py-1.5 bg-primary text-white rounded-lg text-sm font-medium focus-ring">
+              <button 
+                onClick={() => navigate('/admin/chat')}
+                className="flex-1 px-3 py-1.5 bg-primary text-white rounded-lg text-sm font-medium focus-ring"
+              >
                 Chat
               </button>
-              <button className="flex-1 px-3 py-1.5 border border-border-soft rounded-lg text-sm font-medium focus-ring">
+              <button 
+                onClick={() => setViewClient(client)}
+                className="flex-1 px-3 py-1.5 border border-border-soft rounded-lg text-sm font-medium focus-ring hover:bg-bg-app"
+              >
                 Profile
               </button>
             </div>
@@ -250,6 +259,77 @@ export function Clients() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+      {/* View Client Modal */}
+      {viewClient && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-surface rounded-xl w-full max-w-md overflow-hidden"
+          >
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full bg-accent-mint flex items-center justify-center text-white text-2xl font-mono">
+                    {viewClient.avatar}
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-display font-semibold text-text-hi">{viewClient.name}</h2>
+                    <p className="text-text-mid text-sm flex items-center gap-1 mt-1">
+                      <Building2 className="w-3.5 h-3.5" />
+                      {viewClient.title}
+                    </p>
+                  </div>
+                </div>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                  viewClient.status === 'Active' ? 'bg-accent-mint/10 text-accent-mint' : 'bg-text-low/10 text-text-low'
+                }`}>
+                  {viewClient.status}
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-bg-app p-4 rounded-lg space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded bg-surface flex items-center justify-center shadow-sm">
+                      <Mail className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-text-low uppercase tracking-wider">Email</div>
+                      <div className="text-text-hi text-sm font-medium">{viewClient.email}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded bg-surface flex items-center justify-center shadow-sm">
+                      <Phone className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-text-low uppercase tracking-wider">Phone</div>
+                      <div className="text-text-hi text-sm font-medium">{viewClient.phone}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-medium text-text-hi mb-2">Description</h3>
+                  <p className="text-sm text-text-mid bg-bg-app p-3 rounded-lg leading-relaxed">
+                    {viewClient.description || 'No description provided.'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <button
+                  onClick={() => setViewClient(null)}
+                  className="w-full px-4 py-2 border border-border-soft rounded-lg text-sm font-medium hover:bg-bg-app transition-colors focus-ring"
+                >
+                  Close Profile
+                </button>
+              </div>
+            </div>
+          </motion.div>
         </div>
       )}
     </PageShell>

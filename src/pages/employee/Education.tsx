@@ -88,14 +88,14 @@ export function Education() {
   }
 
   const handleUpload = async (docType: string, file: File) => {
-    if (!user?.uid) return
+    if (!user?.uid || !tenantId) return
     setUploading(docType)
     try {
       const db = await getDatabase()
       const storage = await getStorage()
       const { ref: storageRef, uploadBytes, getDownloadURL } = await import('firebase/storage')
       
-      const fileRef = storageRef(storage, `documents/${user.uid}/${docType}/${file.name}`)
+      const fileRef = storageRef(storage, `tenants/${tenantId}/documents/${user.uid}/${docType}/${file.name}`)
       await uploadBytes(fileRef, file)
       const downloadUrl = await getDownloadURL(fileRef)
 
