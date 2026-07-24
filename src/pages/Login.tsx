@@ -26,16 +26,21 @@ export function Login() {
   const {
     register: registerReg,
     handleSubmit: handleSubmitReg,
+    watch: watchReg,
     formState: { errors: regErrors, isSubmitting: isRegistering },
   } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
+    defaultValues: { companySelection: 'vipcon soft systems' }
   })
 
   useEffect(() => {
     if (user && !loading) {
+      console.log('Login useEffect: user is logged in, isAdmin:', isAdmin)
       if (isAdmin) {
+        console.log('Navigating to admin dashboard')
         navigate('/admin/dashboard', { replace: true })
       } else {
+        console.log('Navigating to employee dashboard')
         navigate('/employee/dashboard', { replace: true })
       }
     }
@@ -53,7 +58,8 @@ export function Login() {
 
   const onRegisterSubmit = async (data: RegistrationFormData) => {
     try {
-      await registerAdmin(data.email, data.password, data.fullName, data.organizationName)
+      const finalOrgName = data.companySelection === 'Others' ? data.customCompanyName : data.companySelection
+      await registerAdmin(data.email, data.password, data.fullName, finalOrgName!)
       toast.success('Registration successful! Welcome.')
     } catch (error: any) {
       console.error('Registration error:', error)
@@ -179,16 +185,30 @@ export function Login() {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-text-low uppercase tracking-wider mb-2">
-                      Organization Name
+                      Company
                     </label>
-                    <input
-                      {...registerReg('organizationName')}
+                    <select
+                      {...registerReg('companySelection')}
                       className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all"
-                      placeholder="Acme Corp"
                       disabled={isRegistering}
-                    />
-                    {regErrors.organizationName && (
-                      <p className="text-accent-coral text-xs mt-1">{regErrors.organizationName.message}</p>
+                    >
+                      <option value="vipcon soft systems">vipcon soft systems</option>
+                      <option value="Others">Others</option>
+                    </select>
+                    {regErrors.companySelection && (
+                      <p className="text-accent-coral text-xs mt-1">{regErrors.companySelection.message}</p>
+                    )}
+
+                    {watchReg('companySelection') === 'Others' && (
+                      <input
+                        {...registerReg('customCompanyName')}
+                        className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all mt-2"
+                        placeholder="Type your company name"
+                        disabled={isRegistering}
+                      />
+                    )}
+                    {regErrors.customCompanyName && (
+                      <p className="text-accent-coral text-xs mt-1">{regErrors.customCompanyName.message}</p>
                     )}
                   </div>
                 </div>
