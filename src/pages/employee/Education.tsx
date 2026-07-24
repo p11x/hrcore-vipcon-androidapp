@@ -68,15 +68,21 @@ export function Education() {
       })
     }
     return () => { if (unsubDocs) unsubDocs() }
-  }, [user?.uid, reset])
+  }, [user?.uid, reset, tenantId])
 
   const onSubmit = async (data: EducationFormData) => {
     if (!user?.uid) return
+    if (!tenantId) {
+      hrToast.error('Save Failed', 'Missing organization context')
+      return
+    }
     try {
+      const sanitizedData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined))
       const db = await getDatabase()
-      await db.set(`tenants/${tenantId}/education/${user.uid}`, data)
+      await db.set(`tenants/${tenantId}/education/${user.uid}`, sanitizedData)
       hrToast.success('Education Saved', 'Education details updated successfully')
-    } catch {
+    } catch (error: any) {
+      console.error('Education save error:', error);
       hrToast.error('Save Failed', 'Unable to update education details')
     }
   }
@@ -123,6 +129,9 @@ export function Education() {
               </label>
               <input
                 {...register('collegeName')}
+                onInput={(e) => {
+                  e.currentTarget.value = e.currentTarget.value.replace(/[0-9]/g, '')
+                }}
                 className="w-full px-3 py-2 bg-surface border border-border-soft rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring"
                 placeholder="Enter college name"
               />
@@ -137,6 +146,9 @@ export function Education() {
               </label>
               <input
                 {...register('degree')}
+                onInput={(e) => {
+                  e.currentTarget.value = e.currentTarget.value.replace(/[0-9]/g, '')
+                }}
                 className="w-full px-3 py-2 bg-surface border border-border-soft rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring"
                 placeholder="Enter degree"
               />
@@ -194,6 +206,9 @@ export function Education() {
               </label>
               <input
                 {...register('specialization')}
+                onInput={(e) => {
+                  e.currentTarget.value = e.currentTarget.value.replace(/[0-9]/g, '')
+                }}
                 className="w-full px-3 py-2 bg-surface border border-border-soft rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring"
                 placeholder="Enter specialization"
               />
@@ -296,10 +311,17 @@ export function Education() {
                         {docStatus.uploaded ? 'Replace' : 'Upload'}
                         <input
                           type="file"
+                          accept=".pdf,application/pdf"
                           className="hidden"
                           onChange={(e) => {
                             const file = e.target.files?.[0]
-                            if (file) handleUpload(doc.type, file)
+                            if (file) {
+                              if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+                                hrToast.error('Invalid File', 'Please upload a PDF file.')
+                                return
+                              }
+                              handleUpload(doc.type, file)
+                            }
                           }}
                         />
                       </label>

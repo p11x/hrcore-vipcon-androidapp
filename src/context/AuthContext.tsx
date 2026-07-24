@@ -41,35 +41,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             isAdminUser = token.claims.role === 'admin'
             userTenantId = (token.claims.tenantId as string) || null
 
-            if (!isAdminUser || !userTenantId) {
-              const db = await getDatabase()
-              console.log('Fetching user doc from DB for:', firebaseUser.uid)
+            const db = await getDatabase()
+            console.log('Fetching user doc from DB for:', firebaseUser.uid)
 
-              let snap = null
-              let retries = 0
-              const maxRetries = 5
+            let snap = null
+            let retries = 0
+            const maxRetries = 5
 
-              while (retries < maxRetries) {
-                snap = await db.get(`users/${firebaseUser.uid}`)
-                if (snap.exists()) break
+            while (retries < maxRetries) {
+              snap = await db.get(`users/${firebaseUser.uid}`)
+              if (snap.exists()) break
 
-                console.log(`User doc not found, retry ${retries + 1}/${maxRetries}...`)
-                await new Promise(resolve => setTimeout(resolve, 1500))
-                retries++
+              console.log(`User doc not found, retry ${retries + 1}/${maxRetries}...`)
+              await new Promise(resolve => setTimeout(resolve, 1500))
+              retries++
+            }
+
+            if (!snap || !snap.exists()) {
+              console.warn('User doc missing after retries. Creating a default employee record.')
+              const defaultTenantId = 'default'
+              try {
+                await (db as any).set(`users/${firebaseUser.uid}`, {
+                  email: firebaseUser.email,
+                  role: 'employee',
+                  tenantId: defaultTenantId,
+                  fullName: firebaseUser.email?.split('@')[0] || 'Employee'
+                })
+              } catch (err) {
+                console.error('Failed to create default user doc:', err)
               }
-
-              if (!snap || !snap.exists()) {
-                console.warn('User doc missing after retries. This might be a new user registration in progress.')
-                // Don't sign out immediately if they just registered (they might have role/tenantId in local memory soon)
-                // However, we need tenantId for the app to function.
-                // We'll wait a bit longer or let them stay in a 'loading' state.
-                setLoading(false)
-                return
-              }
+              isAdminUser = false
+              userTenantId = defaultTenantId
+            } else {
               const userData = snap.val()
               console.log('User data from DB:', userData)
               isAdminUser = userData.role?.toLowerCase() === 'admin'
-              userTenantId = userData.tenantId || null
+              userTenantId = userData.tenantId || userTenantId || 'default'
+
+              // Self-heal: If DB is missing tenantId, update it so rules don't fail
+              if (!userData.tenantId && userTenantId) {
+                try {
+                  await (db as any).update(`users/${firebaseUser.uid}`, {
+                    tenantId: userTenantId
+                  })
+                } catch (e) {
+                  console.error('Failed to self-heal tenantId in user doc', e)
+                }
+              }
             }
             
             console.log('Setting final auth state:', { isAdminUser, userTenantId })

@@ -79,6 +79,7 @@ export function AttendanceViewer() {
   const { tenantId } = useAuth()
   const [employees, setEmployees] = useState<Employee[]>([])
   const [attendanceDb, setAttendanceDb] = useState<AllAttendanceRecords>({})
+  const [holidays, setHolidays] = useState<Record<string, { name: string, type: string }>>({})
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedMonth, setSelectedMonth] = useState(6) // July (0-indexed)
   const [selectedYear, setSelectedYear] = useState(2026) // Default 2026
@@ -95,21 +96,25 @@ export function AttendanceViewer() {
   // Real-time listener for database
   useEffect(() => {
     if (!tenantId) return
+
     let unsubEmp: (() => void) | null = null
     let unsubAtt: (() => void) | null = null
+    let unsubHol: (() => void) | null = null
 
     getDatabase().then((db: any) => {
       // 1. Listen to employees
       unsubEmp = db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) {
-          const loaded: Employee[] = Object.entries(data).map(([id, emp]: [string, any]) => ({
-            id,
-            name: emp.name || emp.fullName || 'Unnamed Employee',
-            companyName: emp.companyName || emp.department || 'Acme Corp',
-            position: emp.position || 'Employee',
-            avatar: (emp.name || emp.fullName || 'EE').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
-          }))
+          const loaded: Employee[] = Object.entries(data)
+            .filter(([_, emp]: [string, any]) => emp.role?.toLowerCase() !== 'admin')
+            .map(([id, emp]: [string, any]) => ({
+              id,
+              name: emp.name || emp.fullName || 'Unnamed Employee',
+              companyName: emp.companyName || emp.department || 'Acme Corp',
+              position: emp.position || 'Employee',
+              avatar: (emp.name || emp.fullName || 'EE').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+            }))
           setEmployees(loaded)
         } else {
           setEmployees([])
@@ -125,11 +130,26 @@ export function AttendanceViewer() {
           setAttendanceDb({})
         }
       })
+
+      // 3. Listen to holidays
+      unsubHol = db.onValue(`tenants/${tenantId}/holidays`, (snapshot: any) => {
+        const data = snapshot.val()
+        if (data) {
+          const holidayMap: Record<string, { name: string, type: string }> = {}
+          Object.values(data).forEach((h: any) => {
+            if (h.date) holidayMap[h.date] = { name: h.name, type: h.type }
+          })
+          setHolidays(holidayMap)
+        } else {
+          setHolidays({})
+        }
+      })
     })
 
     return () => {
       if (unsubEmp) unsubEmp()
       if (unsubAtt) unsubAtt()
+      if (unsubHol) unsubHol()
     }
   }, [tenantId])
 
@@ -140,13 +160,18 @@ export function AttendanceViewer() {
       return attendanceDb[employeeId][dateStr]
     }
     
+    // Check if it's a holiday, don't generate mock data for it
+    if (holidays[dateStr]) {
+      return undefined
+    }
+
     // 2. Otherwise generate deterministically so the UI always has realistic records
     const [year, month] = dateStr.split('-').map(Number)
     const emp = employees.find(e => e.id === employeeId)
     const isTestEmployee = emp?.name === 'Sunny' || emp?.name === 'Pavan'
     const mockRecord = generateMockAttendanceForMonth(employeeId, year, month - 1, isTestEmployee)
     return mockRecord[dateStr]
-  }, [attendanceDb, employees])
+  }, [attendanceDb, employees, holidays])
 
   // Calculate statistics for each employee for the currently selected month
   const statsByEmployee = useMemo(() => {
@@ -163,8 +188,9 @@ export function AttendanceViewer() {
         const dateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
         const dayOfWeek = new Date(selectedYear, selectedMonth, d).getDay()
         const record = getDayRecord(emp.id, dateStr)
+        const isHoliday = !!holidays[dateStr]
 
-        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        if (dayOfWeek !== 0 && dayOfWeek !== 6 && !isHoliday) {
           totalWorkdays++
         }
 
@@ -183,7 +209,7 @@ export function AttendanceViewer() {
       acc[emp.id] = { present, halfDay, absent, late, rate, totalWorkdays }
       return acc
     }, {} as Record<string, { present: number; halfDay: number; absent: number; late: number; rate: number; totalWorkdays: number }>)
-  }, [employees, selectedMonth, selectedYear, getDayRecord])
+  }, [employees, selectedMonth, selectedYear, getDayRecord, holidays])
 
   // Filter employees
   const filteredEmployees = useMemo(() => {
@@ -619,6 +645,7 @@ export function AttendanceViewer() {
                     {calendarCells.map((cell, idx) => {
                       const isSelected = selectedDay === cell.dateStr
                       const record = cell.isCurrentMonth ? getDayRecord(selectedEmployee.id, cell.dateStr) : undefined
+                      const holiday = cell.isCurrentMonth ? holidays[cell.dateStr] : undefined
                       
                       let statusBg = ''
                       
@@ -630,6 +657,8 @@ export function AttendanceViewer() {
                         statusBg = 'bg-accent-coral text-white font-medium'
                       } else if (record?.status === 'late') {
                         statusBg = 'bg-purple-500 text-white font-medium'
+                      } else if (holiday) {
+                        statusBg = 'bg-blue-500 text-white font-medium'
                       } else if (cell.isCurrentMonth) {
                         statusBg = 'bg-bg-app border border-dashed border-border-soft hover:border-text-low text-text-hi'
                       } else {
@@ -648,9 +677,9 @@ export function AttendanceViewer() {
                           <span className="text-xs font-mono">{cell.dayNum}</span>
                           
                           {/* Mini label for weekdays in current month */}
-                          {cell.isCurrentMonth && record && (
+                          {cell.isCurrentMonth && (record || holiday) && (
                             <span className="text-[8px] uppercase tracking-wider font-bold opacity-90 truncate max-w-full">
-                              {record.status === 'half-day' ? 'Half' : record.status}
+                              {record ? (record.status === 'half-day' ? 'Half' : record.status) : holiday?.name}
                             </span>
                           )}
                         </button>
@@ -676,6 +705,10 @@ export function AttendanceViewer() {
                     <div className="flex items-center gap-1.5">
                       <div className="w-3 h-3 bg-purple-500 rounded-full" />
                       <span className="text-xs text-text-mid font-body">Late</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full" />
+                      <span className="text-xs text-text-mid font-body">Holiday</span>
                     </div>
                   </div>
                 </div>

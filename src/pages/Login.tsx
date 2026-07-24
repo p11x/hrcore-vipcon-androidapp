@@ -31,7 +31,7 @@ export function Login() {
     formState: { errors: regErrors, isSubmitting: isRegistering },
   } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
-    defaultValues: { companySelection: 'vipcon soft systems' }
+    defaultValues: { companySelection: 'Vepcon Soft Systems' }
   })
 
   const passwordValue = watchReg('password') || ''
@@ -46,9 +46,12 @@ export function Login() {
 
   useEffect(() => {
     if (user && !loading) {
+      console.log('Login useEffect: user is logged in, isAdmin:', isAdmin)
       if (isAdmin) {
+        console.log('Navigating to admin dashboard')
         navigate('/admin/dashboard', { replace: true })
       } else {
+        console.log('Navigating to employee dashboard')
         navigate('/employee/dashboard', { replace: true })
       }
     }
@@ -84,9 +87,7 @@ export function Login() {
       >
         <div className="bg-surface border border-border-soft rounded-2xl shadow-sm p-8">
           <div className="flex flex-col items-center mb-8">
-            <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white font-display font-bold text-2xl mb-4 shadow-lg shadow-primary/20">
-              V
-            </div>
+            <img src="/logo.svg" alt="Logo" className="w-16 h-16 rounded-xl object-cover mb-4 shadow-lg shadow-primary/20" />
             <h1 className="text-3xl font-display font-bold text-text-hi">
               HR CORE
             </h1>
@@ -197,7 +198,7 @@ export function Login() {
                       className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all"
                       disabled={isRegistering}
                     >
-                      <option value="vipcon soft systems">vipcon soft systems</option>
+                      <option value="Vepcon Soft Systems">Vepcon Soft Systems</option>
                       <option value="Others">Others</option>
                     </select>
                     {regErrors.companySelection && (

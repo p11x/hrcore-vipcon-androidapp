@@ -85,9 +85,7 @@ export function Sidebar({ onSignOut, isAdmin = false }: { onSignOut?: () => void
       <aside className={`hidden md:flex fixed left-0 top-0 h-screen ${sidebarWidth} bg-surface border-r border-border-soft flex-col z-40 transition-all duration-300`}>
         <div className="flex items-center justify-between p-4 border-b border-border-soft">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-display font-bold text-lg">
-              V
-            </div>
+            <img src="/logo.svg" alt="Logo" className="w-8 h-8 rounded object-cover" />
             {!collapsed && (
               <div className="flex flex-col">
                 <span className="font-display font-semibold text-text-hi truncate">HR CORE</span>
@@ -146,9 +144,7 @@ export function Sidebar({ onSignOut, isAdmin = false }: { onSignOut?: () => void
           <Menu className="w-6 h-6" />
         </button>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-display font-bold text-lg">
-            V
-          </div>
+          <img src="/logo.svg" alt="Logo" className="w-8 h-8 rounded object-cover" />
           <span className="font-display font-semibold text-text-hi tracking-tight">HR CORE</span>
         </div>
         <div className="w-10" />
@@ -173,9 +169,7 @@ export function Sidebar({ onSignOut, isAdmin = false }: { onSignOut?: () => void
             >
               <div className="flex items-center justify-between p-4 border-b border-border-soft">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-display font-bold text-lg">
-                    V
-                  </div>
+                  <img src="/logo.svg" alt="Logo" className="w-8 h-8 rounded object-cover" />
                   <div className="flex flex-col">
                     <span className="font-display font-semibold text-text-hi truncate max-w-[200px]">HR CORE</span>
                     <span className="text-[10px] text-text-mid font-medium truncate max-w-[200px]">By Vepcon Soft Systems</span>

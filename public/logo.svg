@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="rectClip">
+      <rect width="512" height="512" rx="112" />
+    </clipPath>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#F84466"/>
+  <g clip-path="url(#rectClip)">
+    <!-- Shadow for left arm inner edge -->
+    <polygon points="212,150 712,650 812,920 312,420" fill="#D83251"/>
+    <!-- Shadow for right arm outer edge and bottom edge -->
+    <polygon points="412,150 912,650 812,920 700,920 200,420" fill="#D83251"/>
+  </g>
+  <!-- Left arm -->
+  <polygon points="100,150 212,150 312,420 200,420" fill="#FFE0E9"/>
+  <!-- Right arm -->
+  <polygon points="300,150 412,150 312,420 200,420" fill="#FFFFFF"/>
+</svg>

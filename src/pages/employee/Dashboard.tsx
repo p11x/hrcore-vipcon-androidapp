@@ -275,25 +275,25 @@ export function EmployeeDashboard() {
               {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 shrink-0">
             <button 
               onClick={() => navigate('/employee/notifications')}
-              className="p-2 rounded-full hover:bg-primary-dim transition-colors relative focus-ring"
+              className="p-2 rounded-full hover:bg-primary-dim transition-colors relative focus-ring shrink-0"
             >
               <Bell className="w-5 h-5 text-text-mid" />
               {unreadNotifications > 0 && (
                 <span className="absolute top-1 right-1 w-2 h-2 bg-accent-coral rounded-full" />
               )}
             </button>
-            <div className="flex items-center gap-2 pl-2 border-l border-border-soft">
+            <div className="flex items-center gap-2 pl-2 border-l border-border-soft shrink-0">
               <button 
                 onClick={() => navigate('/employee/profile')}
-                className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-medium hover:bg-primary-dim transition-colors focus-ring"
+                className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-medium hover:bg-primary-dim transition-colors focus-ring shrink-0"
                 aria-label="View Profile"
               >
                 <User className="w-5 h-5" />
               </button>
-              <span className="text-sm font-body">{userName}</span>
+              <span className="hidden sm:block text-sm font-body truncate max-w-[150px]">{userName}</span>
             </div>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { hrToast } from '../../components/HRCToast'
 import { getDatabase } from '../../firebase/config'
 import { useAuth } from '../../context/AuthContext'
+import { logAudit } from '../../utils/auditLogger'
 
 interface HolidayEvent {
   id: string
@@ -15,7 +16,7 @@ interface HolidayEvent {
 }
 
 export function Holidays() {
-  const { tenantId } = useAuth()
+  const { tenantId, user } = useAuth()
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [holidays, setHolidays] = useState<HolidayEvent[]>([])
   const [holidayName, setHolidayName] = useState('')
@@ -68,6 +69,7 @@ export function Holidays() {
       type: holidayType,
     }
     await (db as any).set(`tenants/${tenantId}/holidays/${newHoliday.id}`, newHoliday)
+    await logAudit(tenantId, `Added holiday: ${holidayName} on ${holidayDate}`, user?.email || 'Admin')
     hrToast.success('Holiday Added', 'Holiday event created successfully')
     setHolidayName('')
     setHolidayDate('')

@@ -32,9 +32,27 @@ export function Profile() {
     if (user?.uid) {
       getDatabase().then(async (db: any) => {
         try {
-          const snapshot = await db.get(`tenants/${tenantId}/users/${user.uid}`)
-          const data = snapshot.val() as Partial<PersonalDetailsFormData> & { avatar?: string, position?: string } | null
-          if (data) {
+          // Fetch from both root and tenant spaces
+          const rootSnapshot = await db.get(`users/${user.uid}`)
+          const rootData = rootSnapshot.val() || {}
+          
+          let tenantData = {}
+          if (tenantId) {
+            const tenantSnapshot = await db.get(`tenants/${tenantId}/users/${user.uid}`)
+            tenantData = tenantSnapshot.val() || {}
+          }
+          
+          // Merge data, giving priority to tenant specific data but falling back to rootData for missing fields
+          const data = { ...rootData, ...tenantData } as Partial<PersonalDetailsFormData> & { avatar?: string, position?: string }
+
+          // Ensure we don't accidentally wipe out fields with empty strings from tenantData
+          Object.keys(rootData).forEach(key => {
+            if (!data[key as keyof typeof data] && rootData[key]) {
+              (data as any)[key] = rootData[key]
+            }
+          })
+
+          if (Object.keys(data).length > 0) {
             setPosition(data.position || 'Employee')
             reset({
               fullName: data.fullName || user.displayName || '',
@@ -67,7 +85,7 @@ export function Profile() {
     } else {
       setLoading(false)
     }
-  }, [user?.uid, user?.email, user?.displayName, reset])
+  }, [user?.uid, user?.email, user?.displayName, reset, tenantId])
 
   const handleAvatarUpload = () => {
     const input = document.createElement('input')
@@ -93,15 +111,30 @@ export function Profile() {
   const onSubmit = async (data: PersonalDetailsFormData) => {
     if (!user?.uid) return
     try {
+      const sanitizedData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined && v !== ''))
       const db = await getDatabase()
-      await (db as any).update(`users/${user.uid}`, {
-        ...data,
-        avatar: avatarUrl,
-      })
+      
+      // We will ensure both locations have the exact same full payload
+      const payload = {
+        ...sanitizedData,
+        avatar: avatarUrl || null,
+      }
+
+      // Update root user document
+      await (db as any).update(`users/${user.uid}`, payload)
+
+      // Update tenant scoped user document
+      if (tenantId) {
+        await (db as any).update(`tenants/${tenantId}/users/${user.uid}`, payload)
+      }
+
+      // Update employee record
       try {
-        await (db as any).update(`employees/${user.uid}`, {
-          name: data.fullName,
-        })
+        if (sanitizedData.fullName && tenantId) {
+          await (db as any).update(`tenants/${tenantId}/employees/${user.uid}`, {
+            name: sanitizedData.fullName,
+          })
+        }
       } catch (err) {
         console.warn('Failed to update name in employees node:', err)
       }
@@ -178,6 +211,11 @@ export function Profile() {
               <input
                 {...register('phone')}
                 maxLength={10}
+                type="text"
+                inputMode="numeric"
+                onInput={(e) => {
+                  e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')
+                }}
                 className="w-full px-3 py-2 bg-surface border border-border-soft rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring"
                 placeholder="Enter phone number"
               />
@@ -193,6 +231,11 @@ export function Profile() {
               <input
                 {...register('whatsapp')}
                 maxLength={10}
+                type="text"
+                inputMode="numeric"
+                onInput={(e) => {
+                  e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')
+                }}
                 className="w-full px-3 py-2 bg-surface border border-border-soft rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring"
                 placeholder="Enter WhatsApp number"
               />

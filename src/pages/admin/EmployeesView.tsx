@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Mail, Phone, Search } from 'lucide-react'
 import { useState, useEffect, useMemo } from 'react'
 import { getDatabase } from '../../firebase/config'
+import { useAuth } from '../../context/AuthContext'
 
 const recentActivity = [
   { id: '1', icon: '📅', label: 'Punch In', time: '09:12 AM' },
@@ -22,29 +23,35 @@ interface Employee {
 
 export function EmployeesView() {
   const navigate = useNavigate()
+  const { tenantId } = useAuth()
   const [employees, setEmployees] = useState<Employee[]>([])
   const [attendance, setAttendance] = useState<Record<string, any>>({})
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
+    if (!tenantId) return
     let unsubscribe: (() => void) | null = null
     let unsubAttendance: (() => void) | null = null
 
     getDatabase().then((db: any) => {
-      unsubscribe = db.onValue('employees', (snapshot: any) => {
+      unsubscribe = db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, { name: string; companyName?: string; department?: string; position: string; role?: string }> | undefined
         if (data) {
-          setEmployees(Object.entries(data).map(([id, emp]) => ({
-            id,
-            name: emp.name,
-            companyName: emp.companyName || emp.department || '',
-            position: emp.position || emp.role || '',
-          })))
+          setEmployees(
+            Object.entries(data)
+              .filter(([_, emp]) => emp.role?.toLowerCase() !== 'admin')
+              .map(([id, emp]) => ({
+                id,
+                name: emp.name || (emp as any).fullName || 'Unknown',
+                companyName: emp.companyName || emp.department || '',
+                position: emp.position || emp.role || '',
+              }))
+          )
         } else {
           setEmployees([])
         }
       })
-      unsubAttendance = db.onValue('attendance', (snapshot: any) => {
+      unsubAttendance = db.onValue(`tenants/${tenantId}/attendance`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) setAttendance(data)
         else setAttendance({})
@@ -54,7 +61,7 @@ export function EmployeesView() {
       if (unsubscribe) unsubscribe()
       if (unsubAttendance) unsubAttendance()
     }
-  }, [])
+  }, [tenantId])
 
   const { todayStr, weekStart, monthStart } = useMemo(() => {
     let maxDate = ''
@@ -79,42 +86,13 @@ export function EmployeesView() {
     return { todayStr: maxDate, weekStart: wStart, monthStart: mStart }
   }, [attendance])
 
-  const utilisationData = useMemo(() => {
-    let presentCount = 0
-    let lateCount = 0
-    let totalCount = employees.length || 1
-
-    Object.entries(attendance).forEach(([_, days]: [string, any]) => {
-      if (days && days[todayStr]) {
-        const dStatus = days[todayStr].status
-        if (dStatus === 'present' || dStatus === 'half-day') {
-          presentCount++
-        } else if (dStatus === 'late') {
-          lateCount++
-        }
-      }
-    })
-
-    const working = presentCount + lateCount
-    const offline = Math.max(0, totalCount - working)
-
-    return [
-      { name: 'Working', value: working },
-      { name: 'Break', value: 0 },
-      { name: 'Offline', value: offline },
-    ]
-  }, [employees, attendance, todayStr])
-
-  const { todayPercentage, weekPercentage, monthPercentage } = useMemo(() => {
-    const totalEmployees = employees.length || 1
-    
-    const todayWorking = utilisationData.find(d => d.name === 'Working')?.value || 0
-    const tPercentage = Math.round((todayWorking / totalEmployees) * 100)
-
+  const { todayPercentage, weekPercentage, monthPercentage, monthWorking, monthOffline } = useMemo(() => {
     let weekWorkingCount = 0
     let weekTotalCount = 0
     let monthWorkingCount = 0
     let monthTotalCount = 0
+    let todayWorkingCount = 0
+    let todayTotalCount = employees.length || 1
 
     Object.entries(attendance).forEach(([_, days]: [string, any]) => {
       Object.keys(days).forEach(dateStr => {
@@ -129,20 +107,36 @@ export function EmployeesView() {
            weekTotalCount++
            if (isWorking) weekWorkingCount++
          }
+         if (dateStr === todayStr) {
+           if (isWorking) todayWorkingCount++
+         }
       })
     })
     
     const wPercentage = weekTotalCount === 0 ? 0 : Math.round((weekWorkingCount / weekTotalCount) * 100)
     const mPercentage = monthTotalCount === 0 ? 0 : Math.round((monthWorkingCount / monthTotalCount) * 100)
+    const tPercentage = Math.round((todayWorkingCount / todayTotalCount) * 100)
+    
+    const mOffline = monthTotalCount === 0 ? 100 : Math.max(0, monthTotalCount - monthWorkingCount)
     
     return {
       todayPercentage: tPercentage,
       weekPercentage: wPercentage,
-      monthPercentage: mPercentage
+      monthPercentage: mPercentage,
+      monthWorking: monthWorkingCount,
+      monthOffline: mOffline
     }
-  }, [employees, attendance, utilisationData, todayStr, weekStart, monthStart])
+  }, [employees, attendance, todayStr, weekStart, monthStart])
 
-  const utilisationPercentage = todayPercentage
+  const utilisationData = useMemo(() => {
+    return [
+      { name: 'Working', value: monthWorking },
+      { name: 'Break', value: 0 },
+      { name: 'Offline', value: monthOffline },
+    ]
+  }, [monthWorking, monthOffline])
+
+  const utilisationPercentage = monthPercentage
 
   const yearlyStatusData = useMemo(() => {
     const monthStats: Record<string, { workingDays: number, totalDays: number }> = {}
@@ -194,9 +188,9 @@ export function EmployeesView() {
 
   const filteredEmployees = useMemo(() => {
     return employees.filter(emp => 
-      emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.companyName.toLowerCase().includes(searchQuery.toLowerCase())
+      (emp.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (emp.position || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (emp.companyName || '').toLowerCase().includes(searchQuery.toLowerCase())
     )
   }, [employees, searchQuery])
 
@@ -207,7 +201,7 @@ export function EmployeesView() {
           className="bg-surface border border-border-soft rounded-xl p-6"
           whileHover={{ y: -2 }}
         >
-          <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Today Time Utilisation</h3>
+          <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Month Time Utilisation</h3>
           <div className="h-64 relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>

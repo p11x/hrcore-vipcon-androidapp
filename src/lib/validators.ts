@@ -93,7 +93,7 @@ export const registrationSchema = z.object({
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number')
     .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
-  companySelection: z.enum(['vipcon soft systems', 'Others']),
+  companySelection: z.enum(['Vepcon Soft Systems', 'Others']),
   customCompanyName: z.string().optional(),
 }).refine(data => {
   if (data.companySelection === 'Others' && (!data.customCompanyName || data.customCompanyName.trim() === '')) {

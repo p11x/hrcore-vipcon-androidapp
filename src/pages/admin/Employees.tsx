@@ -6,6 +6,7 @@ import { hrToast } from '../../components/HRCToast'
 import { useNavigate } from 'react-router-dom'
 import { getDatabase } from '../../firebase/config'
 import { useAuth } from '../../context/AuthContext'
+import { logAudit } from '../../utils/auditLogger'
 
 interface Employee {
   id: string
@@ -19,7 +20,7 @@ interface Employee {
 }
 
 export function Employees() {
-  const { tenantId } = useAuth()
+  const { tenantId, user } = useAuth()
   const [statusFilter, setStatusFilter] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [employees, setEmployees] = useState<Employee[]>([])
@@ -71,6 +72,7 @@ export function Employees() {
       const db = await getDatabase()
       await (db as any).remove(`tenants/${tenantId}/employees/${id}`)
       await (db as any).remove(`users/${id}`)
+      await logAudit(tenantId, `Deleted employee ${name}`, user?.email || 'Admin')
       hrToast.success('Deleted', `${name} has been removed.`)
     } catch (error) {
       console.error("Delete failed", error)
@@ -81,9 +83,9 @@ export function Employees() {
   const filteredEmployees = useMemo(() => {
     return employees.filter((emp) => {
       const matchesStatus = statusFilter === 'All' || emp.status === statusFilter;
-      const matchesSearch = emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            emp.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            emp.role.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = (emp.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            (emp.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            (emp.role || '').toLowerCase().includes(searchQuery.toLowerCase());
       return matchesStatus && matchesSearch;
     })
   }, [employees, statusFilter, searchQuery]);

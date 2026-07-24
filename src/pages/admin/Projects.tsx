@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { getDatabase } from '../../firebase/config'
 import { hrToast } from '../../components/HRCToast'
 import { useAuth } from '../../context/AuthContext'
+import { logAudit } from '../../utils/auditLogger'
 
 interface Project {
   id: string
@@ -22,7 +23,7 @@ interface Project {
 const statusTabs = ['All', 'Started', 'Approval', 'Completed']
 
 export function Projects() {
-  const { tenantId } = useAuth()
+  const { tenantId, user } = useAuth()
   const [activeTab, setActiveTab] = useState('All')
   const [projects, setProjects] = useState<Project[]>([])
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -70,6 +71,7 @@ export function Projects() {
         comments: 0,
       }
       await (db as any).set(`tenants/${tenantId}/projects/${projectId}`, projectData)
+      await logAudit(tenantId, `Created project: ${newProject.name}`, user?.email || 'Admin')
       hrToast.success('Project Created', `${newProject.name} has been added`)
       setShowCreateModal(false)
       setNewProject({ name: '', category: 'Web Dev', description: '' })

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { hrToast } from '../../components/HRCToast'
 import { getDatabase } from '../../firebase/config'
 import { useAuth } from '../../context/AuthContext'
+import { logAudit } from '../../utils/auditLogger'
 
 interface LeaveRequest {
   id: string
@@ -18,7 +19,7 @@ interface LeaveRequest {
 }
 
 export function LeaveQueue() {
-  const { tenantId } = useAuth()
+  const { tenantId, user } = useAuth()
   const [showCount, setShowCount] = useState(10)
   const [leaves, setLeaves] = useState<LeaveRequest[]>([])
 
@@ -39,14 +40,16 @@ export function LeaveQueue() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [])
+  }, [tenantId])
 
   const handleAction = async (id: string, action: 'approve' | 'reject') => {
     if (!tenantId) return
     try {
       const db = await getDatabase()
       const status = action === 'approve' ? 'approved' : 'rejected'
+      const req = leaves.find(l => l.id === id)
       await (db as any).set(`tenants/${tenantId}/leaves/${id}/status`, status)
+      await logAudit(tenantId, `${action === 'approve' ? 'Approved' : 'Rejected'} leave request for ${req?.employee || 'Employee'}`, user?.email || 'Admin')
       hrToast.success(action === 'approve' ? 'Approved' : 'Rejected', `Leave request ${action}ed successfully`)
     } catch (e) {
       hrToast.error('Action Failed', (e as Error).message)

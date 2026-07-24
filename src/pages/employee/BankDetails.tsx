@@ -31,15 +31,21 @@ export function BankDetails() {
         })
       })
     }
-  }, [user?.uid, reset])
+  }, [user?.uid, tenantId, reset])
 
   const onSubmit = async (data: BankDetailsFormData) => {
     if (!user?.uid) return
+    if (!tenantId) {
+      hrToast.error('Save Failed', 'Missing organization context')
+      return
+    }
     try {
+      const sanitizedData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined))
       const db = await getDatabase()
-      await db.set(`tenants/${tenantId}/bankDetails/${user.uid}`, data)
+      await db.set(`tenants/${tenantId}/bankDetails/${user.uid}`, sanitizedData)
       hrToast.success('Bank Details Saved', 'Bank details updated successfully')
-    } catch {
+    } catch (error: any) {
+      console.error('Bank details save error:', error);
       hrToast.error('Save Failed', 'Unable to update bank details')
     }
   }
@@ -59,6 +65,11 @@ export function BankDetails() {
               <input
                 {...register('accountNumber')}
                 maxLength={18}
+                type="text"
+                inputMode="numeric"
+                onInput={(e) => {
+                  e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')
+                }}
                 className="w-full px-3 py-2 bg-surface border border-border-soft rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring font-mono"
                 placeholder="Enter account number"
               />
@@ -73,6 +84,9 @@ export function BankDetails() {
               </label>
               <input
                 {...register('bankName')}
+                onInput={(e) => {
+                  e.currentTarget.value = e.currentTarget.value.replace(/[0-9]/g, '')
+                }}
                 className="w-full px-3 py-2 bg-surface border border-border-soft rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring"
                 placeholder="Enter bank name"
               />

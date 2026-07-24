@@ -27,7 +27,7 @@ const prefersReduced = typeof window !== 'undefined' && window.matchMedia('(pref
 
 export function AdminDashboard() {
   const navigate = useNavigate()
-  const { user, tenantId } = useAuth()
+  const { user, tenantId, signOutUser } = useAuth()
   const [documents, setDocuments] = useState<Record<string, Record<string, DocumentStatus>>>({})
   const [unreadNotifications, setUnreadNotifications] = useState(0)
 
@@ -42,11 +42,31 @@ export function AdminDashboard() {
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearchResults, setShowSearchResults] = useState(false)
+  
+  const [adminName, setAdminName] = useState('Admin')
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
+
+  useEffect(() => {
+    if (!user?.uid) return
+    getDatabase().then((db: any) => {
+      // For Admin, their root level user node or tenant level user node has the full name.
+      db.onValue(`users/${user.uid}`, (snapshot: any) => {
+        const data = snapshot.val()
+        if (data && data.fullName) {
+          setAdminName(data.fullName)
+        } else if (data && data.name) {
+          setAdminName(data.name)
+        }
+      })
+    })
+  }, [user?.uid])
+
 
   const dashboardEmployees = useMemo(() => {
     return Object.fromEntries(
       Object.entries(employees).filter(([_, emp]: [string, any]) => {
-        return !selectedCompany || emp.companyName === selectedCompany
+        const isNotAdmin = emp.role?.toLowerCase() !== 'admin'
+        return isNotAdmin && (!selectedCompany || emp.companyName === selectedCompany)
       })
     )
   }, [employees, selectedCompany])
@@ -54,12 +74,13 @@ export function AdminDashboard() {
   const filteredEmployees = useMemo(() => {
     return Object.fromEntries(
       Object.entries(employees).filter(([_, emp]: [string, any]) => {
+        const isNotAdmin = emp.role?.toLowerCase() !== 'admin'
         const matchesCompany = !selectedCompany || emp.companyName === selectedCompany
         const matchesSearch = !searchQuery || 
           emp.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
           emp.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           emp.position?.toLowerCase().includes(searchQuery.toLowerCase())
-        return matchesCompany && matchesSearch
+        return isNotAdmin && matchesCompany && matchesSearch
       })
     )
   }, [employees, selectedCompany, searchQuery])
@@ -79,7 +100,7 @@ export function AdminDashboard() {
       if (!tenantId) return
 
       if (user?.uid) {
-        unsubNotifications = db.onValue(`notifications/${user.uid}`, (snapshot: any) => {
+        unsubNotifications = db.onValue(`tenants/${tenantId}/notifications/${user.uid}`, (snapshot: any) => {
           const data = snapshot.val() as Record<string, any> | undefined
           if (data) {
             const unreadCount = Object.values(data).filter(n => !n.read).length
@@ -349,11 +370,33 @@ export function AdminDashboard() {
               )}
             </div>
 
-            <div className="flex items-center gap-2 pl-2 border-l border-border-soft">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-medium">
-                <User className="w-5 h-5" />
-              </div>
-              <span className="hidden sm:inline text-sm font-body text-text-hi">Admin</span>
+            <div className="relative border-l border-border-soft pl-2 flex items-center">
+              <button 
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                className="flex items-center gap-2 focus-ring hover:opacity-80 transition-opacity"
+              >
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-medium">
+                  <User className="w-5 h-5" />
+                </div>
+                <span className="hidden sm:inline text-sm font-body text-text-hi">{adminName}</span>
+              </button>
+              {profileDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setProfileDropdownOpen(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-surface border border-border-soft rounded-lg shadow-xl py-1 z-20 font-sans">
+                    <button
+                      onClick={async () => {
+                        setProfileDropdownOpen(false)
+                        await signOutUser()
+                        navigate('/login', { replace: true })
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-accent-coral hover:bg-bg-app transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -108,11 +108,15 @@ export function Documents() {
       if (unsubPayslips) unsubPayslips()
       if (unsubEmployee) unsubEmployee()
     }
-  }, [userId])
+  }, [userId, tenantId])
 
   const handleSaveUan = async () => {
     if (!uanNumber.trim()) {
       hrToast.error('Validation Error', 'UAN Number cannot be empty')
+      return
+    }
+    if (!tenantId) {
+      hrToast.error('Save Failed', 'Missing organization context')
       return
     }
     try {
@@ -133,6 +137,10 @@ export function Documents() {
 
   const handleUpload = async (docType: string, file: File) => {
     if (!user?.uid) return
+    if (!tenantId) {
+      hrToast.error('Upload Failed', 'Missing organization context')
+      return
+    }
     setUploading(docType)
     try {
       const db = await getDatabase()
@@ -211,10 +219,15 @@ export function Documents() {
                         {docStatus.uploaded ? 'Replace' : 'Upload'}
                         <input
                           type="file"
+                          accept=".pdf,application/pdf"
                           className="hidden"
                           onChange={(e) => {
                             const file = e.target.files?.[0]
                             if (file) {
+                              if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+                                hrToast.error('Invalid File', 'Please upload a PDF file.')
+                                return
+                              }
                               handleUpload(doc.type, file)
                             }
                           }}

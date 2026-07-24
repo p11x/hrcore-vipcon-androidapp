@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { useState } from 'react'
 import { hrToast } from '../../components/HRCToast'
 import { useAuth } from '../../context/AuthContext'
+import { logAudit } from '../../utils/auditLogger'
 
 const addEmployeeSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -14,7 +15,7 @@ const addEmployeeSchema = z.object({
   companySelection: z.enum(['Vepcon Soft Systems', 'Others']),
   customCompanyName: z.string().optional(),
   position: z.string().min(1, 'Position / Job Title is required'),
-  role: z.enum(['employee', 'admin']),
+  role: z.literal('employee'),
   password: z.string()
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -35,7 +36,7 @@ type AddEmployeeFormData = z.infer<typeof addEmployeeSchema>
 
 export function AddEmployee() {
   const [loading, setLoading] = useState(false)
-  const { tenantId } = useAuth()
+  const { tenantId, user } = useAuth()
   const {
     register,
     handleSubmit,
@@ -47,7 +48,6 @@ export function AddEmployee() {
     defaultValues: { role: 'employee', companySelection: 'Vepcon Soft Systems', customCompanyName: '' },
   })
 
-  const selectedRole = watch('role', 'employee')
   const companySelection = watch('companySelection', 'Vepcon Soft Systems')
   const passwordValue = watch('password') || ''
 
@@ -67,34 +67,48 @@ export function AddEmployee() {
     }
     setLoading(true)
     try {
-      const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
-      if (!apiKey) throw new Error('Missing Firebase API Key')
-      
-      const finalCompanyName = data.companySelection === 'Others' ? data.customCompanyName : data.companySelection;
-      
-      // Use Identity Toolkit REST API to create user without affecting current auth state
-      const signUpRes = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-          returnSecureToken: true
+      const isMock = import.meta.env.VITE_USE_MOCK === 'true'
+      let uid = `emp-${Date.now()}`
+
+      if (!isMock) {
+        const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
+        if (!apiKey) throw new Error('Missing Firebase API Key')
+
+        // Use Identity Toolkit REST API to create user without affecting current auth state
+        const signUpRes = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+            returnSecureToken: true
+          })
         })
-      })
-      
-      const signUpData = await signUpRes.json()
-      if (!signUpRes.ok) {
-        throw new Error(signUpData.error?.message || 'Failed to create user account')
+
+        const signUpData = await signUpRes.json()
+        if (!signUpRes.ok) {
+          throw new Error(signUpData.error?.message || 'Failed to create user account')
+        }
+        uid = signUpData.localId
       }
-      
-      const uid = signUpData.localId
-      
+
       const { getDatabase } = await import('../../firebase/config')
+      const finalCompanyName = data.companySelection === 'Others' ? data.customCompanyName : data.companySelection;
       const primaryDb = await getDatabase()
       
-      // The admin writes to the user profile
+      // The admin writes to the user profile (root level for auth lookup)
       await (primaryDb as any).set(`users/${uid}`, {
+        id: uid,
+        email: data.email,
+        fullName: data.name,
+        companyName: finalCompanyName,
+        position: data.position,
+        role: data.role,
+        tenantId: tenantId
+      })
+
+      // The admin writes to the tenant user profile
+      await (primaryDb as any).set(`tenants/${tenantId}/users/${uid}`, {
         id: uid,
         email: data.email,
         fullName: data.name,
@@ -114,6 +128,7 @@ export function AddEmployee() {
         tenantId: tenantId
       })
       
+      await logAudit(tenantId, `Added employee ${data.name}`, user?.email || 'Admin')
       hrToast.success('Employee Created', `${data.name} has been added successfully`)
       reset()
     } catch (error: any) {
@@ -199,33 +214,6 @@ export function AddEmployee() {
               {errors.position && (
                 <p className="text-accent-coral text-sm mt-1">{errors.position.message}</p>
               )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text-mid mb-2 uppercase tracking-wider">
-                ACCOUNT ROLE
-              </label>
-              <div className="flex gap-2">
-                {(['employee', 'admin'] as const).map((role) => (
-                  <label key={role} className="flex-1">
-                    <input
-                      type="radio"
-                      value={role}
-                      {...register('role')}
-                      className="hidden"
-                    />
-                    <span
-                      className={`
-                        block text-center py-2 px-4 rounded font-medium text-sm cursor-pointer transition-colors
-                        ${selectedRole === role ? 'bg-primary-dim text-primary' : 'border border-border-soft text-text-hi hover:bg-bg-app'}
-                        focus-ring
-                      `}
-                    >
-                      {role === 'employee' ? 'Employee' : 'Admin'}
-                    </span>
-                  </label>
-                ))}
-              </div>
             </div>
 
             <div>

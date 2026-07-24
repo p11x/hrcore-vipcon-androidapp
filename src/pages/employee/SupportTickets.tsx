@@ -45,16 +45,22 @@ export function SupportTickets() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [])
+  }, [tenantId])
 
   const onSubmit = async (data: TicketFormData) => {
     if (!user?.uid) return
+    if (!tenantId) {
+      hrToast.error('Submission Failed', 'Missing organization context')
+      return
+    }
     try {
+      const sanitizedData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined))
       const db = await getDatabase()
       const ticketId = `tic-${Date.now()}`
-      await (db as any).set(`tickets/${ticketId}`, {
-        ...data,
+      await (db as any).set(`tenants/${tenantId}/tickets/${ticketId}`, {
+        ...sanitizedData,
         id: ticketId,
+        employeeId: user.uid,
         employee: user.displayName || user.email?.split('@')[0] || 'Employee',
         status: 'open',
         createdAt: new Date().toISOString().split('T')[0],

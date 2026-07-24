@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useState, useEffect } from 'react'
 import { getDatabase } from '../../firebase/config'
 import { hrToast } from '../../components/HRCToast'
+import { logAudit } from '../../utils/auditLogger'
 
 
 
@@ -21,7 +22,7 @@ interface Announcement {
 }
 
 export function Announcements() {
-  const { tenantId } = useAuth()
+  const { tenantId, user } = useAuth()
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const {
     register,
@@ -58,6 +59,7 @@ export function Announcements() {
         createdAt: new Date().toISOString().split('T')[0]
       }
       await (db as any).set(`tenants/${tenantId}/announcements/${annId}`, newAnn)
+      await logAudit(tenantId, `Posted announcement: ${data.title}`, user?.email || 'Admin')
       hrToast.success('Announcement Posted', 'Successfully added to your organization')
       reset()
     } catch (e: any) {

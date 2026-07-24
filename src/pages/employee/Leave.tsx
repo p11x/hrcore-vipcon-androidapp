@@ -39,6 +39,7 @@ export function Leave() {
   const endDate = watch('endDate')
 
   useEffect(() => {
+    if (!tenantId) return
     let unsub: (() => void) | null = null
     getDatabase().then((db: any) => {
       unsub = db.onValue(`tenants/${tenantId}/leaves`, (snapshot: any) => {
@@ -54,7 +55,7 @@ export function Leave() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [userId])
+  }, [userId, tenantId])
 
   const calculateDays = () => {
     if (startDate && endDate) {
@@ -67,11 +68,16 @@ export function Leave() {
 
   const onSubmit = async (data: LeaveFormData) => {
     if (!user?.uid) return
+    if (!tenantId) {
+      hrToast.error('Submission Failed', 'Missing organization context')
+      return
+    }
     try {
+      const sanitizedData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined))
       const db = await getDatabase()
       const leaveId = `leave-${Date.now()}`
-      await (db as any).set(`leaves/${leaveId}`, {
-        ...data,
+      await (db as any).set(`tenants/${tenantId}/leaves/${leaveId}`, {
+        ...sanitizedData,
         id: leaveId,
         employeeId: userId,
         employee: user.displayName || user.email?.split('@')[0] || 'Employee',
@@ -79,7 +85,9 @@ export function Leave() {
         days: calculateDays(),
       })
       hrToast.success('Leave Applied', 'Your leave request has been submitted')
+      setActiveTab('my-requests')
     } catch (error: any) {
+      console.error('Leave submission error:', error)
       hrToast.error('Submission Failed', error?.message || 'Unable to submit leave request')
     }
   }
