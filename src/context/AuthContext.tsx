@@ -140,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       adminId: uid
     })
 
-    // 2. Create User document
+    // 2. Create User document (root level for auth lookup)
     await db.set(`users/${uid}`, {
       fullName,
       email,
@@ -149,8 +149,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       createdAt: new Date().toISOString(),
     })
 
+    // 2b. Create User document (tenant scoped)
+    await db.set(`tenants/${newTenantId}/users/${uid}`, {
+      fullName,
+      email,
+      role: 'admin',
+      tenantId: newTenantId,
+      createdAt: new Date().toISOString(),
+    })
+
     // 3. Create Admin record in employees for profile
-    await db.set(`employees/${uid}`, {
+    await db.set(`tenants/${newTenantId}/employees/${uid}`, {
       name: fullName,
       email,
       role: 'Admin',

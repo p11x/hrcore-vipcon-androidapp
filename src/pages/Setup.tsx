@@ -51,6 +51,15 @@ export function Setup() {
         status: 'active',
         createdAt: new Date().toISOString()
       })
+
+      await db.set(`tenants/${tenantId}/users/${uid}`, {
+        email,
+        role: 'admin',
+        fullName: 'Admin User',
+        tenantId: tenantId,
+        status: 'active',
+        createdAt: new Date().toISOString()
+      })
       await db.set('Config/setupComplete', true)
       setDone(true)
     } catch (error) {

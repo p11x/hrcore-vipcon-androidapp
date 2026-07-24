@@ -95,8 +95,19 @@ export function AddEmployee() {
       const finalCompanyName = data.companySelection === 'Others' ? data.customCompanyName : data.companySelection;
       const primaryDb = await getDatabase()
       
-      // The admin writes to the user profile
+      // The admin writes to the user profile (root level for auth lookup)
       await (primaryDb as any).set(`users/${uid}`, {
+        id: uid,
+        email: data.email,
+        fullName: data.name,
+        companyName: finalCompanyName,
+        position: data.position,
+        role: data.role,
+        tenantId: tenantId
+      })
+
+      // The admin writes to the tenant user profile
+      await (primaryDb as any).set(`tenants/${tenantId}/users/${uid}`, {
         id: uid,
         email: data.email,
         fullName: data.name,

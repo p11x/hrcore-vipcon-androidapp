@@ -79,7 +79,7 @@ export function AdminDashboard() {
       if (!tenantId) return
 
       if (user?.uid) {
-        unsubNotifications = db.onValue(`notifications/${user.uid}`, (snapshot: any) => {
+        unsubNotifications = db.onValue(`tenants/${tenantId}/notifications/${user.uid}`, (snapshot: any) => {
           const data = snapshot.val() as Record<string, any> | undefined
           if (data) {
             const unreadCount = Object.values(data).filter(n => !n.read).length
