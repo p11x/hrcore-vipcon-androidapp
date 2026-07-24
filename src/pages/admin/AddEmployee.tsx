@@ -14,7 +14,7 @@ const addEmployeeSchema = z.object({
   companySelection: z.enum(['Vepcon Soft Systems', 'Others']),
   customCompanyName: z.string().optional(),
   position: z.string().min(1, 'Position / Job Title is required'),
-  role: z.enum(['employee', 'admin']),
+  role: z.literal('employee'),
   password: z.string()
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -47,7 +47,6 @@ export function AddEmployee() {
     defaultValues: { role: 'employee', companySelection: 'Vepcon Soft Systems', customCompanyName: '' },
   })
 
-  const selectedRole = watch('role', 'employee')
   const companySelection = watch('companySelection', 'Vepcon Soft Systems')
   const passwordValue = watch('password') || ''
 
@@ -199,33 +198,6 @@ export function AddEmployee() {
               {errors.position && (
                 <p className="text-accent-coral text-sm mt-1">{errors.position.message}</p>
               )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text-mid mb-2 uppercase tracking-wider">
-                ACCOUNT ROLE
-              </label>
-              <div className="flex gap-2">
-                {(['employee', 'admin'] as const).map((role) => (
-                  <label key={role} className="flex-1">
-                    <input
-                      type="radio"
-                      value={role}
-                      {...register('role')}
-                      className="hidden"
-                    />
-                    <span
-                      className={`
-                        block text-center py-2 px-4 rounded font-medium text-sm cursor-pointer transition-colors
-                        ${selectedRole === role ? 'bg-primary-dim text-primary' : 'border border-border-soft text-text-hi hover:bg-bg-app'}
-                        focus-ring
-                      `}
-                    >
-                      {role === 'employee' ? 'Employee' : 'Admin'}
-                    </span>
-                  </label>
-                ))}
-              </div>
             </div>
 
             <div>
