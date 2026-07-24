@@ -78,7 +78,7 @@ export function Tasks() {
       if (unsubProjects) unsubProjects()
       if (unsubComments) unsubComments()
     }
-  }, [tenantId])
+  }, [])
 
   const myTasks = tasks.filter(t => t.assignee === userId)
   const todoTasks = myTasks.filter(t => t.status === 'To Do')

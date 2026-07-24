@@ -39,7 +39,7 @@ export function LeaveQueue() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [tenantId])
+  }, [])
 
   const handleAction = async (id: string, action: 'approve' | 'reject') => {
     if (!tenantId) return

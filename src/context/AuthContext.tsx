@@ -63,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 // Don't sign out immediately if they just registered (they might have role/tenantId in local memory soon)
                 // However, we need tenantId for the app to function.
                 // We'll wait a bit longer or let them stay in a 'loading' state.
+                setLoading(false)
                 return
               }
               const userData = snap.val()

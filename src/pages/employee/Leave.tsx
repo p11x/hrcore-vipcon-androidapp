@@ -54,7 +54,7 @@ export function Leave() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [userId, tenantId])
+  }, [userId])
 
   const calculateDays = () => {
     if (startDate && endDate) {
@@ -70,7 +70,7 @@ export function Leave() {
     try {
       const db = await getDatabase()
       const leaveId = `leave-${Date.now()}`
-      await (db as any).set(`tenants/${tenantId}/leaves/${leaveId}`, {
+      await (db as any).set(`leaves/${leaveId}`, {
         ...data,
         id: leaveId,
         employeeId: userId,

@@ -62,13 +62,8 @@ export function TaskManagement() {
       }))
 
       unsubs.push(db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
-        const data = snapshot.val() as Record<string, Employee & { role?: string }> | undefined
-        if (data) {
-          const filtered = Object.fromEntries(
-            Object.entries(data).filter(([_, emp]) => emp.role?.toLowerCase() !== 'admin')
-          )
-          setEmployees(filtered)
-        }
+        const data = snapshot.val() as Record<string, Employee> | undefined
+        if (data) setEmployees(data)
       }))
 
       unsubs.push(db.onValue(`tenants/${tenantId}/projects`, (snapshot: any) => {

@@ -60,7 +60,7 @@ export function Employees() {
     return () => {
       if (unsubscribe) unsubscribe()
     }
-  }, [])
+  }, [tenantId])
 
   const handleDelete = async (id: string, name: string) => {
     if (!window.confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) {

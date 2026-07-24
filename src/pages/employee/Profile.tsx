@@ -67,7 +67,7 @@ export function Profile() {
     } else {
       setLoading(false)
     }
-  }, [user?.uid, user?.email, user?.displayName, reset, tenantId])
+  }, [user?.uid, user?.email, user?.displayName, reset])
 
   const handleAvatarUpload = () => {
     const input = document.createElement('input')

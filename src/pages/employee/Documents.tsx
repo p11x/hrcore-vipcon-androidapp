@@ -108,7 +108,7 @@ export function Documents() {
       if (unsubPayslips) unsubPayslips()
       if (unsubEmployee) unsubEmployee()
     }
-  }, [userId, tenantId])
+  }, [userId])
 
   const handleSaveUan = async () => {
     if (!uanNumber.trim()) {

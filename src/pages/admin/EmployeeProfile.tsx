@@ -5,7 +5,6 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import { getDatabase, getStorage } from '../../firebase/config'
 import { hrToast } from '../../components/HRCToast'
-import { useAuth } from '../../context/AuthContext'
 
 interface EducationData {
   collegeName: string
@@ -77,7 +76,6 @@ interface Payslip {
 
 export function EmployeeProfile() {
   const { employeeId } = useParams<{ employeeId: string }>()
-  const { tenantId } = useAuth()
   const navigate = useNavigate()
   const [profile, setProfile] = useState<EmployeeProfileData | null>(null)
   const [education, setEducation] = useState<EducationData | null>(null)
@@ -97,27 +95,17 @@ export function EmployeeProfile() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!employeeId || !tenantId) return
+      if (!employeeId) return
       const db = await getDatabase()
-      const employeeData = await (db as any).get(`tenants/${tenantId}/employees/${employeeId}`)
-      const userData = await (db as any).get(`tenants/${tenantId}/users/${employeeId}`)
-      if (!userData.exists()) {
-         // Try root users if not in tenant users (for admin users who might be in root)
-         const rootUser = await (db as any).get(`users/${employeeId}`)
-         if (rootUser.exists()) {
-           // If they are in root users, ensure they have correct tenantId
-           const val = rootUser.val()
-           if (val.tenantId !== tenantId) return
-         }
-      }
-      const docsData = await (db as any).get(`tenants/${tenantId}/Documents/${employeeId}`)
-      const eduData = await (db as any).get(`tenants/${tenantId}/education/${employeeId}`)
-      const bankData = await (db as any).get(`tenants/${tenantId}/bankDetails/${employeeId}`)
+      const employeeData = await (db as any).get(`employees/${employeeId}`)
+      const userData = await (db as any).get(`users/${employeeId}`)
+      const docsData = await (db as any).get(`Documents/${employeeId}`)
+      const eduData = await (db as any).get(`education/${employeeId}`)
+      const bankData = await (db as any).get(`bankDetails/${employeeId}`)
 
       if (employeeData.exists()) {
         const empVal = employeeData.val() as EmployeeSeed | null
-        const userSnap = await (db as any).get(`tenants/${tenantId}/users/${employeeId}`)
-        const userVal = userSnap.val() as UserSeed & { whatsapp?: string } | null
+        const userVal = userData.val() as UserSeed & { whatsapp?: string } | null
         setProfile({
           name: empVal?.name || userVal?.fullName || 'Unknown',
           email: userVal?.email || '',
@@ -155,14 +143,14 @@ export function EmployeeProfile() {
         })
       }
 
-      const offerSnap = await (db as any).get(`tenants/${tenantId}/OfferLetters`)
+      const offerSnap = await (db as any).get('OfferLetters')
       const offerData = offerSnap.val() as Record<string, OfferLetter> | null
       if (offerData) {
         const myOffer = Object.values(offerData).find((o: OfferLetter) => o.employeeId === employeeId && o.sent)
         setOfferLetter(myOffer || null)
       }
 
-      const payslipSnap = await (db as any).get(`tenants/${tenantId}/Payslips`)
+      const payslipSnap = await (db as any).get('Payslips')
       const payslipData = payslipSnap.val() as Record<string, Payslip> | null
       if (payslipData) {
         const myPayslips = Object.values(payslipData).filter((p: Payslip) => p.employeeId === employeeId && p.sent)
@@ -173,7 +161,7 @@ export function EmployeeProfile() {
     }
 
     fetchData()
-  }, [employeeId, tenantId])
+  }, [employeeId])
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -215,13 +203,8 @@ export function EmployeeProfile() {
         uanNumber: editData.uanNumber || ''
       }
       
-      await (db as any).update(`tenants/${tenantId}/users/${employeeId}`, userUpdates)
-      await (db as any).update(`tenants/${tenantId}/employees/${employeeId}`, empUpdates)
-
-      // Update root users if they exist there too
-      try {
-        await (db as any).update(`users/${employeeId}`, userUpdates)
-      } catch (e) {}
+      await (db as any).update(`users/${employeeId}`, userUpdates)
+      await (db as any).update(`employees/${employeeId}`, empUpdates)
       
       setProfile(prev => ({ ...prev!, ...editData }))
       setShowEditModal(false)
@@ -248,7 +231,7 @@ export function EmployeeProfile() {
       const storage = await getStorage()
       const { ref: storageRef, uploadBytes, getDownloadURL } = await import('firebase/storage')
       
-      const fileRef = storageRef(storage, `tenants/${tenantId}/offerletters/${employeeId}/${file.name}`)
+      const fileRef = storageRef(storage, `offerletters/${employeeId}/${file.name}`)
       await uploadBytes(fileRef, file)
       const downloadUrl = await getDownloadURL(fileRef)
       
@@ -260,7 +243,7 @@ export function EmployeeProfile() {
         date: new Date().toISOString().split('T')[0],
         url: downloadUrl,
       }
-      await (db as any).set(`tenants/${tenantId}/OfferLetters/${offerData.id}`, offerData)
+      await (db as any).set(`OfferLetters/${offerData.id}`, offerData)
       hrToast.success('Offer Letter Sent', 'Offer letter sent to employee successfully')
     } catch (error: any) {
       hrToast.error('Send Failed', error?.message || 'Unable to send offer letter')
@@ -284,7 +267,7 @@ export function EmployeeProfile() {
       const storage = await getStorage()
       const { ref: storageRef, uploadBytes, getDownloadURL } = await import('firebase/storage')
       
-      const fileRef = storageRef(storage, `tenants/${tenantId}/payslips/${employeeId}/${file.name}`)
+      const fileRef = storageRef(storage, `payslips/${employeeId}/${file.name}`)
       await uploadBytes(fileRef, file)
       const downloadUrl = await getDownloadURL(fileRef)
       
@@ -296,7 +279,7 @@ export function EmployeeProfile() {
         month: 'February 2024',
         url: downloadUrl,
       }
-      await (db as any).set(`tenants/${tenantId}/Payslips/${payslipData.id}`, payslipData)
+      await (db as any).set(`Payslips/${payslipData.id}`, payslipData)
       hrToast.success('Payslip Sent', 'Payslip sent to employee successfully')
     } catch (error: any) {
       hrToast.error('Send Failed', error?.message || 'Unable to send payslip')
@@ -307,27 +290,27 @@ export function EmployeeProfile() {
   }
 
   const handleDeleteEmployee = async () => {
-    if (!employeeId || !tenantId) return
+    if (!employeeId) return
     
     try {
       const db = await getDatabase()
       
-      await (db as any).remove(`tenants/${tenantId}/employees/${employeeId}`)
-      await (db as any).set(`tenants/${tenantId}/users/${employeeId}/deactivated`, true)
-      await (db as any).remove(`tenants/${tenantId}/attendance/${employeeId}`)
-      await (db as any).set(`tenants/${tenantId}/Documents/${employeeId}/deactivated`, true)
+      await (db as any).remove(`employees/${employeeId}`)
+      await (db as any).set(`users/${employeeId}/deactivated`, true)
+      await (db as any).remove(`attendance/${employeeId}`)
+      await (db as any).set(`Documents/${employeeId}/deactivated`, true)
       
-      const tasksSnap = await (db as any).get(`tenants/${tenantId}/tasks`)
+      const tasksSnap = await (db as any).get('tasks')
       const tasks = tasksSnap.val() as Record<string, { assignee?: string; projectId?: string }> | null
       if (tasks) {
         for (const [taskId, task] of Object.entries(tasks)) {
           if (task.assignee === employeeId) {
-            await (db as any).set(`tenants/${tenantId}/tasks/${taskId}/assignee`, null)
+            await (db as any).set(`tasks/${taskId}/assignee`, null)
           }
         }
       }
 
-      const projectsSnap = await (db as any).get(`tenants/${tenantId}/projects`)
+      const projectsSnap = await (db as any).get('projects')
       const projects = projectsSnap.val() as Record<string, { members?: string[] }> | null
       if (projects) {
         for (const [projId, proj] of Object.entries(projects)) {

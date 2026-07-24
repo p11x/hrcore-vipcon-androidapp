@@ -34,7 +34,7 @@ export function Attendance() {
       })
     }
     return () => { if (unsubAll) unsubAll() }
-  }, [user?.uid, tenantId])
+  }, [user?.uid])
 
   useEffect(() => {
     let unsub: (() => void) | null = null
@@ -52,7 +52,7 @@ export function Attendance() {
       })
     }
     return () => { if (unsub) unsub() }
-  }, [user?.uid, tenantId])
+  }, [user?.uid])
 
   const handlePunch = async () => {
     if (!user?.uid) return
@@ -74,7 +74,7 @@ export function Attendance() {
         return
       }
 
-      await (db as any).set(`tenants/${tenantId}/attendance/${userId}/${today}`, {
+      await (db as any).set(`attendance/${userId}/${today}`, {
         checkInTime: now.toLocaleTimeString(),
         status: 'present'
       })
@@ -87,7 +87,7 @@ export function Attendance() {
         return
       }
 
-      await (db as any).set(`tenants/${tenantId}/attendance/${userId}/${today}/checkOutTime`, now.toLocaleTimeString())
+      await (db as any).set(`attendance/${userId}/${today}/checkOutTime`, now.toLocaleTimeString())
       setPunchState('out')
       setActivity([{ icon: '▶', label: 'Punch Out', time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }, ...activity])
       hrToast.success('Punch Out', 'Successfully punched out')

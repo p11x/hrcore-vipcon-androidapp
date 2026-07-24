@@ -68,7 +68,7 @@ export function Education() {
       })
     }
     return () => { if (unsubDocs) unsubDocs() }
-  }, [user?.uid, reset, tenantId])
+  }, [user?.uid, reset])
 
   const onSubmit = async (data: EducationFormData) => {
     if (!user?.uid) return

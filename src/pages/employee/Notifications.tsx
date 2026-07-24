@@ -52,7 +52,7 @@ export function Notifications() {
     return () => {
       if (unsubscribe) unsubscribe()
     }
-  }, [user, tenantId])
+  }, [user])
 
   const markAsRead = async (id: string) => {
     if (!user) return

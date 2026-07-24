@@ -41,7 +41,7 @@ export function Projects() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [userId, tenantId])
+  }, [userId])
 
   if (loading) {
     return (

@@ -74,7 +74,7 @@ export function Tickets() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [tenantId])
+  }, [])
 
   const handleStatusChange = async (ticketId: string, status: 'open' | 'in-progress' | 'resolved') => {
     if (!tenantId) return

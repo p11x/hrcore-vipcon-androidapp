@@ -3,10 +3,10 @@ import { useAuth } from '../context/AuthContext'
 
 export function usePresence() {
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set())
-  const { user, tenantId } = useAuth()
+  const { user } = useAuth()
 
   useEffect(() => {
-    if (!user || !tenantId) {
+    if (!user) {
       setOnlineUsers(new Set())
       return
     }
@@ -14,7 +14,7 @@ export function usePresence() {
     import('../firebase/config').then(({ getDatabase }) => {
       getDatabase().then((db) => {
         const database = db as any
-        database.onValue(`tenants/${tenantId}/presence`, (snap: any) => {
+        database.onValue('presence', (snap: any) => {
           const data = snap.val() || {}
           const online = new Set(
             Object.entries(data)

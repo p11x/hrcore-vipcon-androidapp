@@ -67,7 +67,7 @@ export function Chat() {
       if (unsubChat) unsubChat()
       if (unsubEmp) unsubEmp()
     }
-  }, [userId, tenantId])
+  }, [userId])
 
   const getThreadName = (thread: Thread) => {
     const otherParticipants = thread.participants.filter(p => p !== userId)

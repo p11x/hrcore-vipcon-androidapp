@@ -4,7 +4,6 @@ import { Plus, Edit, Trash2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { hrToast } from '../../components/HRCToast'
 import { getDatabase } from '../../firebase/config'
-import { useAuth } from '../../context/AuthContext'
 
 interface Client {
   id: string
@@ -18,7 +17,6 @@ interface Client {
 }
 
 export function Clients() {
-  const { tenantId } = useAuth()
   const [clients, setClients] = useState<Client[]>([])
   const [statusFilter, setStatusFilter] = useState('All')
   const [showModal, setShowModal] = useState(false)
@@ -33,10 +31,9 @@ export function Clients() {
   })
 
   useEffect(() => {
-    if (!tenantId) return
     let unsub: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsub = db.onValue(`tenants/${tenantId}/clients`, (snapshot: any) => {
+      unsub = db.onValue('clients', (snapshot: any) => {
         const data = snapshot.val() as Record<string, Omit<Client, 'id'>> | undefined
         if (data) {
           setClients(Object.entries(data).map(([id, c]) => ({ ...c, id } as Client)))
@@ -46,24 +43,22 @@ export function Clients() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [tenantId])
+  }, [])
 
   const filteredClients = clients.filter((c) => statusFilter === 'All' || c.status === statusFilter)
 
   const handleSaveClient = async () => {
-    if (!tenantId) return
     const db = await getDatabase()
     const clientData = {
       ...formData,
       avatar: formData.name?.split(' ').map(n => n[0]).join('').toUpperCase() || '??',
-      tenantId: tenantId
     }
     if (editingClient) {
-      await (db as any).set(`tenants/${tenantId}/clients/${editingClient.id}`, clientData)
+      await (db as any).set(`clients/${editingClient.id}`, clientData)
       hrToast.success('Client Updated', 'Client details updated')
     } else {
       const newClient = { ...clientData, id: `client-${Date.now()}` }
-      await (db as any).set(`tenants/${tenantId}/clients/${newClient.id}`, newClient)
+      await (db as any).set(`clients/${newClient.id}`, newClient)
       hrToast.success('Client Added', 'New client created')
     }
     setShowModal(false)
@@ -85,9 +80,8 @@ export function Clients() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!tenantId) return
     const db = await getDatabase()
-    await (db as any).remove(`tenants/${tenantId}/clients/${id}`)
+    await (db as any).remove(`clients/${id}`)
     hrToast.success('Client Deleted', 'Client removed successfully')
   }
 

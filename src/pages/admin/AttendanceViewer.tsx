@@ -103,15 +103,13 @@ export function AttendanceViewer() {
       unsubEmp = db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) {
-          const loaded: Employee[] = Object.entries(data)
-            .filter(([_, emp]: [string, any]) => emp.role?.toLowerCase() !== 'admin')
-            .map(([id, emp]: [string, any]) => ({
-              id,
-              name: emp.name || emp.fullName || 'Unnamed Employee',
-              companyName: emp.companyName || emp.department || 'Acme Corp',
-              position: emp.position || 'Employee',
-              avatar: (emp.name || emp.fullName || 'EE').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
-            }))
+          const loaded: Employee[] = Object.entries(data).map(([id, emp]: [string, any]) => ({
+            id,
+            name: emp.name || emp.fullName || 'Unnamed Employee',
+            companyName: emp.companyName || emp.department || 'Acme Corp',
+            position: emp.position || 'Employee',
+            avatar: (emp.name || emp.fullName || 'EE').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+          }))
           setEmployees(loaded)
         } else {
           setEmployees([])

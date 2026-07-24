@@ -46,8 +46,7 @@ export function AdminDashboard() {
   const dashboardEmployees = useMemo(() => {
     return Object.fromEntries(
       Object.entries(employees).filter(([_, emp]: [string, any]) => {
-        const isNotAdmin = emp.role?.toLowerCase() !== 'admin'
-        return isNotAdmin && (!selectedCompany || emp.companyName === selectedCompany)
+        return !selectedCompany || emp.companyName === selectedCompany
       })
     )
   }, [employees, selectedCompany])
@@ -55,13 +54,12 @@ export function AdminDashboard() {
   const filteredEmployees = useMemo(() => {
     return Object.fromEntries(
       Object.entries(employees).filter(([_, emp]: [string, any]) => {
-        const isNotAdmin = emp.role?.toLowerCase() !== 'admin'
         const matchesCompany = !selectedCompany || emp.companyName === selectedCompany
         const matchesSearch = !searchQuery || 
           emp.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
           emp.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           emp.position?.toLowerCase().includes(searchQuery.toLowerCase())
-        return isNotAdmin && matchesCompany && matchesSearch
+        return matchesCompany && matchesSearch
       })
     )
   }, [employees, selectedCompany, searchQuery])
@@ -81,7 +79,7 @@ export function AdminDashboard() {
       if (!tenantId) return
 
       if (user?.uid) {
-        unsubNotifications = db.onValue(`tenants/${tenantId}/notifications/${user.uid}`, (snapshot: any) => {
+        unsubNotifications = db.onValue(`notifications/${user.uid}`, (snapshot: any) => {
           const data = snapshot.val() as Record<string, any> | undefined
           if (data) {
             const unreadCount = Object.values(data).filter(n => !n.read).length

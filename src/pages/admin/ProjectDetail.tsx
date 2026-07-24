@@ -5,7 +5,6 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { hrToast } from '../../components/HRCToast'
 import { getDatabase } from '../../firebase/config'
-import { useAuth } from '../../context/AuthContext'
 
 interface Project {
   id: string
@@ -46,7 +45,6 @@ interface Employee {
 
 export function ProjectDetail() {
   const { projectId } = useParams<{ projectId: string }>()
-  const { tenantId } = useAuth()
   const navigate = useNavigate()
   const [project, setProject] = useState<Project | null>(null)
   const [tasks, setTasks] = useState<Task[]>([])
@@ -61,11 +59,10 @@ export function ProjectDetail() {
   const [newComment, setNewComment] = useState('')
 
   useEffect(() => {
-    if (!tenantId) return
     const fetchData = async () => {
       const db = await getDatabase()
-      const projectData = await (db as any).get(`tenants/${tenantId}/projects/${projectId}`)
-      const employeesData = await (db as any).get(`tenants/${tenantId}/employees`)
+      const projectData = await (db as any).get(`projects/${projectId}`)
+      const employeesData = await (db as any).get('employees')
 
       if (projectData.exists()) {
         setProject(projectData.val() as Project)
@@ -79,7 +76,7 @@ export function ProjectDetail() {
 
     const unsubs: Array<() => void> = []
     getDatabase().then((db: any) => {
-      unsubs.push(db.onValue(`tenants/${tenantId}/tasks`, (snapshot: any) => {
+      unsubs.push(db.onValue('tasks', (snapshot: any) => {
         const allTasks = snapshot.val() as Record<string, Task> | undefined
         if (allTasks) {
           const projectTasks = Object.entries(allTasks)
@@ -91,7 +88,7 @@ export function ProjectDetail() {
         }
       }))
 
-      unsubs.push(db.onValue(`tenants/${tenantId}/taskComments`, (snapshot: any) => {
+      unsubs.push(db.onValue('taskComments', (snapshot: any) => {
         const data = snapshot.val() as Record<string, Record<string, TaskComment>> | undefined
         if (data) {
           const formatted: Record<string, TaskComment[]> = {}
@@ -109,14 +106,14 @@ export function ProjectDetail() {
       fetchData()
     }
     return () => { unsubs.forEach(u => u()) }
-  }, [projectId, tenantId])
+  }, [projectId])
 
   const handleAssignMember = async (empId: string) => {
     if (!project) return
     const currentMembers = project.members || []
     if (!currentMembers.includes(empId)) {
       const db = await getDatabase()
-      await (db as any).set(`tenants/${tenantId}/projects/${projectId}/members`, [...currentMembers, empId])
+      await (db as any).set(`projects/${projectId}/members`, [...currentMembers, empId])
       setProject({ ...project, members: [...currentMembers, empId] })
       hrToast.success('Member Assigned', 'Team member added to project')
     }
@@ -124,28 +121,27 @@ export function ProjectDetail() {
   }
 
   const handleRemoveMember = async (empId: string) => {
-    if (!project || !tenantId) return
+    if (!project) return
     const db = await getDatabase()
     const updatedMembers = (project.members || []).filter(id => id !== empId)
-    await (db as any).set(`tenants/${tenantId}/projects/${projectId}/members`, updatedMembers)
+    await (db as any).set(`projects/${projectId}/members`, updatedMembers)
     setProject({ ...project, members: updatedMembers })
     hrToast.success('Member Removed', 'Team member removed from project')
   }
 
   const handleEditProject = async (updatedProject: Partial<Project>) => {
-    if (!project || !tenantId) return
+    if (!project) return
     const db = await getDatabase()
-    await (db as any).set(`tenants/${tenantId}/projects/${projectId}`, { ...project, ...updatedProject })
+    await (db as any).set(`projects/${projectId}`, { ...project, ...updatedProject })
     setProject({ ...project, ...updatedProject })
     hrToast.success('Project Updated', 'Project details saved')
     setShowEditProject(false)
   }
 
   const handleTaskSubmit = async (taskData: { title: string; assignee: string; status: 'To Do' | 'In Progress' | 'Completed' }) => {
-    if (!tenantId) return
     const db = await getDatabase()
     if (editingTask) {
-      await (db as any).set(`tenants/${tenantId}/tasks/${editingTask.id}`, { ...editingTask, ...taskData })
+      await (db as any).set(`tasks/${editingTask.id}`, { ...editingTask, ...taskData })
       hrToast.success('Task Updated', 'Task updated successfully')
     } else {
       const newTask: Task = {
@@ -158,7 +154,7 @@ export function ProjectDetail() {
         attachments: 0,
         comments: 0,
       }
-      await (db as any).set(`tenants/${tenantId}/tasks/${newTask.id}`, newTask)
+      await (db as any).set(`tasks/${newTask.id}`, newTask)
       hrToast.success('Task Created', 'New task added to project')
     }
     setShowTaskModal(false)
@@ -167,15 +163,15 @@ export function ProjectDetail() {
 
   const handleMarkComplete = async (taskId: string) => {
     const task = tasks.find(t => t.id === taskId)
-    if (task && tenantId) {
+    if (task) {
       const db = await getDatabase()
-      await (db as any).set(`tenants/${tenantId}/tasks/${taskId}`, { ...task, status: 'Completed' })
+      await (db as any).set(`tasks/${taskId}`, { ...task, status: 'Completed' })
       hrToast.success('Task Completed', 'Task marked as complete')
     }
   }
 
   const handleSendComment = async (taskId: string) => {
-    if (!newComment.trim() || !tenantId) return
+    if (!newComment.trim()) return
     const db = await getDatabase()
     const comment: TaskComment = {
       id: `cmt-${Date.now()}`,
@@ -184,7 +180,7 @@ export function ProjectDetail() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
     const existing = taskComments[taskId] || []
-    await (db as any).set(`tenants/${tenantId}/taskComments/${taskId}`, [...existing, comment])
+    await (db as any).set(`taskComments/${taskId}`, [...existing, comment])
     setNewComment('')
     hrToast.success('Comment Sent', 'Your clarification has been sent')
   }
