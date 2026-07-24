@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Mail, Phone, Search } from 'lucide-react'
 import { useState, useEffect, useMemo } from 'react'
 import { getDatabase } from '../../firebase/config'
+import { useAuth } from '../../context/AuthContext'
 
 const recentActivity = [
   { id: '1', icon: '📅', label: 'Punch In', time: '09:12 AM' },
@@ -22,16 +23,18 @@ interface Employee {
 
 export function EmployeesView() {
   const navigate = useNavigate()
+  const { tenantId } = useAuth()
   const [employees, setEmployees] = useState<Employee[]>([])
   const [attendance, setAttendance] = useState<Record<string, any>>({})
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
+    if (!tenantId) return
     let unsubscribe: (() => void) | null = null
     let unsubAttendance: (() => void) | null = null
 
     getDatabase().then((db: any) => {
-      unsubscribe = db.onValue('employees', (snapshot: any) => {
+      unsubscribe = db.onValue(`tenants/${tenantId}/employees`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, { name: string; companyName?: string; department?: string; position: string; role?: string }> | undefined
         if (data) {
           setEmployees(Object.entries(data).map(([id, emp]) => ({
@@ -44,7 +47,7 @@ export function EmployeesView() {
           setEmployees([])
         }
       })
-      unsubAttendance = db.onValue('attendance', (snapshot: any) => {
+      unsubAttendance = db.onValue(`tenants/${tenantId}/attendance`, (snapshot: any) => {
         const data = snapshot.val()
         if (data) setAttendance(data)
         else setAttendance({})
@@ -54,7 +57,7 @@ export function EmployeesView() {
       if (unsubscribe) unsubscribe()
       if (unsubAttendance) unsubAttendance()
     }
-  }, [])
+  }, [tenantId])
 
   const { todayStr, weekStart, monthStart } = useMemo(() => {
     let maxDate = ''

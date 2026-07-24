@@ -66,30 +66,33 @@ export function AddEmployee() {
     }
     setLoading(true)
     try {
-      const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
-      if (!apiKey) throw new Error('Missing Firebase API Key')
-      
-      const finalCompanyName = data.companySelection === 'Others' ? data.customCompanyName : data.companySelection;
-      
-      // Use Identity Toolkit REST API to create user without affecting current auth state
-      const signUpRes = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-          returnSecureToken: true
+      const isMock = import.meta.env.VITE_USE_MOCK === 'true'
+      let uid = `emp-${Date.now()}`
+
+      if (!isMock) {
+        const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
+        if (!apiKey) throw new Error('Missing Firebase API Key')
+
+        // Use Identity Toolkit REST API to create user without affecting current auth state
+        const signUpRes = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+            returnSecureToken: true
+          })
         })
-      })
-      
-      const signUpData = await signUpRes.json()
-      if (!signUpRes.ok) {
-        throw new Error(signUpData.error?.message || 'Failed to create user account')
+
+        const signUpData = await signUpRes.json()
+        if (!signUpRes.ok) {
+          throw new Error(signUpData.error?.message || 'Failed to create user account')
+        }
+        uid = signUpData.localId
       }
-      
-      const uid = signUpData.localId
-      
+
       const { getDatabase } = await import('../../firebase/config')
+      const finalCompanyName = data.companySelection === 'Others' ? data.customCompanyName : data.companySelection;
       const primaryDb = await getDatabase()
       
       // The admin writes to the user profile
