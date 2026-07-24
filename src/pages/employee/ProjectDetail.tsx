@@ -63,8 +63,8 @@ export function ProjectDetail() {
 
     const fetchData = async () => {
       const db = await getDatabase()
-      const projectData = await (db as any).get(`projects/${projectId}`)
-      const employeesData = await (db as any).get('employees')
+      const projectData = await (db as any).get(`tenants/${tenantId}/projects/${projectId}`)
+      const employeesData = await (db as any).get(`tenants/${tenantId}/employees`)
 
       if (projectData.exists()) {
         setProject(projectData.val() as Project)
@@ -111,28 +111,28 @@ export function ProjectDetail() {
       if (unsubTasks) unsubTasks()
       if (unsubComments) unsubComments()
     }
-  }, [projectId])
+  }, [projectId, tenantId])
 
   const handleMarkComplete = async (taskId: string) => {
     const task = tasks.find(t => t.id === taskId)
-    if (task) {
+    if (task && tenantId) {
       const db = await getDatabase()
-      await (db as any).set(`tasks/${taskId}`, { ...task, status: 'Completed' })
+      await (db as any).set(`tenants/${tenantId}/tasks/${taskId}`, { ...task, status: 'Completed' })
       hrToast.success('Task Completed', 'Task marked as complete')
     }
   }
 
   const handleStatusChange = async (taskId: string, status: 'To Do' | 'In Progress' | 'Completed') => {
     const task = tasks.find(t => t.id === taskId)
-    if (task) {
+    if (task && tenantId) {
       const db = await getDatabase()
-      await (db as any).set(`tasks/${taskId}`, { ...task, status })
+      await (db as any).set(`tenants/${tenantId}/tasks/${taskId}`, { ...task, status })
       hrToast.success('Status Updated', `Task moved to ${status}`)
     }
   }
 
   const handleSendComment = async (taskId: string) => {
-    if (!newComment.trim()) return
+    if (!newComment.trim() || !tenantId) return
     const db = await getDatabase()
     const comment: TaskComment = {
       id: `cmt-${Date.now()}`,
@@ -141,7 +141,7 @@ export function ProjectDetail() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
     const existing = taskComments[taskId] || []
-    await (db as any).set(`taskComments/${taskId}`, [...existing, comment])
+    await (db as any).set(`tenants/${tenantId}/taskComments/${taskId}`, [...existing, comment])
     setNewComment('')
     hrToast.success('Comment Sent', 'Your clarification has been sent')
   }

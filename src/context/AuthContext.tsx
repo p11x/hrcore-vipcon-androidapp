@@ -23,10 +23,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [tenantId, setTenantId] = useState<string | null>(null)
 
   useEffect(() => {
+    let unsubscribe: (() => void) | undefined
+
     const initAuth = async () => {
       const auth = await getAuth()
       
       const handleAuthChange = async (firebaseUser: User | null) => {
+        console.log('Auth state changed:', firebaseUser?.email || 'null')
         setLoading(true)
         setUser(firebaseUser)
         if (firebaseUser) {
@@ -34,19 +37,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             let isAdminUser = false
             let userTenantId = null
             const token = await firebaseUser.getIdTokenResult(true)
-            console.log('Auth token claims:', token.claims)
+            console.log('Auth token claims:', JSON.stringify(token.claims))
             isAdminUser = token.claims.role === 'admin'
             userTenantId = (token.claims.tenantId as string) || null
 
             if (!isAdminUser || !userTenantId) {
               const db = await getDatabase()
+              console.log('Fetching user doc from DB for:', firebaseUser.uid)
               // First verify the user exists in our DB, if not they were deleted
               let snap = await db.get(`users/${firebaseUser.uid}`)
               if (!snap.exists()) {
+                console.log('User doc not found, waiting 2s...')
                 await new Promise(resolve => setTimeout(resolve, 2000))
                 snap = await db.get(`users/${firebaseUser.uid}`)
               }
               if (!snap.exists()) {
+                console.error('User doc still not found, signing out')
                 if ((auth as any).signOut) {
                   await (auth as any).signOut()
                 } else {
@@ -55,14 +61,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 return
               }
               const userData = snap.val()
+              console.log('User data from DB:', userData)
               isAdminUser = userData.role === 'admin'
               userTenantId = userData.tenantId || null
             }
             
+            console.log('Setting final auth state:', { isAdminUser, userTenantId })
             setIsAdmin(isAdminUser)
             setTenantId(userTenantId)
           } catch (e) {
-            console.error('Token result error:', e)
+            console.error('handleAuthChange error:', e)
             setIsAdmin(false)
             setTenantId(null)
           }
@@ -73,16 +81,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false)
       }
 
-      let unsubscribe: () => void
       if ((auth as any).onAuthStateChanged) {
         unsubscribe = (auth as any).onAuthStateChanged(handleAuthChange)
       } else {
         unsubscribe = onAuthStateChanged(auth, handleAuthChange)
       }
-      
-      return () => unsubscribe()
     }
+
     initAuth()
+    return () => {
+      if (unsubscribe) unsubscribe()
+    }
   }, [])
 
   const signIn = async (email: string, password: string) => {

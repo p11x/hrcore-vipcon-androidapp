@@ -31,7 +31,7 @@ export function BankDetails() {
         })
       })
     }
-  }, [user?.uid, reset])
+  }, [user?.uid, tenantId, reset])
 
   const onSubmit = async (data: BankDetailsFormData) => {
     if (!user?.uid) return

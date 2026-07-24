@@ -45,14 +45,14 @@ export function SupportTickets() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [])
+  }, [tenantId])
 
   const onSubmit = async (data: TicketFormData) => {
     if (!user?.uid) return
     try {
       const db = await getDatabase()
       const ticketId = `tic-${Date.now()}`
-      await (db as any).set(`tickets/${ticketId}`, {
+      await (db as any).set(`tenants/${tenantId}/tickets/${ticketId}`, {
         ...data,
         id: ticketId,
         employee: user.displayName || user.email?.split('@')[0] || 'Employee',

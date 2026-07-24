@@ -32,7 +32,7 @@ export function HolidayCalendar() {
       })
     })
     return () => { if (unsub) unsub() }
-  }, [])
+  }, [tenantId])
 
   const days = eachDayOfInterval({
     start: startOfMonth(currentMonth),

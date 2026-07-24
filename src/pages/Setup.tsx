@@ -33,11 +33,21 @@ export function Setup() {
       const auth = await getAuth()
       const cred = await createUserWithEmailAndPassword(auth, email, password)
       const db = await getDatabase()
-      await db.set(`users/${cred.user.uid}`, {
+      const uid = cred.user.uid
+      const tenantId = `org-${Date.now()}`
+
+      await db.set(`organizations/${tenantId}`, {
+        name: 'Default Organization',
+        createdAt: new Date().toISOString(),
+        adminId: uid
+      })
+
+      await db.set(`users/${uid}`, {
         email,
         role: 'admin',
         firstName: 'Admin',
         lastName: 'User',
+        tenantId: tenantId,
         status: 'active',
         createdAt: new Date().toISOString()
       })

@@ -170,7 +170,3 @@ export const mockDb = {
     }
   },
 }
-// Inject users to root for AuthContext
-if (seedData.tenants && seedData.tenants['mock-tenant-1'] && seedData.tenants['mock-tenant-1'].users) {
-  db.users = seedData.tenants['mock-tenant-1'].users;
-}

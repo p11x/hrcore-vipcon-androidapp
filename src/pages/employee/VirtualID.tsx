@@ -39,7 +39,7 @@ export function VirtualID() {
         if (unsubUser) unsubUser()
       }
     }
-  }, [user?.uid])
+  }, [user?.uid, tenantId])
 
   const mergedData = { ...userData, ...employeeData }
 

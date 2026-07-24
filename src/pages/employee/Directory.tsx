@@ -43,7 +43,7 @@ export function Directory() {
     return () => {
       if (unsubscribe) unsubscribe()
     }
-  }, [])
+  }, [tenantId])
 
   const getStatus = (id: string) => {
     return onlineUsers.has(id) ? 'pulse' : 'neutral'

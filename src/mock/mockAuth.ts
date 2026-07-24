@@ -4,7 +4,7 @@ type User = {
   emailVerified: boolean
   displayName: string | null
   photoURL: string | null
-  getIdTokenResult: () => Promise<{ claims: { role?: string } }>
+  getIdTokenResult: () => Promise<{ claims: { role?: string; tenantId?: string } }>
 }
 
 type Listener = (user: User | null) => void
@@ -18,7 +18,12 @@ const adminUser: User = {
   emailVerified: true,
   displayName: 'Admin User',
   photoURL: null,
-  getIdTokenResult: async () => ({ claims: { role: 'admin' } }),
+  getIdTokenResult: async () => ({
+    claims: {
+      role: 'admin',
+      tenantId: 'mock-tenant-1'
+    }
+  }),
 }
 
 const employeeUsers: Record<string, User> = {
@@ -28,7 +33,11 @@ const employeeUsers: Record<string, User> = {
     emailVerified: true,
     displayName: 'Alice Chen',
     photoURL: null,
-    getIdTokenResult: async () => ({ claims: {} }),
+    getIdTokenResult: async () => ({
+      claims: {
+        tenantId: 'mock-tenant-1'
+      }
+    }),
   },
   'emp-002': {
     uid: 'emp-002',
@@ -36,7 +45,7 @@ const employeeUsers: Record<string, User> = {
     emailVerified: true,
     displayName: 'Bob Rivera',
     photoURL: null,
-    getIdTokenResult: async () => ({ claims: {} }),
+    getIdTokenResult: async () => ({ claims: { tenantId: 'mock-tenant-1' } }),
   },
   'emp-003': {
     uid: 'emp-003',
@@ -44,7 +53,7 @@ const employeeUsers: Record<string, User> = {
     emailVerified: true,
     displayName: 'Carol Kim',
     photoURL: null,
-    getIdTokenResult: async () => ({ claims: {} }),
+    getIdTokenResult: async () => ({ claims: { tenantId: 'mock-tenant-1' } }),
   },
   'emp-004': {
     uid: 'emp-004',
@@ -52,7 +61,7 @@ const employeeUsers: Record<string, User> = {
     emailVerified: true,
     displayName: 'David Park',
     photoURL: null,
-    getIdTokenResult: async () => ({ claims: {} }),
+    getIdTokenResult: async () => ({ claims: { tenantId: 'mock-tenant-1' } }),
   },
   'emp-005': {
     uid: 'emp-005',
@@ -60,7 +69,7 @@ const employeeUsers: Record<string, User> = {
     emailVerified: true,
     displayName: 'Eve Martinez',
     photoURL: null,
-    getIdTokenResult: async () => ({ claims: {} }),
+    getIdTokenResult: async () => ({ claims: { tenantId: 'mock-tenant-1' } }),
   },
   'emp-006': {
     uid: 'emp-006',
@@ -68,7 +77,7 @@ const employeeUsers: Record<string, User> = {
     emailVerified: true,
     displayName: 'Frank Wilson',
     photoURL: null,
-    getIdTokenResult: async () => ({ claims: {} }),
+    getIdTokenResult: async () => ({ claims: { tenantId: 'mock-tenant-1' } }),
   },
   'emp-007': {
     uid: 'emp-007',
@@ -76,7 +85,7 @@ const employeeUsers: Record<string, User> = {
     emailVerified: true,
     displayName: 'Sunny',
     photoURL: null,
-    getIdTokenResult: async () => ({ claims: {} }),
+    getIdTokenResult: async () => ({ claims: { tenantId: 'mock-tenant-1' } }),
   },
 }
 
