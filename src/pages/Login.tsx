@@ -166,9 +166,6 @@ export function Login() {
                 >
                   {isLoggingIn ? 'Verifying...' : 'Sign In'}
                 </button>
-                <div className="mt-4 p-3 bg-primary/10 rounded-lg text-xs text-primary text-center">
-                  <strong>Demo Admin:</strong> admin@hrcore.dev / admin123
-                </div>
               </motion.form>
             ) : (
               <motion.form

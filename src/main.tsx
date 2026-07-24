@@ -5,15 +5,8 @@ import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/AuthContext'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { CommandPalette } from './components/CommandPalette'
-import { MockModeBadge } from './components/MockModeBadge'
 import AppRouter from './AppRouter'
 import './index.css'
-
-const useMock = import.meta.env.VITE_USE_MOCK === 'true'
-if (useMock) {
-  const { mockDb } = await import('./mock/mockDb')
-  mockDb.startRailSimulation()
-}
 
 createRoot(document.getElementById('root')!)!.render(
   <StrictMode>
@@ -22,7 +15,6 @@ createRoot(document.getElementById('root')!)!.render(
         <BrowserRouter>
           <AppRouter />
           <CommandPalette />
-          <MockModeBadge />
           <Toaster
             position="bottom-right"
             toastOptions={{
