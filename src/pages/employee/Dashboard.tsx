@@ -178,6 +178,39 @@ export function EmployeeDashboard() {
   }, [attendance])
 
   // 4-Step Onboarding calculations
+  const thisMonthAttendance = useMemo(() => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = now.getMonth()
+    
+    // Total working days in current month
+    let totalWorkingDays = 0;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (let i = 1; i <= daysInMonth; i++) {
+      const d = new Date(year, month, i);
+      const day = d.getDay();
+      if (day !== 0 && day !== 6) { // 0 is Sunday, 6 is Saturday
+        totalWorkingDays++;
+      }
+    }
+
+    if (!attendance) return { present: 0, total: totalWorkingDays, percent: 0 }
+
+    const monthStr = `${year}-${String(month + 1).padStart(2, '0')}`
+    
+    let presentCount = 0
+    Object.entries(attendance).forEach(([date, data]: [string, any]) => {
+      if (date.startsWith(monthStr)) {
+        if (data?.status === 'present' || data?.status === 'late') {
+          presentCount++
+        }
+      }
+    })
+
+    const percent = totalWorkingDays > 0 ? Math.round((presentCount / totalWorkingDays) * 100) : 0
+    return { present: presentCount, total: totalWorkingDays, percent }
+  }, [attendance])
+
   const isStep1Complete = useMemo(() => !!(personalDetails?.fullName && personalDetails?.phone), [personalDetails])
   const isStep2Complete = useMemo(() => !!(educationDetails?.collegeName && educationDetails?.degree), [educationDetails])
   const isStep3Complete = useMemo(() => uploadedCount === 5, [uploadedCount])
@@ -439,8 +472,8 @@ export function EmployeeDashboard() {
               </div>
               <span className="font-body font-medium text-text-hi">This Month Attendance</span>
             </div>
-            <div className="font-mono text-3xl font-bold text-accent-mint">85%</div>
-            <div className="text-text-mid text-xs">20/22 days</div>
+            <div className="font-mono text-3xl font-bold text-accent-mint">{thisMonthAttendance.percent}%</div>
+            <div className="text-text-mid text-xs">{thisMonthAttendance.present}/{thisMonthAttendance.total} days</div>
           </motion.div>
 
           <motion.div
