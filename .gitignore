@@ -34,3 +34,9 @@ dist-ssr
 
 # Build outputs
 *.tsbuildinfo
+.gradle/
+build/
+bin/
+obj/
+.firebase/
+.artifacts/
