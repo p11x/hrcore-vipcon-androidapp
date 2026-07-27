@@ -74,7 +74,7 @@ export function Attendance() {
         return
       }
 
-      await (db as any).set(`attendance/${userId}/${today}`, {
+      await (db as any).set(`tenants/${tenantId}/attendance/${userId}/${today}`, {
         checkInTime: now.toLocaleTimeString(),
         status: 'present'
       })
@@ -87,7 +87,7 @@ export function Attendance() {
         return
       }
 
-      await (db as any).set(`attendance/${userId}/${today}/checkOutTime`, now.toLocaleTimeString())
+      await (db as any).set(`tenants/${tenantId}/attendance/${userId}/${today}/checkOutTime`, now.toLocaleTimeString())
       setPunchState('out')
       setActivity([{ icon: '▶', label: 'Punch Out', time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }, ...activity])
       hrToast.success('Punch Out', 'Successfully punched out')

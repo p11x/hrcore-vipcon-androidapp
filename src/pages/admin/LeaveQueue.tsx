@@ -12,8 +12,8 @@ interface LeaveRequest {
   employee: string
   avatar?: string
   type: string
-  from: string
-  to: string
+  startDate: string
+  endDate: string
   reason: string
   status: 'pending' | 'approved' | 'rejected'
 }
@@ -22,6 +22,7 @@ export function LeaveQueue() {
   const { tenantId, user } = useAuth()
   const [showCount, setShowCount] = useState(10)
   const [leaves, setLeaves] = useState<LeaveRequest[]>([])
+  const [allLeaves, setAllLeaves] = useState<LeaveRequest[]>([])
 
   useEffect(() => {
     if (!tenantId) return
@@ -30,11 +31,13 @@ export function LeaveQueue() {
       unsub = db.onValue(`tenants/${tenantId}/leaves`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, Omit<LeaveRequest, 'id'>> | undefined
         if (data) {
-          const pending = Object.entries(data)
-            .filter(([_, r]) => (r as LeaveRequest).status === 'pending')
-            .map(([id, req]) => ({ ...(req as Omit<LeaveRequest, 'id'>), id }))
+          const allReqs = Object.entries(data).map(([id, req]) => ({ ...(req as Omit<LeaveRequest, 'id'>), id }))
+          setAllLeaves(allReqs)
+          
+          const pending = allReqs.filter(r => r.status === 'pending')
           setLeaves(pending)
         } else {
+          setAllLeaves([])
           setLeaves([])
         }
       })
@@ -46,8 +49,31 @@ export function LeaveQueue() {
     if (!tenantId) return
     try {
       const db = await getDatabase()
-      const status = action === 'approve' ? 'approved' : 'rejected'
       const req = leaves.find(l => l.id === id)
+      
+      if (!req) return;
+
+      if (action === 'approve') {
+        const hasOverlap = allLeaves.some(otherReq => {
+          if (otherReq.id === req.id) return false;
+          if (otherReq.employeeId !== req.employeeId) return false;
+          if (otherReq.status !== 'approved') return false;
+
+          const reqStart = new Date(otherReq.startDate);
+          const reqEnd = new Date(otherReq.endDate);
+          const newStart = new Date(req.startDate);
+          const newEnd = new Date(req.endDate);
+
+          return (newStart <= reqEnd && newEnd >= reqStart);
+        });
+
+        if (hasOverlap) {
+          hrToast.error('Overlap Error', 'This employee already has an approved leave for these dates.');
+          return;
+        }
+      }
+
+      const status = action === 'approve' ? 'approved' : 'rejected'
       await (db as any).set(`tenants/${tenantId}/leaves/${id}/status`, status)
       await logAudit(tenantId, `${action === 'approve' ? 'Approved' : 'Rejected'} leave request for ${req?.employee || 'Employee'}`, user?.email || 'Admin')
       hrToast.success(action === 'approve' ? 'Approved' : 'Rejected', `Leave request ${action}ed successfully`)
@@ -119,8 +145,8 @@ export function LeaveQueue() {
                     </div>
                   </td>
                   <td className="p-4 text-text-hi">{leave.type}</td>
-                  <td className="p-4 font-mono text-text-mid">{leave.from}</td>
-                  <td className="p-4 font-mono text-text-mid">{leave.to}</td>
+                  <td className="p-4 font-mono text-text-mid">{leave.startDate}</td>
+                  <td className="p-4 font-mono text-text-mid">{leave.endDate}</td>
                   <td className="p-4 text-text-mid max-w-[200px] truncate">{leave.reason}</td>
                   <td className="p-4">
                     <div className="flex gap-2">

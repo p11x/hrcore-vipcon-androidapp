@@ -347,7 +347,7 @@ export function EmployeeProfile() {
         for (const [projId, proj] of Object.entries(projects)) {
           if (proj.members?.includes(employeeId)) {
             const updatedMembers = proj.members.filter((m: string) => m !== employeeId)
-            await (db as any).set(`projects/${projId}/members`, updatedMembers)
+            await (db as any).set(`tenants/${tenantId}/projects/${projId}/members`, updatedMembers)
           }
         }
       }

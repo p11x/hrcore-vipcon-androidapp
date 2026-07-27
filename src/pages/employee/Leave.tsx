@@ -72,6 +72,21 @@ export function Leave() {
       hrToast.error('Submission Failed', 'Missing organization context')
       return
     }
+
+    const hasOverlap = myRequests.some(req => {
+      if (req.status !== 'approved' && req.status !== 'pending') return false;
+      const reqStart = new Date(req.startDate);
+      const reqEnd = new Date(req.endDate);
+      const newStart = new Date(data.startDate);
+      const newEnd = new Date(data.endDate);
+      return (newStart <= reqEnd && newEnd >= reqStart);
+    });
+
+    if (hasOverlap) {
+      hrToast.error('Overlap Error', 'You already have an approved or pending leave for these dates.');
+      return;
+    }
+
     try {
       const sanitizedData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined))
       const db = await getDatabase()

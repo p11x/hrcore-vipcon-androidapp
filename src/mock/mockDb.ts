@@ -2,7 +2,37 @@ import { seedData } from './seedData'
 
 type Listener = (snapshot: { val: () => unknown; key?: string }) => void
 
-const db: Record<string, unknown> = JSON.parse(JSON.stringify(seedData))
+let db: Record<string, unknown>
+try {
+  const stored = localStorage.getItem('mock-db-state')
+  if (stored) {
+    db = JSON.parse(stored)
+  } else {
+    db = JSON.parse(JSON.stringify(seedData))
+  }
+} catch (e) {
+  db = JSON.parse(JSON.stringify(seedData))
+}
+
+const persistDb = () => {
+  localStorage.setItem('mock-db-state', JSON.stringify(db))
+}
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'mock-db-state' && e.newValue) {
+    try {
+      db = JSON.parse(e.newValue)
+      // Notify all registered listeners because the entire DB was updated
+      Object.keys(listeners).forEach(path => {
+        const value = getNestedValue(path)
+        if (value !== undefined) {
+          const snapshot = { val: () => value, key: path }
+          listeners[path].forEach((cb) => cb(snapshot))
+        }
+      })
+    } catch (err) {}
+  }
+})
 
 const listeners: Record<string, Listener[]> = {}
 let railInterval: ReturnType<typeof setInterval> | null = null
@@ -31,6 +61,7 @@ const setNestedValue = (path: string, value: unknown) => {
     current = current[part] as Record<string, unknown>
   }
   current[parts[parts.length - 1]] = value
+  persistDb()
 }
 
 const deleteNestedValue = (path: string) => {
@@ -42,6 +73,7 @@ const deleteNestedValue = (path: string) => {
     current = current[part] as Record<string, unknown>
   }
   delete current[parts[parts.length - 1]]
+  persistDb()
 }
 
 const notifyListeners = (path: string) => {

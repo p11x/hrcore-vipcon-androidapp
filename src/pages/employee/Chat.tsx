@@ -43,7 +43,14 @@ export function Chat() {
         if (data) {
           const myThreads = Object.entries(data)
             .filter(([_, t]) => (t as Thread).participants?.includes(userId))
-            .map(([id, t]) => ({ ...t, id, messages: (t as Thread).messages || [] }))
+            .map(([id, t]) => {
+              const threadObj = t as Thread;
+              let msgs = threadObj.messages || [];
+              if (!Array.isArray(msgs)) {
+                msgs = Object.values(msgs);
+              }
+              return { ...threadObj, id, messages: msgs };
+            })
           setThreads(myThreads)
         } else {
           setThreads([])

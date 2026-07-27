@@ -1,0 +1,1 @@
+import{nt as e}from"./index.esm-CV5IFH1m.js";import{p as t}from"./proxy-Dtnn5rkE.js";import{q as n,t as r}from"./CartesianChart-SN5DB22K.js";var i=e(t()),a=[`axis`,`item`],o=(0,i.forwardRef)((e,t)=>i.createElement(r,{chartName:`BarChart`,defaultTooltipEventType:`axis`,validateTooltipEventTypes:a,tooltipPayloadSearcher:n,categoricalChartProps:e,ref:t}));export{o as t};

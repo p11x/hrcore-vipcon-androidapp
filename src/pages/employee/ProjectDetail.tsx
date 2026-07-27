@@ -62,18 +62,23 @@ export function ProjectDetail() {
     let unsubComments: (() => void) | null = null
 
     const fetchData = async () => {
-      const db = await getDatabase()
-      const projectData = await (db as any).get(`projects/${projectId}`)
-      const employeesData = await (db as any).get('employees')
+      try {
+        const db = await getDatabase()
+        const projectData = await (db as any).get(`tenants/${tenantId}/projects/${projectId}`)
+        const employeesData = await (db as any).get(`tenants/${tenantId}/employees`)
 
-      if (projectData.exists()) {
-        setProject(projectData.val() as Project)
-      }
+        if (projectData.exists()) {
+          setProject(projectData.val() as Project)
+        }
 
-      if (employeesData.exists()) {
-        setEmployees(employeesData.val() as Record<string, Employee>)
+        if (employeesData.exists()) {
+          setEmployees(employeesData.val() as Record<string, Employee>)
+        }
+      } catch (err) {
+        console.error("Error fetching project data:", err)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
 
     getDatabase().then((db: any) => {
@@ -117,7 +122,7 @@ export function ProjectDetail() {
     const task = tasks.find(t => t.id === taskId)
     if (task) {
       const db = await getDatabase()
-      await (db as any).set(`tasks/${taskId}`, { ...task, status: 'Completed' })
+      await (db as any).set(`tenants/${tenantId}/tasks/${taskId}`, { ...task, status: 'Completed' })
       hrToast.success('Task Completed', 'Task marked as complete')
     }
   }
@@ -126,7 +131,7 @@ export function ProjectDetail() {
     const task = tasks.find(t => t.id === taskId)
     if (task) {
       const db = await getDatabase()
-      await (db as any).set(`tasks/${taskId}`, { ...task, status })
+      await (db as any).set(`tenants/${tenantId}/tasks/${taskId}`, { ...task, status })
       hrToast.success('Status Updated', `Task moved to ${status}`)
     }
   }
@@ -141,7 +146,7 @@ export function ProjectDetail() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
     const existing = taskComments[taskId] || []
-    await (db as any).set(`taskComments/${taskId}`, [...existing, comment])
+    await (db as any).set(`tenants/${tenantId}/taskComments/${taskId}`, [...existing, comment])
     setNewComment('')
     hrToast.success('Comment Sent', 'Your clarification has been sent')
   }
@@ -217,7 +222,7 @@ export function ProjectDetail() {
                 </div>
               </div>
             ))}
-            {project.members.length === 0 && (
+            {(project.members || []).length === 0 && (
               <span className="text-text-mid">No members assigned</span>
             )}
           </div>
