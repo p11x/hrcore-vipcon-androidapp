@@ -711,13 +711,13 @@ export function AdminDashboard() {
                 <span>Approve Leaves</span>
               </button>
               <button 
-                onClick={() => navigate('/admin/timesheet')}
+                onClick={() => navigate('/admin/employees-view')}
                 className="flex flex-col items-center justify-center gap-1 px-2 py-2 rounded text-xs font-medium focus-ring bg-accent-amber/10 text-accent-amber"
               >
                 <div className="w-6 h-6 rounded bg-accent-amber/20 flex items-center justify-center">
-                  <Plus className="w-3 h-3 text-accent-amber" />
+                  <Users className="w-3 h-3 text-accent-amber" />
                 </div>
-                <span>Send Payslip</span>
+                <span>Employees View</span>
               </button>
               <button 
                 onClick={() => navigate('/admin/projects')}
