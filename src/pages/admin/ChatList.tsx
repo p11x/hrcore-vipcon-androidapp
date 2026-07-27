@@ -25,7 +25,7 @@ interface Employee {
 }
 
 export function ChatList() {
-  const { user } = useAuth()
+  const { user, tenantId } = useAuth()
   const userId = user?.uid || 'admin-001'
   
   const [activeThread, setActiveThread] = useState<string | null>(null)
@@ -36,10 +36,11 @@ export function ChatList() {
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
+    if (!tenantId) return
     let unsubChat: (() => void) | null = null
     let unsubEmp: (() => void) | null = null
     getDatabase().then((db: any) => {
-      unsubChat = db.onValue('messages_Chat', (snapshot: any) => {
+      unsubChat = db.onValue(`tenants/${tenantId}/messages_Chat`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, { id: string; participants: string[]; messages: Message[] }> | undefined
         if (data) {
           const myThreads = Object.entries(data)
@@ -55,7 +56,7 @@ export function ChatList() {
         }
       })
 
-      unsubEmp = db.onValue('users', (snapshot: any) => {
+      unsubEmp = db.onValue(`tenants/${tenantId}/users`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, { fullName?: string, name?: string }> | undefined
         if (data) {
           const formatted: Record<string, Employee> = {}
@@ -73,7 +74,7 @@ export function ChatList() {
       if (unsubChat) unsubChat()
       if (unsubEmp) unsubEmp()
     }
-  }, [userId])
+  }, [userId, tenantId])
 
   const getThreadName = (thread: Thread) => {
     const otherParticipants = thread.participants.filter(p => p !== userId)
@@ -119,7 +120,7 @@ export function ChatList() {
         text: newMessage,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }
-      await db.set(`messages_Chat/${activeThread}/messages`, [...existing, newMsg])
+      await db.set(`tenants/${tenantId}/messages_Chat/${activeThread}/messages`, [...existing, newMsg])
       setNewMessage('')
       hrToast.success('Message Sent', 'Your message has been sent')
     }
@@ -137,7 +138,7 @@ export function ChatList() {
           participants: [userId, otherUserId],
           messages: [],
         }
-        await db.set(`messages_Chat/${threadId}`, newThread)
+        await db.set(`tenants/${tenantId}/messages_Chat/${threadId}`, newThread)
         setThreads([...threads, newThread])
         setActiveThread(threadId)
       }

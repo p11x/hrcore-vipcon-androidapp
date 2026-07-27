@@ -147,7 +147,8 @@ export function Documents() {
       const storage = await getStorage()
       const { ref: storageRef, uploadBytes, getDownloadURL } = await import('firebase/storage')
       
-      const fileRef = storageRef(storage, `tenants/${tenantId}/documents/${userId}/${docType}/${file.name}`)
+      const uniqueFilename = `${Date.now()}-${file.name}`
+      const fileRef = storageRef(storage, `tenants/${tenantId}/documents/${userId}/${docType}/${uniqueFilename}`)
       await uploadBytes(fileRef, file)
       const downloadUrl = await getDownloadURL(fileRef)
 
@@ -164,6 +165,10 @@ export function Documents() {
     } finally {
       setUploading(null)
     }
+  }
+
+  const handleView = (url?: string) => {
+    if (url) window.open(url, '_blank')
   }
 
   const handleDownload = (url?: string, filename?: string) => {
@@ -294,12 +299,20 @@ export function Documents() {
                   {payslips.map((p) => (
                     <div key={p.id} className="flex items-center justify-between py-1">
                       <span className="text-text-mid text-sm">{p.month}</span>
-                      <button
-                        onClick={() => handleDownload(p.url, `${p.month}-payslip.pdf`)}
-                        className="px-3 py-1 bg-primary text-white rounded text-xs font-medium hover:bg-primary/90 transition-colors focus-ring"
-                      >
-                        Download
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleView(p.url)}
+                          className="px-3 py-1 bg-accent-mint/10 text-accent-mint rounded text-xs font-medium hover:bg-accent-mint/20 transition-colors focus-ring"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => handleDownload(p.url, `${p.month}-payslip.pdf`)}
+                          className="px-3 py-1 bg-primary text-white rounded text-xs font-medium hover:bg-primary/90 transition-colors focus-ring"
+                        >
+                          Download
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

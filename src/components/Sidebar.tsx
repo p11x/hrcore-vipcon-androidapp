@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard,
@@ -33,6 +33,8 @@ import {
   BarChart3,
   ShieldAlert,
 } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import { getDatabase } from '../firebase/config'
 
 const adminNavItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard', showDot: true },
@@ -74,8 +76,24 @@ const employeeNavItems = [
 export function Sidebar({ onSignOut, isAdmin = false }: { onSignOut?: () => void; isAdmin?: boolean }) {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [companyName, setCompanyName] = useState('Vepcon Soft Systems')
   const navigate = useNavigate()
   const location = useLocation()
+  const { user, tenantId } = useAuth()
+
+  useEffect(() => {
+    if (isAdmin || !user?.uid || !tenantId) return
+    let unsub = () => {}
+    getDatabase().then((db: any) => {
+      unsub = db.onValue(`tenants/${tenantId}/employees/${user.uid}`, (snapshot: any) => {
+        const data = snapshot.val()
+        if (data?.companyName) {
+          setCompanyName(data.companyName)
+        }
+      })
+    })
+    return () => unsub()
+  }, [isAdmin, user?.uid, tenantId])
 
   const navItems = isAdmin ? adminNavItems : employeeNavItems
   const sidebarWidth = collapsed ? 'w-20' : 'w-64'
@@ -89,7 +107,7 @@ export function Sidebar({ onSignOut, isAdmin = false }: { onSignOut?: () => void
             {!collapsed && (
               <div className="flex flex-col">
                 <span className="font-display font-semibold text-text-hi truncate">HR CORE</span>
-                <span className="text-[10px] text-text-mid font-medium truncate">By Vepcon Soft Systems</span>
+                <span className="text-[10px] text-text-mid font-medium truncate">By {companyName}</span>
               </div>
             )}
           </div>
@@ -172,7 +190,7 @@ export function Sidebar({ onSignOut, isAdmin = false }: { onSignOut?: () => void
                   <img src="/logo.svg" alt="Logo" className="w-8 h-8 rounded object-cover" />
                   <div className="flex flex-col">
                     <span className="font-display font-semibold text-text-hi truncate max-w-[200px]">HR CORE</span>
-                    <span className="text-[10px] text-text-mid font-medium truncate max-w-[200px]">By Vepcon Soft Systems</span>
+                    <span className="text-[10px] text-text-mid font-medium truncate max-w-[200px]">By {companyName}</span>
                   </div>
                 </div>
                 <button

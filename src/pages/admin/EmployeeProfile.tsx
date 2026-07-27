@@ -242,13 +242,20 @@ export function EmployeeProfile() {
     const file = e.target.files?.[0]
     if (!file || !employeeId) return
     
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      hrToast.error('Invalid File', 'Please upload a PDF file.')
+      if (e.target) e.target.value = ''
+      return
+    }
+
     setSendingOffer(true)
     try {
       const db = await getDatabase()
       const storage = await getStorage()
       const { ref: storageRef, uploadBytes, getDownloadURL } = await import('firebase/storage')
       
-      const fileRef = storageRef(storage, `tenants/${tenantId}/offerletters/${employeeId}/${file.name}`)
+      const uniqueFilename = `${Date.now()}-${file.name}`
+      const fileRef = storageRef(storage, `tenants/${tenantId}/offerletters/${employeeId}/${uniqueFilename}`)
       await uploadBytes(fileRef, file)
       const downloadUrl = await getDownloadURL(fileRef)
       
@@ -278,13 +285,20 @@ export function EmployeeProfile() {
     const file = e.target.files?.[0]
     if (!file || !employeeId) return
     
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      hrToast.error('Invalid File', 'Please upload a PDF file.')
+      if (e.target) e.target.value = ''
+      return
+    }
+
     setSendingPayslip(true)
     try {
       const db = await getDatabase()
       const storage = await getStorage()
       const { ref: storageRef, uploadBytes, getDownloadURL } = await import('firebase/storage')
       
-      const fileRef = storageRef(storage, `tenants/${tenantId}/payslips/${employeeId}/${file.name}`)
+      const uniqueFilename = `${Date.now()}-${file.name}`
+      const fileRef = storageRef(storage, `tenants/${tenantId}/payslips/${employeeId}/${uniqueFilename}`)
       await uploadBytes(fileRef, file)
       const downloadUrl = await getDownloadURL(fileRef)
       
@@ -347,7 +361,13 @@ export function EmployeeProfile() {
   }
 
   const handleView = (url?: string) => {
-    if (url) window.open(url, '_blank')
+    if (url) {
+      const a = document.createElement('a')
+      a.href = url
+      a.target = '_blank'
+      a.rel = 'noopener noreferrer'
+      a.click()
+    }
   }
 
   const handleDownload = (url?: string, filename?: string) => {
@@ -552,14 +572,14 @@ export function EmployeeProfile() {
       <input
         ref={offerFileRef}
         type="file"
-        accept=".pdf,.doc,.docx"
+        accept=".pdf"
         className="hidden"
         onChange={handleOfferFileSelected}
       />
       <input
         ref={payslipFileRef}
         type="file"
-        accept=".pdf,.doc,.docx"
+        accept=".pdf"
         className="hidden"
         onChange={handlePayslipFileSelected}
       />

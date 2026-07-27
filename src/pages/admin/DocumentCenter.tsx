@@ -116,7 +116,13 @@ export function DocumentCenter() {
   }, [docsData, empData])
 
   const handleView = (url?: string) => {
-    if (url) window.open(url, '_blank')
+    if (url) {
+      const a = document.createElement('a')
+      a.href = url
+      a.target = '_blank'
+      a.rel = 'noopener noreferrer'
+      a.click()
+    }
   }
 
   const handleDownload = (url?: string, filename?: string) => {
