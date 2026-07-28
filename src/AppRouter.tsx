@@ -48,6 +48,7 @@ const ProjectTimesheet = lazy(() => import('./pages/admin/ProjectTimesheet').the
 const Clients = lazy(() => import('./pages/admin/Clients').then(m => ({ default: m.Clients })))
 const ChatList = lazy(() => import('./pages/admin/ChatList').then(m => ({ default: m.ChatList })))
 const EmployeeProfile = lazy(() => import('./pages/admin/EmployeeProfile').then(m => ({ default: m.EmployeeProfile })))
+const AdminProfile = lazy(() => import('./pages/admin/AdminProfile').then(m => ({ default: m.AdminProfile })))
 const ProjectDetail = lazy(() => import('./pages/admin/ProjectDetail').then(m => ({ default: m.ProjectDetail })))
 const AddEmployee = lazy(() => import('./pages/admin/AddEmployee').then(m => ({ default: m.AddEmployee })))
 
@@ -176,6 +177,7 @@ function AdminLayout() {
             <Route path="projects" element={<Projects />} />
             <Route path="projects/:projectId" element={<ProjectDetail />} />
             <Route path="employee/:employeeId" element={<EmployeeProfile />} />
+            <Route path="profile" element={<AdminProfile />} />
             <Route path="tasks" element={<TaskManagement />} />
             <Route path="timesheet" element={<ProjectTimesheet />} />
             <Route path="clients" element={<Clients />} />

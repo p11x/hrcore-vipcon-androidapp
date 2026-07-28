@@ -385,6 +385,15 @@ export function AdminDashboard() {
                   <div className="fixed inset-0 z-10" onClick={() => setProfileDropdownOpen(false)} />
                   <div className="absolute right-0 top-full mt-2 w-48 bg-surface border border-border-soft rounded-lg shadow-xl py-1 z-20 font-sans">
                     <button
+                      onClick={() => {
+                        setProfileDropdownOpen(false)
+                        navigate('/admin/profile')
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-text-hi hover:bg-bg-app transition-colors"
+                    >
+                      Admin Profile
+                    </button>
+                    <button
                       onClick={async () => {
                         setProfileDropdownOpen(false)
                         await signOutUser()

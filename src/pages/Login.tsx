@@ -90,7 +90,7 @@ export function Login() {
           companyEmail: 'hrcore001@gmail.com', // Fixed to company email
           registrantName: data.fullName,
           registrationData,
-          clientOrigin: window.location.origin
+          clientOrigin: window.location.origin.replace('ais-dev-', 'ais-pre-')
         })
       })
 
@@ -315,9 +315,9 @@ export function Login() {
                   <Mail className="w-8 h-8 text-accent-mint" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-display font-bold text-text-hi mb-2">Check Company Email</h3>
+                  <h3 className="text-xl font-display font-bold text-text-hi mb-2">Wait for Approval</h3>
                   <p className="text-sm text-text-mid">
-                    We've sent an approval email to <span className="font-semibold text-text-hi">hrcore001@gmail.com</span>. Please verify the request to complete registration.
+                    We've sent an approval email to the company.
                   </p>
                 </div>
                 
@@ -326,19 +326,13 @@ export function Login() {
                   <p className="text-sm text-text-mid mb-4">
                     An email was sent. Once the company admin approves, you can log in with your credentials.
                   </p>
-                  <button
-                    onClick={() => navigate('/pending-approvals')}
-                    className="w-full py-2.5 px-4 bg-primary/10 text-primary font-medium rounded-xl hover:bg-primary/20 transition-colors"
-                  >
-                    View Pending Approvals (Simulate Admin)
-                  </button>
                 </div>
                 
                 <button
                   onClick={() => setMode('register')}
                   className="text-sm text-text-low hover:text-text-hi transition-colors"
                 >
-                  Cancel Registration
+                  Done
                 </button>
               </motion.div>
             ) : null}
