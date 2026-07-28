@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { getDatabase } from '../firebase/config'
-import { ref, get, remove } from 'firebase/database'
+
 import { useAuth } from '../context/AuthContext'
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -29,7 +29,7 @@ export function ApproveWorkspace() {
 const processApproval = async () => {
       try {
         const db = await getDatabase();
-        const snapshot = await get(ref(db, 'pending_registrations/' + token));
+        const snapshot = await db.get('pending_registrations/' + token);
         
         if (!snapshot.exists()) {
           setStatus('error')
@@ -44,7 +44,7 @@ const processApproval = async () => {
         await registerAdmin(data.email, data.password, data.fullName, data.orgName)
         
         // Remove from pending registrations
-        await remove(ref(db, 'pending_registrations/' + token));
+        await db.remove('pending_registrations/' + token);
         
         // Sign out immediately so the company admin who clicked the link doesn't stay logged in as the new user
         await signOutUser()

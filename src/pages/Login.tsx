@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, registrationSchema } from '../lib/validators'
 import type { LoginFormData, RegistrationFormData } from '../lib/validators'
 import { getDatabase } from '../firebase/config'
-import { ref, set } from 'firebase/database'
+
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -85,7 +85,7 @@ const onRegisterSubmit = async (data: RegistrationFormData) => {
       };
 
       const db = await getDatabase();
-      await set(ref(db, 'pending_registrations/' + token), registrationData);
+      await db.set('pending_registrations/' + token, registrationData);
 
       setMode('verify')
       toast.success('Registration submitted. Awaiting admin approval.')

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getDatabase } from '../firebase/config'
-import { ref, get, remove } from 'firebase/database'
+
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Loader2, CheckCircle, Clock, RefreshCw, XCircle } from 'lucide-react'
@@ -14,7 +14,7 @@ const [registrations, setRegistrations] = useState<any[]>([])
     setLoading(true)
     try {
       const db = await getDatabase();
-      const snapshot = await get(ref(db, 'pending_registrations'));
+      const snapshot = await db.get('pending_registrations');
       if (snapshot.exists()) {
         const data = snapshot.val();
         const list = Object.entries(data).map(([token, regData]: any) => ({
@@ -36,7 +36,7 @@ const [registrations, setRegistrations] = useState<any[]>([])
     if (!window.confirm("Are you sure you want to deny this registration?")) return;
     try {
       const db = await getDatabase();
-      await remove(ref(db, 'pending_registrations/' + token));
+      await db.remove('pending_registrations/' + token);
       fetchRegistrations();
     } catch (e) {
       console.error(e);
