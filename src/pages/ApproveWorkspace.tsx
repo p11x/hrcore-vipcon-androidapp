@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react'
@@ -9,6 +9,7 @@ export function ApproveWorkspace() {
   const token = searchParams.get('token')
   const navigate = useNavigate()
   const { registerAdmin, signOutUser } = useAuth()
+  const processedRef = useRef(false)
   
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('Verifying registration request...')
@@ -19,6 +20,9 @@ export function ApproveWorkspace() {
       setMessage('Invalid or missing verification token.')
       return
     }
+    
+    if (processedRef.current) return;
+    processedRef.current = true;
 
     const processApproval = async () => {
       try {
@@ -44,7 +48,11 @@ export function ApproveWorkspace() {
       } catch (error: any) {
         console.error('Approval error:', error)
         setStatus('error')
-        setMessage(error?.message || 'Failed to approve registration.')
+        if (error?.message?.includes('email-already-in-use')) {
+          setMessage('An account with this email already exists.')
+        } else {
+          setMessage(error?.message || 'Failed to approve registration.')
+        }
       }
     }
 

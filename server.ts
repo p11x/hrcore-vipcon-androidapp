@@ -16,7 +16,7 @@ async function startServer() {
 
   // Email route
   app.post("/api/send-approval-email", async (req, res) => {
-    const { token, companyEmail, registrantName, registrationData } = req.body;
+    const { token, companyEmail, registrantName, registrationData, clientOrigin } = req.body;
 
     if (!token || !companyEmail || !registrationData) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -27,7 +27,8 @@ async function startServer() {
     try {
       const host = req.get("host") || "localhost:3000";
       const protocol = req.headers["x-forwarded-proto"] || "http";
-      const approvalUrl = `${protocol}://${host}/approve-workspace?token=${token}`;
+      const baseUrl = clientOrigin || `${protocol}://${host}`;
+      const approvalUrl = `${baseUrl}/approve-workspace?token=${token}`;
 
       let transporter;
       
@@ -89,6 +90,14 @@ async function startServer() {
     }
   });
 
+  app.get("/api/get-all-pending-registrations", (req, res) => {
+    const list = Array.from(pendingRegistrations.entries()).map(([token, data]) => ({
+      token,
+      ...data
+    }));
+    res.json(list);
+  });
+
   app.get("/api/get-pending-registration", (req, res) => {
     const token = req.query.token as string;
     if (!token) return res.status(400).json({ error: "Missing token" });
@@ -112,7 +121,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    app.get('/*path', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

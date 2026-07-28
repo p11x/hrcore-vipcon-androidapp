@@ -89,7 +89,8 @@ export function Login() {
           token,
           companyEmail: 'hrcore001@gmail.com', // Fixed to company email
           registrantName: data.fullName,
-          registrationData
+          registrationData,
+          clientOrigin: window.location.origin
         })
       })
 
@@ -320,11 +321,17 @@ export function Login() {
                   </p>
                 </div>
                 
-                <div className="w-full p-4 border border-border-soft bg-bg-app rounded-xl">
+                <div className="w-full p-4 border border-border-soft bg-bg-app rounded-xl text-center">
                   <p className="text-xs text-text-low uppercase font-bold tracking-wider mb-3">Pending Verification</p>
-                  <p className="text-sm text-text-mid">
+                  <p className="text-sm text-text-mid mb-4">
                     An email was sent. Once the company admin approves, you can log in with your credentials.
                   </p>
+                  <button
+                    onClick={() => navigate('/pending-approvals')}
+                    className="w-full py-2.5 px-4 bg-primary/10 text-primary font-medium rounded-xl hover:bg-primary/20 transition-colors"
+                  >
+                    View Pending Approvals (Simulate Admin)
+                  </button>
                 </div>
                 
                 <button
