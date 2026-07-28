@@ -30,6 +30,7 @@ interface EmployeeProfileData {
   uanNumber?: string
   employeeCode?: string
   position?: string
+  chatEnabled?: boolean
 }
 
 interface DocumentStatus {
@@ -43,6 +44,7 @@ interface EmployeeSeed {
   uanNumber?: string
   employeeCode?: string
   position?: string
+  chatEnabled?: boolean
 }
 
 interface UserSeed {
@@ -235,6 +237,22 @@ export function EmployeeProfile() {
       hrToast.error('Error', 'Failed to update profile')
     } finally {
       setUpdating(false)
+    }
+  }
+
+  
+  const handleToggleChat = async () => {
+    if (!employeeId || !tenantId) return
+    const db = await getDatabase()
+    const newValue = !(profile?.chatEnabled !== false)
+    try {
+      await (db as any).update(`tenants/${tenantId}/users/${employeeId}`, { chatEnabled: newValue })
+      await (db as any).update(`users/${employeeId}`, { chatEnabled: newValue })
+      setProfile(prev => prev ? { ...prev, chatEnabled: newValue } : null)
+      hrToast.success('Success', `Chat access ${newValue ? 'enabled' : 'disabled'} for employee`)
+    } catch (e) {
+      console.error(e)
+      hrToast.error('Error', 'Failed to update chat permissions')
     }
   }
 
@@ -899,6 +917,26 @@ export function EmployeeProfile() {
                 </div>
               )
             })}
+          </div>
+        </motion.div>
+
+        
+        <motion.div
+          className="bg-surface border border-border-soft rounded-xl p-6"
+          whileHover={{ y: -2 }}
+        >
+          <h3 className="text-lg font-display font-semibold text-text-hi mb-4">Permissions</h3>
+          <div className="flex items-center justify-between py-3 border-b border-border-soft last:border-0">
+            <div>
+              <span className="text-text-hi font-body block">Chat Access</span>
+              <span className="text-text-low text-sm">Allow employee to use the internal chat</span>
+            </div>
+            <button
+              onClick={handleToggleChat}
+              className={`w-12 h-6 rounded-full transition-colors relative ${profile?.chatEnabled !== false ? 'bg-accent-mint' : 'bg-gray-300'}`}
+            >
+              <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all ${profile?.chatEnabled !== false ? 'left-7' : 'left-1'}`} />
+            </button>
           </div>
         </motion.div>
 

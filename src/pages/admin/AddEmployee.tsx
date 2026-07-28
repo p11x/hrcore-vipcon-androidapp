@@ -4,7 +4,7 @@ import { Plus, Check, X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { hrToast } from '../../components/HRCToast'
 import { useAuth } from '../../context/AuthContext'
 import { logAudit } from '../../utils/auditLogger'
@@ -12,7 +12,7 @@ import { logAudit } from '../../utils/auditLogger'
 const addEmployeeSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
-  companySelection: z.enum(['Vepcon Soft Systems', 'Others']),
+  companySelection: z.string().min(1, 'Please select a company'),
   customCompanyName: z.string().optional(),
   position: z.string().min(1, 'Position / Job Title is required'),
   role: z.literal('employee'),
@@ -35,8 +35,33 @@ const addEmployeeSchema = z.object({
 type AddEmployeeFormData = z.infer<typeof addEmployeeSchema>
 
 export function AddEmployee() {
-  const [loading, setLoading] = useState(false)
   const { tenantId, user } = useAuth()
+
+  const [companies, setCompanies] = useState<string[]>([])
+  const [fetchingCompanies, setFetchingCompanies] = useState(true)
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      if (!tenantId) return
+      try {
+        const { getDatabase } = await import('../../firebase/config')
+        const db = await getDatabase()
+        const snap = await (db as any).get(`Config/companies`)
+        if (snap.exists()) {
+          const vals = snap.val() || [];
+          setCompanies(vals.length > 0 ? vals : ['Vepcon Soft Systems']);
+        } else {
+          setCompanies(['Vepcon Soft Systems']);
+        }
+      } catch (e) {
+        console.error(e)
+      } finally {
+        setFetchingCompanies(false)
+      }
+    }
+    fetchCompanies()
+  }, [tenantId])
+  const [loading, setLoading] = useState(false)
   const {
     register,
     handleSubmit,
@@ -45,10 +70,10 @@ export function AddEmployee() {
     formState: { errors },
   } = useForm<AddEmployeeFormData>({
     resolver: zodResolver(addEmployeeSchema),
-    defaultValues: { role: 'employee', companySelection: 'Vepcon Soft Systems', customCompanyName: '' },
+    defaultValues: { role: 'employee', companySelection: '', customCompanyName: '' },
   })
 
-  const companySelection = watch('companySelection', 'Vepcon Soft Systems')
+  const companySelection = watch('companySelection', '')
   const passwordValue = watch('password') || ''
 
   const passwordRules = [
@@ -118,7 +143,7 @@ export function AddEmployee() {
         tenantId: tenantId
       })
       
-      // The admin writes to the company employee directory
+            // The admin writes to the company employee directory
       await (primaryDb as any).set(`tenants/${tenantId}/employees/${uid}`, {
         name: data.name,
         email: data.email,
@@ -127,6 +152,12 @@ export function AddEmployee() {
         role: data.role,
         tenantId: tenantId
       })
+      
+      if (data.companySelection === 'Others' && finalCompanyName) {
+        const newCompanies = Array.from(new Set([...companies, finalCompanyName]));
+        await (primaryDb as any).set(`Config/companies`, newCompanies);
+        setCompanies(newCompanies);
+      }
       
       await logAudit(tenantId, `Added employee ${data.name}`, user?.email || 'Admin')
       hrToast.success('Employee Created', `${data.name} has been added successfully`)
@@ -179,11 +210,14 @@ export function AddEmployee() {
               <label className="block text-sm font-medium text-text-mid mb-1.5 uppercase tracking-wider">
                 COMPANY NAME <span className="text-accent-coral">*</span>
               </label>
-              <select
+                            <select
                 {...register('companySelection')}
                 className="w-full px-3 py-2 bg-surface border border-border-soft rounded text-text-hi focus:outline-none focus:border-primary transition-colors focus-ring mb-3"
               >
-                <option value="Vepcon Soft Systems">Vepcon Soft Systems</option>
+                <option value="" disabled>Select a company</option>
+                {companies.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
                 <option value="Others">Others</option>
               </select>
               {errors.companySelection && (

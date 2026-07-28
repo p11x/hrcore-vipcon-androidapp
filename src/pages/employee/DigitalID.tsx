@@ -49,18 +49,10 @@ export function DigitalID() {
           className="w-[320px] h-[480px] bg-white rounded-xl shadow-2xl relative overflow-hidden flex flex-col items-center border border-gray-200"
         >
           {/* Top Logo Section */}
-          <div className="w-[220px] bg-[#222222] mt-8 rounded-md py-4 flex flex-col items-center justify-center z-10 shadow-md"> 
-             <div className="flex items-center">
-                <svg width="32" height="28" viewBox="0 0 32 28" className="mr-0.5">
-                  <path d="M2,4 L16,4 L9,24 Z" fill="#E31E24" />
-                  <path d="M17,4 L27,4 L22,11 Z" fill="#e66827" />
-                </svg>
-                <span className="text-[#E31E24] text-[28px] font-black tracking-wide leading-none">EPCON</span>
-             </div>
-             <div className="text-[#e66827] text-[11px] font-medium tracking-[0.2em] mt-2">Code</div>
-          </div>
-          <div className="text-[#E31E24] text-[12px] font-semibold mt-3 z-10 tracking-wide">
-            VEPCON Soft Systems Pvt Ltd
+          <div className="mt-12 z-10 px-4 text-center">
+            <h1 className="text-[#E31E24] text-[24px] font-black uppercase tracking-wide leading-tight drop-shadow-sm">
+              {mergedData?.companyName || mergedData?.orgName || ''}
+            </h1>
           </div>
 
           {/* Sweeping background graphic */}

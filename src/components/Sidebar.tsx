@@ -77,25 +77,43 @@ export function Sidebar({ onSignOut, isAdmin = false }: { onSignOut?: () => void
   const [collapsed, setCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [companyName, setCompanyName] = useState('Vepcon Soft Systems')
+  const [chatEnabled, setChatEnabled] = useState(true)
   const navigate = useNavigate()
   const location = useLocation()
   const { user, tenantId } = useAuth()
 
   useEffect(() => {
-    if (isAdmin || !user?.uid || !tenantId) return
+    if (!user?.uid || !tenantId) return
     let unsub = () => {}
     getDatabase().then((db: any) => {
-      unsub = db.onValue(`tenants/${tenantId}/employees/${user.uid}`, (snapshot: any) => {
-        const data = snapshot.val()
-        if (data?.companyName) {
-          setCompanyName(data.companyName)
-        }
-      })
+      if (isAdmin) {
+        // Admin gets company name from organization settings or their own users/ profile if added there.
+        // Actually, org name is at organizations/${tenantId}/name
+        unsub = db.onValue(`organizations/${tenantId}`, (snapshot: any) => {
+          const data = snapshot.val()
+          if (data?.name) {
+            setCompanyName(data.name)
+          }
+        })
+      } else {
+        unsub = db.onValue(`tenants/${tenantId}/employees/${user.uid}`, (snapshot: any) => {
+          const data = snapshot.val()
+          if (data?.companyName) {
+            setCompanyName(data.companyName)
+          }
+          if (data?.chatEnabled !== undefined) {
+            setChatEnabled(data.chatEnabled)
+          }
+        })
+      }
     })
     return () => unsub()
   }, [isAdmin, user?.uid, tenantId])
 
-  const navItems = isAdmin ? adminNavItems : employeeNavItems
+  let navItems = isAdmin ? adminNavItems : employeeNavItems;
+  if (!isAdmin && !chatEnabled) {
+    navItems = navItems.filter(item => item.label !== 'Chat');
+  }
   const sidebarWidth = collapsed ? 'w-20' : 'w-64'
 
   return (

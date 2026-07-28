@@ -19,6 +19,28 @@ export function Login() {
   const [mode, setMode] = useState<Mode>('login')
   const [pendingRegData, setPendingRegData] = useState<RegistrationFormData | null>(null)
   const [isVerifying, setIsVerifying] = useState(false)
+  const [companies, setCompanies] = useState<string[]>([])
+  const [fetchingCompanies, setFetchingCompanies] = useState(true)
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const db = await getDatabase()
+        const snap = await (db as any).get(`Config/companies`)
+        if (snap.exists()) {
+          const vals = snap.val() || [];
+          setCompanies(vals.length > 0 ? vals : ['Vepcon Soft Systems']);
+        } else {
+          setCompanies(['Vepcon Soft Systems']);
+        }
+      } catch (e) {
+        console.error(e)
+      } finally {
+        setFetchingCompanies(false)
+      }
+    }
+    fetchCompanies()
+  }, [])
 
   const {
     register: registerLogin,
@@ -35,7 +57,7 @@ export function Login() {
     formState: { errors: regErrors, isSubmitting: isRegistering },
   } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
-    defaultValues: { companySelection: 'Vepcon Soft Systems' }
+    defaultValues: { companySelection: '' }
   })
 
   const passwordValue = watchReg('password') || ''
@@ -85,7 +107,9 @@ const onRegisterSubmit = async (data: RegistrationFormData) => {
       };
 
       const db = await getDatabase();
-      await db.set('pending_registrations/' + token, registrationData);
+            await db.set('pending_registrations/' + token, registrationData);
+      
+
 
       setMode('verify')
       toast.success('Registration submitted. Awaiting admin approval.')
@@ -210,12 +234,15 @@ const onRegisterSubmit = async (data: RegistrationFormData) => {
                     <label className="block text-xs font-bold text-text-low uppercase tracking-wider mb-2">
                       Company
                     </label>
-                    <select
+                                        <select
                       {...registerReg('companySelection')}
                       className="w-full px-4 py-2.5 bg-bg-app border border-border-soft rounded-xl text-text-hi outline-none focus:border-primary transition-all"
                       disabled={isRegistering}
                     >
-                      <option value="Vepcon Soft Systems">Vepcon Soft Systems</option>
+                      <option value="" disabled>Select a company</option>
+                      {companies.map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
                       <option value="Others">Others</option>
                     </select>
                     {regErrors.companySelection && (

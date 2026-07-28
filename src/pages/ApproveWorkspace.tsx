@@ -43,6 +43,13 @@ const processApproval = async () => {
         // Register the admin (this automatically logs them in due to Firebase Auth behavior)
         await registerAdmin(data.email, data.password, data.fullName, data.orgName)
         
+        // Save the new company to the global list if not present
+        const snap = await db.get('Config/companies');
+        const companies = snap.exists() ? snap.val() : [];
+        if (!companies.includes(data.orgName)) {
+            await db.set('Config/companies', [...companies, data.orgName]);
+        }
+        
         // Remove from pending registrations
         await db.remove('pending_registrations/' + token);
         

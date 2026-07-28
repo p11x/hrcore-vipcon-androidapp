@@ -33,11 +33,21 @@ export function Chat() {
   const [employees, setEmployees] = useState<Record<string, Employee>>({})
   const [threads, setThreads] = useState<Thread[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [chatEnabled, setChatEnabled] = useState(true)
 
   useEffect(() => {
     let unsubChat: (() => void) | null = null
     let unsubEmp: (() => void) | null = null
+    let unsubCurrentUser: (() => void) | null = null
     getDatabase().then((db: any) => {
+      unsubCurrentUser = db.onValue(`tenants/${tenantId}/users/${userId}`, (snapshot: any) => {
+        const data = snapshot.val()
+        if (data && data.chatEnabled === false) {
+          setChatEnabled(false)
+        } else {
+          setChatEnabled(true)
+        }
+      })
       unsubChat = db.onValue(`tenants/${tenantId}/messages_Chat`, (snapshot: any) => {
         const data = snapshot.val() as Record<string, { id: string; participants: string[]; messages: Message[] }> | undefined
         if (data) {
@@ -73,6 +83,7 @@ export function Chat() {
     return () => {
       if (unsubChat) unsubChat()
       if (unsubEmp) unsubEmp()
+      if (unsubCurrentUser) unsubCurrentUser()
     }
   }, [userId])
 
@@ -164,6 +175,17 @@ export function Chat() {
   }
 
   const allParticipants = Object.entries(employees)
+
+  if (!chatEnabled) {
+    return (
+      <PageShell title="Chat Disabled">
+        <div className="flex flex-col items-center justify-center h-[60vh]">
+          <h2 className="text-xl font-bold text-text-hi mb-2">Access Denied</h2>
+          <p className="text-text-mid text-center max-w-md">Your chat access has been disabled by the administrator. Please contact your HR department if you believe this is a mistake.</p>
+        </div>
+      </PageShell>
+    )
+  }
 
   return (
     <PageShell title="Chats">

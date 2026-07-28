@@ -166,7 +166,7 @@ export function VirtualID() {
                   </div>
                   <span className="text-xs font-bold text-text-low uppercase tracking-wider">Company</span>
                 </div>
-                <span className="font-semibold text-text-hi text-right max-w-[200px] line-clamp-2">{mergedData?.companyName || 'Acme Corp'}</span>
+                <span className="font-semibold text-text-hi text-right max-w-[200px] line-clamp-2">{mergedData?.companyName || ''}</span>
               </div>
 
               <div className="flex items-center justify-between p-3 bg-bg-app rounded-xl">
