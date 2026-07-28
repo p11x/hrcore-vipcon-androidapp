@@ -111,14 +111,7 @@ const [registrations, setRegistrations] = useState<any[]>([])
           </div>
         )}
 
-        <div className="mt-8 pt-6 border-t border-border-soft text-center">
-          <button
-            onClick={() => navigate('/login')}
-            className="text-text-mid hover:text-primary transition-colors text-sm font-medium"
-          >
-            Back to Login
-          </button>
-        </div>
+        
       </motion.div>
     </div>
   )

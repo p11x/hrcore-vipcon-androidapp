@@ -86,10 +86,10 @@ const processApproval = async () => {
         
         {status !== 'loading' && (
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/pending-approvals')}
             className="px-6 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-primary/90 transition-all shadow-sm"
           >
-            Return to Login
+            Back to pending-approvals
           </button>
         )}
       </motion.div>
