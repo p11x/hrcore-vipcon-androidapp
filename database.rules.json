@@ -14,6 +14,10 @@
       ".read": "auth != null",
       ".write": "auth != null"
     },
+    "pending_registrations": {
+      ".read": true,
+      ".write": true
+    },
     "Config": {
       ".read": true,
       ".write": "auth != null"

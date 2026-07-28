@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react'
 import { AuthGuard } from './components/AuthGuard'
 import { AdminGuard } from './components/AdminGuard'
 import { Login } from './pages/Login'
+import { ApproveWorkspace } from './pages/ApproveWorkspace'
 import { Setup } from './pages/Setup'
 import { Sidebar } from './components/Sidebar'
 import { CardSkeleton } from './components/skeletons/CardSkeleton'
@@ -77,6 +78,7 @@ function AppRouter() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/approve-workspace" element={<ApproveWorkspace />} />
       <Route path="/setup" element={<Setup />} />
       <Route path="/" element={<Navigate to="/login" replace />} />
 

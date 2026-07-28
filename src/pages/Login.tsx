@@ -7,14 +7,16 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, X } from 'lucide-react'
+import { Check, X, Mail } from 'lucide-react'
 
-type Mode = 'login' | 'register'
+type Mode = 'login' | 'register' | 'verify'
 
 export function Login() {
   const { signIn, registerAdmin, user, isAdmin, loading } = useAuth()
   const navigate = useNavigate()
   const [mode, setMode] = useState<Mode>('login')
+  const [pendingRegData, setPendingRegData] = useState<RegistrationFormData | null>(null)
+  const [isVerifying, setIsVerifying] = useState(false)
 
   const {
     register: registerLogin,
@@ -70,11 +72,36 @@ export function Login() {
   const onRegisterSubmit = async (data: RegistrationFormData) => {
     try {
       const finalOrgName = data.companySelection === 'Others' ? data.customCompanyName : data.companySelection
-      await registerAdmin(data.email, data.password, data.fullName, finalOrgName!)
-      toast.success('Registration successful! Welcome.')
+      const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+
+      const registrationData = {
+        email: data.email,
+        password: data.password,
+        fullName: data.fullName,
+        orgName: finalOrgName,
+        createdAt: new Date().toISOString()
+      };
+
+      const response = await fetch('/api/send-approval-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          companyEmail: 'hrcore001@gmail.com', // Fixed to company email
+          registrantName: data.fullName,
+          registrationData
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to send verification email')
+      }
+
+      setMode('verify')
+      toast.success('Verification email sent to company admin.')
     } catch (error: any) {
       console.error('Registration error:', error)
-      toast.error(error?.message || 'Failed to register organization')
+      toast.error(error?.message || 'Failed to initiate registration')
     }
   }
 
@@ -108,7 +135,7 @@ export function Login() {
             <button
               onClick={() => setMode('register')}
               className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${
-                mode === 'register'
+                (mode === 'register' || mode === 'verify')
                   ? 'bg-white text-primary shadow-sm'
                   : 'text-text-mid hover:text-text-hi'
               }`}
@@ -165,7 +192,7 @@ export function Login() {
                   {isLoggingIn ? 'Verifying...' : 'Sign In'}
                 </button>
               </motion.form>
-            ) : (
+            ) : mode === 'register' ? (
               <motion.form
                 key="register"
                 initial={{ opacity: 0, x: 10 }}
@@ -275,7 +302,39 @@ export function Login() {
                   By registering, you agree to our Terms of Service and Privacy Policy.
                 </p>
               </motion.form>
-            )}
+            ) : mode === 'verify' ? (
+              <motion.div
+                key="verify"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                className="flex flex-col items-center text-center space-y-6"
+              >
+                <div className="w-16 h-16 bg-accent-mint/10 rounded-full flex items-center justify-center">
+                  <Mail className="w-8 h-8 text-accent-mint" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-display font-bold text-text-hi mb-2">Check Company Email</h3>
+                  <p className="text-sm text-text-mid">
+                    We've sent an approval email to <span className="font-semibold text-text-hi">hrcore001@gmail.com</span>. Please verify the request to complete registration.
+                  </p>
+                </div>
+                
+                <div className="w-full p-4 border border-border-soft bg-bg-app rounded-xl">
+                  <p className="text-xs text-text-low uppercase font-bold tracking-wider mb-3">Pending Verification</p>
+                  <p className="text-sm text-text-mid">
+                    An email was sent. Once the company admin approves, you can log in with your credentials.
+                  </p>
+                </div>
+                
+                <button
+                  onClick={() => setMode('register')}
+                  className="text-sm text-text-low hover:text-text-hi transition-colors"
+                >
+                  Cancel Registration
+                </button>
+              </motion.div>
+            ) : null}
           </AnimatePresence>
         </div>
       </motion.div>
