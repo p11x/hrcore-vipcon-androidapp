@@ -2,6 +2,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, registrationSchema } from '../lib/validators'
 import type { LoginFormData, RegistrationFormData } from '../lib/validators'
+import { getDatabase } from '../firebase/config'
+import { ref, set } from 'firebase/database'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -69,11 +71,11 @@ export function Login() {
     }
   }
 
-  const onRegisterSubmit = async (data: RegistrationFormData) => {
+const onRegisterSubmit = async (data: RegistrationFormData) => {
     try {
       const finalOrgName = data.companySelection === 'Others' ? data.customCompanyName : data.companySelection
       const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-
+      
       const registrationData = {
         email: data.email,
         password: data.password,
@@ -82,24 +84,11 @@ export function Login() {
         createdAt: new Date().toISOString()
       };
 
-      const response = await fetch('/api/send-approval-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          token,
-          companyEmail: 'hrcore001@gmail.com', // Fixed to company email
-          registrantName: data.fullName,
-          registrationData,
-          clientOrigin: window.location.origin.replace('ais-dev-', 'ais-pre-')
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to send verification email')
-      }
+      const db = await getDatabase();
+      await set(ref(db, 'pending_registrations/' + token), registrationData);
 
       setMode('verify')
-      toast.success('Verification email sent to company admin.')
+      toast.success('Registration submitted. Awaiting admin approval.')
     } catch (error: any) {
       console.error('Registration error:', error)
       toast.error(error?.message || 'Failed to initiate registration')

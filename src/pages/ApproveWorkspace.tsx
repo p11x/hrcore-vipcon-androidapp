@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
+import { getDatabase } from '../firebase/config'
+import { ref, get, remove } from 'firebase/database'
 import { useAuth } from '../context/AuthContext'
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -24,21 +26,25 @@ export function ApproveWorkspace() {
     if (processedRef.current) return;
     processedRef.current = true;
 
-    const processApproval = async () => {
+const processApproval = async () => {
       try {
-        const response = await fetch(`/api/get-pending-registration?token=${token}`)
+        const db = await getDatabase();
+        const snapshot = await get(ref(db, 'pending_registrations/' + token));
         
-        if (!response.ok) {
+        if (!snapshot.exists()) {
           setStatus('error')
           setMessage('Verification link is expired or invalid.')
           return
         }
-
-        const data = await response.json()
+        
+        const data = snapshot.val();
         setMessage('Creating admin account...')
         
         // Register the admin (this automatically logs them in due to Firebase Auth behavior)
         await registerAdmin(data.email, data.password, data.fullName, data.orgName)
+        
+        // Remove from pending registrations
+        await remove(ref(db, 'pending_registrations/' + token));
         
         // Sign out immediately so the company admin who clicked the link doesn't stay logged in as the new user
         await signOutUser()

@@ -1,40 +1,43 @@
 import { useEffect, useState } from 'react'
+import { getDatabase } from '../firebase/config'
+import { ref, get, remove } from 'firebase/database'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Loader2, CheckCircle, Clock, RefreshCw, XCircle } from 'lucide-react'
 
 export function PendingApprovals() {
-  const [registrations, setRegistrations] = useState<any[]>([])
+const [registrations, setRegistrations] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
-  const fetchRegistrations = () => {
+  const fetchRegistrations = async () => {
     setLoading(true)
-    fetch('/api/get-all-pending-registrations')
-      .then(res => res.json())
-      .then(data => {
-        setRegistrations(data)
-        setLoading(false)
-      })
-      .catch(err => {
-        console.error(err)
-        setLoading(false)
-      })
+    try {
+      const db = await getDatabase();
+      const snapshot = await get(ref(db, 'pending_registrations'));
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const list = Object.entries(data).map(([token, regData]: any) => ({
+          token,
+          ...regData
+        }));
+        setRegistrations(list);
+      } else {
+        setRegistrations([]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const handleDeny = async (token: string) => {
     if (!window.confirm("Are you sure you want to deny this registration?")) return;
     try {
-      const res = await fetch('/api/deny-registration', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token })
-      });
-      if (res.ok) {
-        fetchRegistrations();
-      } else {
-        alert("Failed to deny registration");
-      }
+      const db = await getDatabase();
+      await remove(ref(db, 'pending_registrations/' + token));
+      fetchRegistrations();
     } catch (e) {
       console.error(e);
       alert("Error denying registration");
