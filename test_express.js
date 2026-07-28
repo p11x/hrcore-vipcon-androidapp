@@ -2,10 +2,13 @@ import express from 'express';
 const app = express();
 
 const tests = [
-  '/{*path}',
-  '/{*foo}',
-  '/(.*)',
+  '/',
   '*',
+  '/*',
+  '/(.*)',
+  '/:path(*)',
+  '/{*path}',
+  '/{*foo}'
 ];
 
 for (const t of tests) {

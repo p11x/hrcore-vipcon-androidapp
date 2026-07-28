@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Loader2, CheckCircle, Clock } from 'lucide-react'
+import { Loader2, CheckCircle, Clock, RefreshCw, XCircle } from 'lucide-react'
 
 export function PendingApprovals() {
   const [registrations, setRegistrations] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
-  useEffect(() => {
+  const fetchRegistrations = () => {
+    setLoading(true)
     fetch('/api/get-all-pending-registrations')
       .then(res => res.json())
       .then(data => {
@@ -19,6 +20,29 @@ export function PendingApprovals() {
         console.error(err)
         setLoading(false)
       })
+  }
+
+  const handleDeny = async (token: string) => {
+    if (!window.confirm("Are you sure you want to deny this registration?")) return;
+    try {
+      const res = await fetch('/api/deny-registration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      if (res.ok) {
+        fetchRegistrations();
+      } else {
+        alert("Failed to deny registration");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error denying registration");
+    }
+  }
+
+  useEffect(() => {
+    fetchRegistrations()
   }, [])
 
   return (
@@ -28,7 +52,17 @@ export function PendingApprovals() {
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-2xl bg-surface border border-border-soft rounded-2xl shadow-sm p-8"
       >
-        <h2 className="text-2xl font-display font-bold text-text-hi mb-6">Pending Admin Registrations</h2>
+                <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-display font-bold text-text-hi">Pending Admin Registrations</h2>
+          <button 
+            onClick={fetchRegistrations}
+            disabled={loading}
+            className="p-2 text-text-mid hover:text-primary hover:bg-primary/10 rounded-lg transition-colors focus-ring disabled:opacity-50"
+            title="Refresh"
+          >
+            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
         
         {loading ? (
           <div className="flex justify-center items-center py-12">
@@ -54,12 +88,21 @@ export function PendingApprovals() {
                     Requested on: {new Date(reg.createdAt).toLocaleString()}
                   </div>
                 </div>
-                <button
-                  onClick={() => navigate(`/approve-workspace?token=${reg.token}`)}
-                  className="px-6 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-primary/90 transition-all shadow-sm shrink-0"
-                >
-                  Verify & Approve
-                </button>
+                                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => handleDeny(reg.token)}
+                    className="px-4 py-2.5 bg-surface border border-border-soft text-text-hi font-medium rounded-xl hover:bg-accent-coral/10 hover:text-accent-coral hover:border-accent-coral/20 transition-all focus-ring"
+                    title="Deny"
+                  >
+                    Deny
+                  </button>
+                  <button
+                    onClick={() => navigate(`/approve-workspace?token=${reg.token}`)}
+                    className="px-6 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-primary/90 transition-all shadow-sm"
+                  >
+                    Verify & Approve
+                  </button>
+                </div>
               </div>
             ))}
           </div>
