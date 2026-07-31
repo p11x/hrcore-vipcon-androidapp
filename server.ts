@@ -4,6 +4,7 @@ import { createServer as createViteServer } from "vite";
 import nodemailer from "nodemailer";
 import cors from "cors";
 import * as admin from "firebase-admin";
+import { getAuth } from "firebase-admin/auth";
 
 try {
   admin.initializeApp();
@@ -87,16 +88,15 @@ async function startServer() {
     const { uid, newPassword } = req.body;
     if (!uid || !newPassword) return res.status(400).json({ error: "Missing uid or newPassword" });
     try {
-      await admin.auth().updateUser(uid, { password: newPassword });
+      await getAuth().updateUser(uid, { password: newPassword });
       res.json({ success: true });
     } catch (error: any) {
       console.error("Failed to update password", error);
-      // In a mock environment or if admin SDK fails due to missing creds, we just return success for simulation
-      if (error.message && (error.message.includes("Could not load the default credentials") || error.message.includes("default Firebase app already exists") || error.message.includes("App must be initialized"))) {
-        console.log("Mocking password update success due to missing admin credentials");
-        return res.json({ success: true, mocked: true });
+      let errorMessage = error.message || "Unknown error";
+      if (errorMessage.includes("identitytoolkit.googleapis.com")) {
+        errorMessage = "Service Account missing. Please use the 'Send Password Reset Email' option instead.";
       }
-      res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: errorMessage });
     }
   });
 

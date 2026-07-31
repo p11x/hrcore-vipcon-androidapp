@@ -356,7 +356,14 @@ export function EmployeeProfile() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uid: employeeId, newPassword })
       })
-      const data = await response.json()
+      
+      let data;
+      try {
+        data = await response.json()
+      } catch (e) {
+        throw new Error('Server returned an invalid response. Please ensure Firebase is correctly configured.')
+      }
+
       if (data.success) {
         setPasswordStatus({ type: 'success', msg: 'Password updated successfully!' })
         setTimeout(() => {
@@ -369,6 +376,24 @@ export function EmployeeProfile() {
       }
     } catch (error: any) {
       setPasswordStatus({ type: 'error', msg: error.message })
+    }
+  }
+
+  const handleSendResetEmail = async () => {
+    if (!profile?.email) return;
+    try {
+      setPasswordStatus({ type: 'loading', msg: 'Sending reset email...' })
+      const { getAuth } = await import('../../firebase/config')
+      const { sendPasswordResetEmail } = await import('firebase/auth')
+      const auth = await getAuth()
+      await sendPasswordResetEmail(auth, profile.email)
+      setPasswordStatus({ type: 'success', msg: 'Password reset email sent successfully!' })
+      setTimeout(() => {
+        setShowChangePassword(false)
+        setPasswordStatus({ type: 'idle', msg: '' })
+      }, 2000)
+    } catch (error: any) {
+      setPasswordStatus({ type: 'error', msg: error.message || 'Failed to send reset email' })
     }
   }
 
@@ -627,20 +652,36 @@ export function EmployeeProfile() {
                 </div>
               )}
 
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowChangePassword(false)}
+                    className="flex-1 px-4 py-2 border border-border-soft rounded-lg text-text-hi hover:bg-bg-app transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={passwordStatus.type === 'loading' || !newPassword}
+                    className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  >
+                    {passwordStatus.type === 'loading' ? 'Saving...' : 'Save Password'}
+                  </button>
+                </div>
+                
+                <div className="relative flex items-center py-2">
+                  <div className="flex-grow border-t border-border-soft"></div>
+                  <span className="flex-shrink-0 mx-4 text-text-mid text-sm">OR</span>
+                  <div className="flex-grow border-t border-border-soft"></div>
+                </div>
+
                 <button
                   type="button"
-                  onClick={() => setShowChangePassword(false)}
-                  className="flex-1 px-4 py-2 border border-border-soft rounded-lg text-text-hi hover:bg-bg-app transition-colors"
+                  onClick={handleSendResetEmail}
+                  className="w-full px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary/5 transition-colors focus-ring"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={passwordStatus.type === 'loading'}
-                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
-                >
-                  {passwordStatus.type === 'loading' ? 'Saving...' : 'Save'}
+                  Send Password Reset Email
                 </button>
               </div>
             </form>
