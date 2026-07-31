@@ -29,7 +29,8 @@
     "rewrites": [
       {
         "source": "/api/admin/change-employee-password",
-        "function": "changeEmployeePassword"
+        "function": "changeEmployeePassword",
+        "region": "asia-southeast1"
       },
       {
         "source": "**",
