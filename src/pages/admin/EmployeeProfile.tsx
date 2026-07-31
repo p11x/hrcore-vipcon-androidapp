@@ -365,10 +365,12 @@ export function EmployeeProfile() {
       })
       
       let data;
+      const text = await response.text();
       try {
-        data = await response.json()
+        data = JSON.parse(text);
       } catch (e) {
-        throw new Error('Server returned an invalid response. Please ensure Firebase is correctly configured.')
+        console.error("Raw response:", text);
+        throw new Error('Server returned an invalid response. Raw: ' + text.substring(0, 100));
       }
 
       if (data.success) {
