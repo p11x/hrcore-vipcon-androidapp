@@ -28,6 +28,10 @@
     ],
     "rewrites": [
       {
+        "source": "/api/admin/change-employee-password",
+        "function": "changeEmployeePassword"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
@@ -38,5 +42,8 @@
   },
   "storage": {
     "rules": "storage.rules"
+  },
+  "functions": {
+    "source": "functions"
   }
 }

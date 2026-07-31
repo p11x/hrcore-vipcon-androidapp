@@ -5,6 +5,7 @@ type User = {
   displayName: string | null
   photoURL: string | null
   getIdTokenResult: () => Promise<{ claims: { role?: string } }>
+  getIdToken: () => Promise<string>
 }
 
 type Listener = (user: User | null) => void
@@ -19,6 +20,7 @@ const adminUser: User = {
   displayName: 'Admin User',
   photoURL: null,
   getIdTokenResult: async () => ({ claims: { role: 'admin' } }),
+    getIdToken: async () => "mock-token",
 }
 
 const employeeUsers: Record<string, User> = {
@@ -29,6 +31,7 @@ const employeeUsers: Record<string, User> = {
     displayName: 'Alice Chen',
     photoURL: null,
     getIdTokenResult: async () => ({ claims: {} }),
+    getIdToken: async () => "mock-token",
   },
   'emp-002': {
     uid: 'emp-002',
@@ -37,6 +40,7 @@ const employeeUsers: Record<string, User> = {
     displayName: 'Bob Rivera',
     photoURL: null,
     getIdTokenResult: async () => ({ claims: {} }),
+    getIdToken: async () => "mock-token",
   },
   'emp-003': {
     uid: 'emp-003',
@@ -45,6 +49,7 @@ const employeeUsers: Record<string, User> = {
     displayName: 'Carol Kim',
     photoURL: null,
     getIdTokenResult: async () => ({ claims: {} }),
+    getIdToken: async () => "mock-token",
   },
   'emp-004': {
     uid: 'emp-004',
@@ -53,6 +58,7 @@ const employeeUsers: Record<string, User> = {
     displayName: 'David Park',
     photoURL: null,
     getIdTokenResult: async () => ({ claims: {} }),
+    getIdToken: async () => "mock-token",
   },
   'emp-005': {
     uid: 'emp-005',
@@ -61,6 +67,7 @@ const employeeUsers: Record<string, User> = {
     displayName: 'Eve Martinez',
     photoURL: null,
     getIdTokenResult: async () => ({ claims: {} }),
+    getIdToken: async () => "mock-token",
   },
   'emp-006': {
     uid: 'emp-006',
@@ -69,6 +76,7 @@ const employeeUsers: Record<string, User> = {
     displayName: 'Frank Wilson',
     photoURL: null,
     getIdTokenResult: async () => ({ claims: {} }),
+    getIdToken: async () => "mock-token",
   },
   'emp-007': {
     uid: 'emp-007',
@@ -77,6 +85,7 @@ const employeeUsers: Record<string, User> = {
     displayName: 'Sunny',
     photoURL: null,
     getIdTokenResult: async () => ({ claims: {} }),
+    getIdToken: async () => "mock-token",
   },
 }
 
@@ -128,6 +137,7 @@ export const mockAuth = {
       displayName: null,
       photoURL: null,
       getIdTokenResult: async () => ({ claims: role === 'admin' ? { role: 'admin' } : {} }),
+    getIdToken: async () => "mock-token",
     }
     employeeUsers[uid] = newUser
     validCredentials[email] = password

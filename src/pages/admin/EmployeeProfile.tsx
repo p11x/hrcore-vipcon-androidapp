@@ -351,9 +351,16 @@ export function EmployeeProfile() {
     }
     setPasswordStatus({ type: 'loading', msg: 'Updating password...' })
     try {
+      const { getAuth } = await import('../../firebase/config');
+      const auth = await getAuth();
+      const token = await auth.currentUser?.getIdToken();
+      
       const response = await fetch('/api/admin/change-employee-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ uid: employeeId, newPassword })
       })
       
