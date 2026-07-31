@@ -5,7 +5,7 @@ const cors = require("cors")({ origin: true });
 
 admin.initializeApp();
 
-exports.changeEmployeePassword = onRequest({ region: "asia-southeast1" }, (req, res) => {
+exports.changeEmployeePassword = onRequest({ region: "asia-southeast1", cors: true, invoker: "public" }, (req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method Not Allowed" });
