@@ -281,8 +281,20 @@ export function EmployeeProfile() {
       await uploadBytes(fileRef, file)
       const downloadUrl = await getDownloadURL(fileRef)
       
+      const offerSnap = await (db as any).get(`tenants/${tenantId}/OfferLetters`)
+      const existingOffersData = offerSnap.val() as Record<string, OfferLetter> | null
+      
+      if (existingOffersData) {
+        const existingOffers = Object.values(existingOffersData).filter((o: any) => o.employeeId === employeeId)
+        for (const offer of existingOffers) {
+          if (offer.id) {
+            await (db as any).remove(`tenants/${tenantId}/OfferLetters/${offer.id}`)
+          }
+        }
+      }
+
       const offerData: OfferLetter = {
-        id: `offer-${Date.now()}`,
+        id: `offer-${employeeId}`,
         employeeId,
         employeeName: profile?.name || '',
         sent: true,
@@ -290,6 +302,7 @@ export function EmployeeProfile() {
         url: downloadUrl,
       }
       await (db as any).set(`tenants/${tenantId}/OfferLetters/${offerData.id}`, offerData)
+      setOfferLetter(offerData)
       hrToast.success('Offer Letter Sent', 'Offer letter sent to employee successfully')
     } catch (error: any) {
       hrToast.error('Send Failed', error?.message || 'Unable to send offer letter')
