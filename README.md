@@ -168,3 +168,4 @@ firebase deploy --only hosting,database,storage
 - **Type Safety**: Absolute TypeScript typing with zero `any` usage in main layouts.
 - **Modularity**: Separation of concerns with dedicated component files, custom presence hooks (`usePresence`), and modular context states.
 - **Fast Build**: Validated using `oxlint` ensuring clean imports and optimal hook dependency arrays.
+
