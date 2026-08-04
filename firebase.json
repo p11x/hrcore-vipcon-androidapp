@@ -29,7 +29,7 @@
     "rewrites": [
       {
         "source": "/api/admin/change-employee-password",
-        "function": "changeEmployeePassword",
+        "function": "changepassword",
         "region": "asia-southeast1"
       },
       {
@@ -45,6 +45,7 @@
     "rules": "storage.rules"
   },
   "functions": {
-    "source": "functions"
+    "source": "functions",
+    "runtime": "nodejs22"
   }
 }
