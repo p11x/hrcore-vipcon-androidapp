@@ -1,1 +1,0 @@
-import{r as e}from"./config-1-cOb20z.js";async function t(t,n,r){if(t)try{let i=await e(),a=new Date().toISOString(),o=`audit-${Date.now()}`;await i.set(`tenants/${t}/auditLog/${o}`,{timestamp:a,action:n,user:r})}catch(e){console.error(`Failed to write audit log:`,e)}}export{t};
