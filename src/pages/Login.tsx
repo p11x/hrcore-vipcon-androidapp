@@ -205,6 +205,15 @@ const onRegisterSubmit = async (data: RegistrationFormData) => {
                 >
                   {isLoggingIn ? 'Verifying...' : 'Sign In'}
                 </button>
+                <div className="pt-4 mt-2">
+                  <a 
+                    href="mailto:hrcore001@gmail.com"
+                    className="flex items-center justify-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20 text-primary hover:bg-primary/10 transition-colors group cursor-pointer"
+                  >
+                    <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span className="text-sm font-semibold">Need help? Contact Support</span>
+                  </a>
+                </div>
               </motion.form>
             ) : mode === 'register' ? (
               <motion.form
@@ -342,6 +351,13 @@ const onRegisterSubmit = async (data: RegistrationFormData) => {
                   <p className="text-sm text-text-mid mb-4">
                     An email was sent. Once the company admin approves, you can log in with your credentials.
                   </p>
+                  <a 
+                    href="mailto:hrcore001@gmail.com"
+                    className="flex items-center justify-center gap-2 mt-4 p-3 rounded-lg bg-primary/5 border border-primary/20 text-primary hover:bg-primary/10 transition-colors group cursor-pointer"
+                  >
+                    <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span className="text-sm font-semibold">Contact Support</span>
+                  </a>
                 </div>
                 
                 <button
